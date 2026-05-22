@@ -1,3 +1,4 @@
+<!-- Creador de CV Dinámico - Diseñado y desarrollado por jusana -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -36,13 +37,73 @@
       </div>
 
       <div class="controls-top">
-        <!-- Selector de Plantilla -->
-        <div class="select-wrapper">
-          <select id="template-select" title="Selecciona una plantilla de currículum">
-            <option value="moderno">Modelo Moderno (Charcoal)</option>
-            <option value="profesional">Modelo Profesional (Navy/Gold)</option>
-            <option value="minimalista">Modelo Minimalista (B&W)</option>
-          </select>
+        <!-- Selector de Plantilla Visual -->
+        <div class="template-selector-container">
+          <button id="btn-template-select-trigger" class="btn" title="Selecciona una plantilla de currículum">
+            <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.17 19.64 10.53 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7zm-3.5-8c.83 0 1.5-.67 1.5-1.5S9.33 7 8.5 7 7 7.67 7 8.5s.67 1.5 1.5 1.5zm7 0c.83 0 1.5-.67 1.5-1.5S16.33 7 15.5 7 14 7.67 14 8.5s.67 1.5 1.5 1.5zm-3.5 5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" fill="currentColor"/></svg>
+            <span id="current-template-text">Plantilla: Moderno</span>
+            <svg class="dropdown-chevron-svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
+          </button>
+          
+          <div id="template-dropdown-menu" class="template-dropdown-menu">
+            <div class="template-option active" data-value="moderno">
+              <div class="template-mini-preview moderno">
+                <div class="mini-header"></div>
+                <div class="mini-body">
+                  <div class="mini-content-col">
+                    <div class="mini-line mini-title"></div>
+                    <div class="mini-line"></div>
+                    <div class="mini-line"></div>
+                  </div>
+                  <div class="mini-sidebar-col">
+                    <div class="mini-avatar"></div>
+                    <div class="mini-line"></div>
+                    <div class="mini-line"></div>
+                  </div>
+                </div>
+              </div>
+              <span class="template-name">Moderno</span>
+            </div>
+            
+            <div class="template-option" data-value="profesional">
+              <div class="template-mini-preview profesional">
+                <div class="mini-stripe"></div>
+                <div class="mini-right-side">
+                  <div class="mini-header">
+                    <div class="mini-avatar"></div>
+                  </div>
+                  <div class="mini-body">
+                    <div class="mini-content-col">
+                      <div class="mini-line mini-title"></div>
+                      <div class="mini-line"></div>
+                    </div>
+                    <div class="mini-sidebar-col">
+                      <div class="mini-line"></div>
+                      <div class="mini-line"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <span class="template-name">Profesional</span>
+            </div>
+            
+            <div class="template-option" data-value="minimalista">
+              <div class="template-mini-preview minimalista">
+                <div class="mini-header">
+                  <div class="mini-line mini-title" style="width: 50%;"></div>
+                  <div class="mini-avatar"></div>
+                </div>
+                <div class="mini-body">
+                  <div class="mini-main-full">
+                    <div class="mini-line"></div>
+                    <div class="mini-line"></div>
+                    <div class="mini-line"></div>
+                  </div>
+                </div>
+              </div>
+              <span class="template-name">Minimalista</span>
+            </div>
+          </div>
         </div>
 
         <!-- Acciones de Datos -->
@@ -284,6 +345,11 @@
           </section>
 
         </div>
+
+        <!-- Pie de página del editor con créditos de autoría -->
+        <footer class="editor-footer">
+          <span>Creado por <span class="author-highlight">jusana</span></span>
+        </footer>
       </aside>
 
       <!-- Contenedor del Previsualizador con Zoom Fijo -->

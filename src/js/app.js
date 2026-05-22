@@ -1,3 +1,4 @@
+/* Creador de CV Dinámico - Diseñado y desarrollado por jusana */
 import { renderCV, TEMPLATES } from '../templates/templates.js';
 import { INTEREST_ICONS, UI_ICONS } from './icon-library.js';
 
@@ -213,11 +214,26 @@ function syncStaticInputs() {
     }
   }
 
-  // Template select
-  const selectTemplate = document.getElementById('template-select');
-  if (selectTemplate) {
-    selectTemplate.value = state.activeTemplate;
+  // Sincronizar selector visual de plantilla
+  const triggerBtnText = document.getElementById('current-template-text');
+  if (triggerBtnText) {
+    const templateNames = {
+      moderno: 'Moderno',
+      profesional: 'Profesional',
+      minimalista: 'Minimalista'
+    };
+    triggerBtnText.textContent = `Plantilla: ${templateNames[state.activeTemplate] || 'Moderno'}`;
   }
+
+  // Marcar la opción activa en el dropdown de plantillas
+  const options = document.querySelectorAll('.template-option');
+  options.forEach(opt => {
+    if (opt.getAttribute('data-value') === state.activeTemplate) {
+      opt.classList.add('active');
+    } else {
+      opt.classList.remove('active');
+    }
+  });
   
   // Actualizar los pickers de colores del tema
   syncColorPickers();
@@ -455,14 +471,38 @@ function renderAllForms() {
 
 // --- CONFIGURACIÓN DE EVENT LISTENERS ---
 function setupEventListeners() {
-  // 1. Selector de Plantillas
-  const selectTemplate = document.getElementById('template-select');
-  if (selectTemplate) {
-    selectTemplate.addEventListener('change', (e) => {
-      state.activeTemplate = e.target.value;
-      syncColorPickers();
-      updatePreview();
-      saveState();
+  // 1. Selector de Plantillas Visual (Dropdown con Miniaturas)
+  const triggerBtn = document.getElementById('btn-template-select-trigger');
+  const dropdownMenu = document.getElementById('template-dropdown-menu');
+  const templateOptions = document.querySelectorAll('.template-option');
+
+  if (triggerBtn && dropdownMenu) {
+    triggerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle('active');
+    });
+
+    // Cerrar el menú si se hace clic fuera de su contenedor
+    document.addEventListener('click', (e) => {
+      const container = document.querySelector('.template-selector-container');
+      if (container && !container.contains(e.target)) {
+        dropdownMenu.classList.remove('active');
+      }
+    });
+
+    // Cambiar la plantilla al hacer clic en una opción
+    templateOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        const val = option.getAttribute('data-value');
+        if (val) {
+          state.activeTemplate = val;
+          syncStaticInputs();
+          syncColorPickers();
+          updatePreview();
+          saveState();
+          dropdownMenu.classList.remove('active');
+        }
+      });
     });
   }
 

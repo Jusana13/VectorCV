@@ -1,5 +1,8 @@
-/* styles.css - Hoja de Estilos Principal (Dashboard + Plantillas de CV + ImpresiÃ³n)
-   Desarrollado completamente con CSS Nesting nativo */
+/* ==========================================================================
+   Creador de CV Dinámico - Diseñado y desarrollado por jusana
+   styles.css - Hoja de Estilos Principal (Dashboard + Plantillas de CV + Impresión)
+   Desarrollado completamente con CSS Nesting nativo
+   ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
@@ -74,6 +77,10 @@ body {
       display: flex;
       align-items: center;
       gap: 12px;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
 
       .logo-icon {
         width: 38px;
@@ -95,6 +102,8 @@ body {
         background: linear-gradient(120deg, #ffffff, var(--db-text-muted));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        user-select: none;
+        -webkit-user-select: none;
       }
     }
 
@@ -102,6 +111,297 @@ body {
       display: flex;
       align-items: center;
       gap: 15px;
+
+      /* Selector de Plantilla Visual */
+      .template-selector-container {
+        position: relative;
+        
+        .dropdown-chevron-svg {
+          width: 14px;
+          height: 14px;
+          fill: currentColor;
+          transition: transform 0.2s ease;
+        }
+
+        &.open {
+          .dropdown-chevron-svg {
+            transform: rotate(180deg);
+          }
+        }
+
+        /* Menú Desplegable de Plantillas */
+        .template-dropdown-menu {
+          display: none;
+          position: absolute;
+          top: calc(100% + 8px);
+          right: 0;
+          background: rgba(16, 19, 24, 0.96);
+          backdrop-filter: blur(16px);
+          border: 1px solid var(--db-border);
+          border-radius: 8px;
+          padding: 16px;
+          z-index: 100;
+          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+          flex-direction: row;
+          gap: 16px;
+          animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+          &.active {
+            display: flex;
+          }
+
+          /* Opción de Plantilla Individual */
+          .template-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: rgba(255, 255, 255, 0.03);
+              border-color: var(--db-border-hover);
+              
+              .template-name {
+                color: white;
+              }
+              
+              .template-mini-preview {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+              }
+            }
+
+            &.active {
+              background: rgba(201, 162, 39, 0.08);
+              border-color: var(--db-accent);
+
+              .template-name {
+                color: var(--db-accent);
+                font-weight: 600;
+              }
+              
+              .template-mini-preview {
+                border-color: var(--db-accent);
+                box-shadow: 0 0 10px var(--db-accent-glow);
+              }
+            }
+          }
+
+          .template-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--db-text-muted);
+            transition: color 0.2s;
+            text-align: center;
+          }
+
+          /* Previsualizaciones en miniatura A4 */
+          .template-mini-preview {
+            width: 110px;
+            height: 155px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s ease;
+            user-select: none;
+
+            .mini-avatar {
+              background: #e2e8f0;
+              border: 1px solid white;
+            }
+
+            .mini-line {
+              height: 3px;
+              background: #e2e8f0;
+              border-radius: 1px;
+              width: 100%;
+              
+              &.mini-title {
+                height: 4px;
+              }
+            }
+
+            /* Miniatura para Moderno (Charcoal) */
+            &.moderno {
+              background: #ffffff;
+              
+              .mini-header {
+                height: 32px;
+                background: #2C2D30;
+                width: 100%;
+              }
+
+              .mini-body {
+                display: flex;
+                flex-direction: row;
+                flex-grow: 1;
+                height: calc(100% - 32px);
+              }
+
+              .mini-content-col {
+                width: 65px;
+                padding: 8px 6px;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+              }
+
+              .mini-sidebar-col {
+                width: 45px;
+                background: #2C2D30;
+                padding: 8px 4px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+              }
+
+              .mini-avatar {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #F3EFE6;
+                margin-bottom: 2px;
+              }
+
+              .mini-line.mini-title {
+                width: 80%;
+                background: #C9A227;
+              }
+
+              .mini-sidebar-col .mini-line {
+                background: rgba(255, 255, 255, 0.2);
+              }
+            }
+
+            /* Miniatura para Profesional (Navy/Gold) */
+            &.profesional {
+              background: #ffffff;
+              display: flex;
+              flex-direction: row;
+
+              .mini-stripe {
+                width: 6px;
+                height: 100%;
+                background: #0b1726;
+                flex-shrink: 0;
+              }
+
+              .mini-right-side {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+              }
+
+              .mini-header {
+                height: 28px;
+                background: #1b2a4a;
+                padding: 4px 6px;
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+              }
+
+              .mini-avatar {
+                width: 16px;
+                height: 16px;
+                border-radius: 2px;
+              }
+
+              .mini-body {
+                display: flex;
+                flex-direction: row;
+                flex-grow: 1;
+                height: calc(100% - 28px);
+              }
+
+              .mini-content-col {
+                width: 62px;
+                padding: 8px 6px;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+              }
+
+              .mini-sidebar-col {
+                width: 42px;
+                background: #f4f6f8;
+                border-left: 1px solid #e1e4e8;
+                padding: 8px 4px;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+              }
+
+              .mini-line.mini-title {
+                width: 70%;
+                background: #e8a838;
+              }
+            }
+
+            /* Miniatura para Minimalista (B&W) */
+            &.minimalista {
+              background: #ffffff;
+              padding: 8px;
+
+              .mini-header {
+                height: 22px;
+                border-bottom: 1.5px solid #111111;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-bottom: 3px;
+                margin-bottom: 6px;
+              }
+
+              .mini-avatar {
+                width: 14px;
+                height: 14px;
+                border-radius: 50%;
+              }
+
+              .mini-body {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+              }
+
+              .mini-main-full {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                width: 100%;
+              }
+
+              .mini-line.mini-title {
+                background: #111111;
+                width: 50%;
+              }
+            }
+          }
+        }
+      }
+
+      @keyframes dropdownFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
       .select-wrapper {
         position: relative;
@@ -130,7 +430,7 @@ body {
         }
 
         &::after {
-          content: 'â–¼';
+          content: '\25BC';
           font-size: 8px;
           color: var(--db-text-muted);
           position: absolute;
@@ -186,7 +486,7 @@ body {
     }
   }
 
-  /* Workspace del Editor + PrevisualizaciÃ³n */
+  /* Workspace del Editor + Previsualización */
   .workspace {
     display: grid;
     grid-template-columns: 460px 1fr;
@@ -201,7 +501,24 @@ body {
       flex-direction: column;
       overflow: hidden;
 
-      /* NavegaciÃ³n por pestaÃ±as */
+      /* Pie de página del editor con créditos de autoría */
+      .editor-footer {
+        padding: 12px 24px;
+        border-top: 1px solid var(--db-border);
+        text-align: center;
+        font-size: 11px;
+        color: var(--db-text-muted);
+        background: rgba(10, 11, 14, 0.4);
+        user-select: none;
+        flex-shrink: 0;
+
+        .author-highlight {
+          color: var(--db-accent);
+          font-weight: 600;
+        }
+      }
+
+      /* Navegación por pestañas */
       nav.editor-tabs {
         display: flex;
         overflow-x: auto;
@@ -235,7 +552,7 @@ body {
         }
       }
 
-      /* Formularios de EdiciÃ³n */
+      /* Formularios de Edición */
       .editor-content {
         flex-grow: 1;
         overflow-y: auto;
@@ -244,7 +561,7 @@ body {
         flex-direction: column;
         gap: 24px;
 
-        /* Estilo SemÃ¡ntico de fieldset y legend en Formularios */
+        /* Estilo Semántico de fieldset y legend en Formularios */
         fieldset {
           border: 1px solid var(--db-border);
           border-radius: 8px;
@@ -614,7 +931,7 @@ body {
           }
         }
 
-        /* Controles DinÃ¡micos de Lista (Agregar / Quitar) */
+        /* Controles Dinámicos de Lista (Agregar / Quitar) */
         .list-items-container {
           display: flex;
           flex-direction: column;
@@ -699,7 +1016,7 @@ body {
             }
           }
 
-          /* Fieldset anidado para la URL y texto de botÃ³n de estudios */
+          /* Fieldset anidado para la URL y texto de botón de estudios */
           .nested-fieldset {
             background: rgba(0, 0, 0, 0.25);
             border: 1px solid var(--db-border);
@@ -874,7 +1191,7 @@ body {
         position: relative;
         flex-grow: 1;
 
-        /* Wrapper intermedio que se redimensiona por JS segÃºn la escala */
+        /* Wrapper intermedio que se redimensiona por JS según la escala */
         .cv-preview-wrapper {
           position: relative;
           margin: auto;
@@ -2082,7 +2399,7 @@ body {
 }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   CONFIGURACIÃ“N DE IMPRESIÃ“N (PIXEL-PERFECT A4 EXPORT)
+   CONFIGURACIÓN DE IMPRESIÓN (PIXEL-PERFECT A4 EXPORT)
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 @page {
   size: A4 portrait;
@@ -2142,7 +2459,7 @@ body {
 
         .cv-preview-container {
           transform: none !important;
-          /* Desactiva el escalado dinÃ¡mico */
+          /* Desactiva el escalado dinámico */
           width: 210mm !important;
           height: 297mm !important;
           box-shadow: none !important;
@@ -2164,7 +2481,7 @@ body {
     print-color-adjust: exact !important;
   }
 
-  /* Ocultar barra flotante de zoom en la impresiÃ³n */
+  /* Ocultar barra flotante de zoom en la impresión */
   .zoom-controls-floating {
     display: none !important;
   }

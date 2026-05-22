@@ -1,3 +1,4 @@
+/* Creador de CV Dinámico - Diseñado y desarrollado por jusana */
 import { CONTACT_ICONS, INTEREST_ICONS } from '../js/icon-library.js';
 
 // Helper to escape HTML characters and prevent XSS or broken layouts
