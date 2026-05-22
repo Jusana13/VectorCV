@@ -101,6 +101,47 @@ function formatPeriodDates(startDateVal, endDateVal, isCurrent) {
   return startFormatted;
 }
 
+// Analiza un período en formato de texto e intenta extraer las fechas (startDate, endDate, current) para selectores nativos
+function parsePeriodToDates(periodText) {
+  const result = { startDate: '', endDate: '', current: false };
+  if (!periodText) return result;
+  
+  const text = periodText.trim().toLowerCase();
+  
+  // Dividir por guion
+  const parts = text.split(/[-–—]|a\s+|hasta\s+/).map(p => p.trim());
+  
+  const parsePart = (str) => {
+    // Buscar formato MM/YYYY o M/YYYY
+    const myMatch = str.match(/^(\d{1,2})\/(\d{4})$/);
+    if (myMatch) {
+      const month = myMatch[1].padStart(2, '0');
+      const year = myMatch[2];
+      return `${year}-${month}-01`;
+    }
+    // Buscar formato YYYY
+    const yMatch = str.match(/^(\d{4})$/);
+    if (yMatch) {
+      return `${yMatch[1]}-01-01`;
+    }
+    return '';
+  };
+  
+  if (parts.length >= 1 && parts[0]) {
+    result.startDate = parsePart(parts[0]);
+  }
+  
+  if (parts.length >= 2 && parts[1]) {
+    if (parts[1] === 'presente' || parts[1] === 'actual' || parts[1] === 'actualidad' || parts[1].includes('hoy')) {
+      result.current = true;
+    } else {
+      result.endDate = parsePart(parts[1]);
+    }
+  }
+  
+  return result;
+}
+
 // --- ESTADO GLOBAL ---
 let state = null;
 let currentZoomMode = 'fit'; // 'fit' o 'manual'
@@ -138,6 +179,9 @@ const defaultData = {
       title: 'Nombre de tu Puesto de Trabajo',
       company: 'Nombre de la Empresa o Entidad',
       period: 'Año Inicio - Año Fin (o Actual)',
+      startDate: '',
+      endDate: '',
+      current: false,
       bullets: [
         'Detalla aquí un logro importante o una responsabilidad principal que tuviste.',
         'Procura iniciar cada viñeta con un verbo de acción claro y conciso.',
@@ -154,7 +198,7 @@ const defaultData = {
       endDate: '',
       current: false,
       description: 'Describe brevemente las materias de mayor importancia, proyectos realizados o competencias especiales desarrolladas durante tus estudios.',
-      button: { text: 'Ver Certificado', url: '' }
+      button: { text: 'Ver Certificado', url: 'https://ejemplo.com' }
     }
   ],
   skills: [
@@ -222,29 +266,61 @@ function saveState() {
   localStorage.setItem('cv_creator_state', JSON.stringify(state));
 }
 
+function migrateState(stateObj) {
+  if (!stateObj) return;
+  
+  // Asegurar compatibilidad de sectionTitles
+  if (!stateObj.sectionTitles) {
+    stateObj.sectionTitles = {};
+  }
+  const defaults = defaultData.sectionTitles;
+  for (const key in defaults) {
+    if (!stateObj.sectionTitles[key]) {
+      stateObj.sectionTitles[key] = defaults[key];
+    }
+  }
+  
+  // Asegurar inicialización de campos de fecha en estudios
+  if (stateObj.education) {
+    stateObj.education.forEach(edu => {
+      if (edu.startDate === undefined) edu.startDate = '';
+      if (edu.endDate === undefined) edu.endDate = '';
+      if (edu.current === undefined) edu.current = false;
+      
+      // Auto-parsear si están vacíos pero hay un period
+      if (!edu.startDate && !edu.endDate && !edu.current && edu.period) {
+        const parsed = parsePeriodToDates(edu.period);
+        edu.startDate = parsed.startDate;
+        edu.endDate = parsed.endDate;
+        edu.current = parsed.current;
+      }
+    });
+  }
+  
+  // Asegurar inicialización de campos de fecha en experiencia
+  if (stateObj.experience) {
+    stateObj.experience.forEach(exp => {
+      if (exp.startDate === undefined) exp.startDate = '';
+      if (exp.endDate === undefined) exp.endDate = '';
+      if (exp.current === undefined) exp.current = false;
+      
+      // Auto-parsear si están vacíos pero hay un period
+      if (!exp.startDate && !exp.endDate && !exp.current && exp.period) {
+        const parsed = parsePeriodToDates(exp.period);
+        exp.startDate = parsed.startDate;
+        exp.endDate = parsed.endDate;
+        exp.current = parsed.current;
+      }
+    });
+  }
+}
+
 function loadState() {
   const saved = localStorage.getItem('cv_creator_state');
   if (saved) {
     try {
       state = JSON.parse(saved);
-      // Asegurar compatibilidad de sectionTitles
-      if (!state.sectionTitles) {
-        state.sectionTitles = {};
-      }
-      const defaults = defaultData.sectionTitles;
-      for (const key in defaults) {
-        if (!state.sectionTitles[key]) {
-          state.sectionTitles[key] = defaults[key];
-        }
-      }
-      // Asegurar inicialización de campos de fecha en estudios
-      if (state.education) {
-        state.education.forEach(edu => {
-          if (edu.startDate === undefined) edu.startDate = '';
-          if (edu.endDate === undefined) edu.endDate = '';
-          if (edu.current === undefined) edu.current = false;
-        });
-      }
+      migrateState(state);
     } catch (e) {
       console.error("Error al cargar localStorage, usando datos por defecto", e);
       state = JSON.parse(JSON.stringify(defaultData));
@@ -485,6 +561,10 @@ function renderExperienceForm() {
   }
 
   state.experience.forEach((exp, index) => {
+    const startDateVal = exp.startDate || '';
+    const endDateVal = exp.endDate || '';
+    const isCurrent = exp.current || false;
+
     const fieldset = document.createElement('fieldset');
     fieldset.className = 'repeater-card';
     fieldset.innerHTML = `
@@ -504,7 +584,22 @@ function renderExperienceForm() {
       </div>
       <div class="form-group">
         <label>Período / Fechas</label>
-        <input type="text" class="exp-input" data-field="period" data-index="${index}" value="${exp.period || ''}">
+        <div class="date-picker-helper-row">
+          <div class="date-inputs-row">
+            <div class="date-field">
+              <span>Desde</span>
+              <input type="date" class="exp-date-start" data-index="${index}" value="${startDateVal}">
+            </div>
+            <div class="date-field">
+              <span>Hasta</span>
+              <input type="date" class="exp-date-end" data-index="${index}" value="${endDateVal}" ${isCurrent ? 'disabled' : ''}>
+            </div>
+          </div>
+          <label class="presente-checkbox-label">
+            <input type="checkbox" class="exp-date-current" data-index="${index}" ${isCurrent ? 'checked' : ''}>
+            <span>Trabajo actual</span>
+          </label>
+        </div>
       </div>
       <div class="form-group">
         <label>Logros o Tareas (Uno por línea)</label>
@@ -553,20 +648,20 @@ function renderEducationForm() {
       </div>
       <div class="form-group">
         <label>Período / Fechas</label>
-        <input type="text" class="edu-input edu-period-manual" data-field="period" data-index="${index}" value="${edu.period || ''}">
-        
         <div class="date-picker-helper-row">
-          <div class="date-field">
-            <span>Desde</span>
-            <input type="date" class="edu-date-start" data-index="${index}" value="${startDateVal}">
-          </div>
-          <div class="date-field">
-            <span>Hasta</span>
-            <input type="date" class="edu-date-end" data-index="${index}" value="${endDateVal}" ${isCurrent ? 'disabled' : ''}>
+          <div class="date-inputs-row">
+            <div class="date-field">
+              <span>Desde</span>
+              <input type="date" class="edu-date-start" data-index="${index}" value="${startDateVal}">
+            </div>
+            <div class="date-field">
+              <span>Hasta</span>
+              <input type="date" class="edu-date-end" data-index="${index}" value="${endDateVal}" ${isCurrent ? 'disabled' : ''}>
+            </div>
           </div>
           <label class="presente-checkbox-label">
             <input type="checkbox" class="edu-date-current" data-index="${index}" ${isCurrent ? 'checked' : ''}>
-            <span>Presente</span>
+            <span>Cursando actualmente</span>
           </label>
         </div>
       </div>
@@ -807,25 +902,82 @@ function setupEventListeners() {
   // 5. Delegado de Entradas Dinámicas de Experiencia Laboral
   const expContainer = document.getElementById('experience-list-container');
   if (expContainer) {
+    const handleExpDateChange = (e) => {
+      const idx = parseInt(e.target.getAttribute('data-index'));
+      if (isNaN(idx)) return;
+
+      if (e.target.classList.contains('exp-date-start')) {
+        state.experience[idx].startDate = e.target.value;
+        state.experience[idx].period = formatPeriodDates(state.experience[idx].startDate, state.experience[idx].endDate, state.experience[idx].current);
+        updatePreview();
+        saveState();
+      } else if (e.target.classList.contains('exp-date-end')) {
+        state.experience[idx].endDate = e.target.value;
+        state.experience[idx].period = formatPeriodDates(state.experience[idx].startDate, state.experience[idx].endDate, state.experience[idx].current);
+        updatePreview();
+        saveState();
+      } else if (e.target.classList.contains('exp-date-current')) {
+        state.experience[idx].current = e.target.checked;
+        
+        const endInput = expContainer.querySelector(`.exp-date-end[data-index="${idx}"]`);
+        if (endInput) endInput.disabled = e.target.checked;
+        
+        state.experience[idx].period = formatPeriodDates(state.experience[idx].startDate, state.experience[idx].endDate, state.experience[idx].current);
+        updatePreview();
+        saveState();
+      }
+    };
+
     expContainer.addEventListener('input', (e) => {
       const idx = parseInt(e.target.getAttribute('data-index'));
+      if (isNaN(idx)) return;
       
       if (e.target.classList.contains('exp-input')) {
         const field = e.target.getAttribute('data-field');
         state.experience[idx][field] = e.target.value;
+        updatePreview();
+        saveState();
       } else if (e.target.classList.contains('exp-bullets-input')) {
         state.experience[idx].bullets = e.target.value.split('\n').filter(line => line.trim() !== '');
+        updatePreview();
+        saveState();
+      } else if (e.target.classList.contains('exp-date-start') || e.target.classList.contains('exp-date-end')) {
+        handleExpDateChange(e);
       }
-      
-      updatePreview();
-      saveState();
     });
+
+    expContainer.addEventListener('change', handleExpDateChange);
   }
 
   // 6. Delegado de Entradas Dinámicas de Formación Académica
   const eduContainer = document.getElementById('education-list-container');
   if (eduContainer) {
-    // Escuchar cambios de entrada en campos de texto de la formación académica
+    const handleEduDateChange = (e) => {
+      const idx = parseInt(e.target.getAttribute('data-index'));
+      if (isNaN(idx)) return;
+
+      if (e.target.classList.contains('edu-date-start')) {
+        state.education[idx].startDate = e.target.value;
+        state.education[idx].period = formatPeriodDates(state.education[idx].startDate, state.education[idx].endDate, state.education[idx].current);
+        updatePreview();
+        saveState();
+      } else if (e.target.classList.contains('edu-date-end')) {
+        state.education[idx].endDate = e.target.value;
+        state.education[idx].period = formatPeriodDates(state.education[idx].startDate, state.education[idx].endDate, state.education[idx].current);
+        updatePreview();
+        saveState();
+      } else if (e.target.classList.contains('edu-date-current')) {
+        state.education[idx].current = e.target.checked;
+        
+        const endInput = eduContainer.querySelector(`.edu-date-end[data-index="${idx}"]`);
+        if (endInput) endInput.disabled = e.target.checked;
+        
+        state.education[idx].period = formatPeriodDates(state.education[idx].startDate, state.education[idx].endDate, state.education[idx].current);
+        updatePreview();
+        saveState();
+      }
+    };
+
     eduContainer.addEventListener('input', (e) => {
       const idx = parseInt(e.target.getAttribute('data-index'));
       if (isNaN(idx)) return;
@@ -841,57 +993,12 @@ function setupEventListeners() {
         state.education[idx].button[field] = e.target.value;
         updatePreview();
         saveState();
+      } else if (e.target.classList.contains('edu-date-start') || e.target.classList.contains('edu-date-end')) {
+        handleEduDateChange(e);
       }
     });
 
-    // Escuchar cambios en los selectores de fecha y checkbox de Presente
-    const handleDateChange = (e) => {
-      const idx = parseInt(e.target.getAttribute('data-index'));
-      if (isNaN(idx)) return;
-
-      if (e.target.classList.contains('edu-date-start')) {
-        state.education[idx].startDate = e.target.value;
-        const formatted = formatPeriodDates(state.education[idx].startDate, state.education[idx].endDate, state.education[idx].current);
-        state.education[idx].period = formatted;
-        
-        const manualInput = eduContainer.querySelector(`.edu-period-manual[data-index="${idx}"]`);
-        if (manualInput) manualInput.value = formatted;
-        
-        updatePreview();
-        saveState();
-      } else if (e.target.classList.contains('edu-date-end')) {
-        state.education[idx].endDate = e.target.value;
-        const formatted = formatPeriodDates(state.education[idx].startDate, state.education[idx].endDate, state.education[idx].current);
-        state.education[idx].period = formatted;
-        
-        const manualInput = eduContainer.querySelector(`.edu-period-manual[data-index="${idx}"]`);
-        if (manualInput) manualInput.value = formatted;
-        
-        updatePreview();
-        saveState();
-      } else if (e.target.classList.contains('edu-date-current')) {
-        state.education[idx].current = e.target.checked;
-        
-        const endInput = eduContainer.querySelector(`.edu-date-end[data-index="${idx}"]`);
-        if (endInput) endInput.disabled = e.target.checked;
-        
-        const formatted = formatPeriodDates(state.education[idx].startDate, state.education[idx].endDate, state.education[idx].current);
-        state.education[idx].period = formatted;
-        
-        const manualInput = eduContainer.querySelector(`.edu-period-manual[data-index="${idx}"]`);
-        if (manualInput) manualInput.value = formatted;
-        
-        updatePreview();
-        saveState();
-      }
-    };
-
-    eduContainer.addEventListener('change', handleDateChange);
-    eduContainer.addEventListener('input', (e) => {
-      if (e.target.classList.contains('edu-date-start') || e.target.classList.contains('edu-date-end')) {
-        handleDateChange(e);
-      }
-    });
+    eduContainer.addEventListener('change', handleEduDateChange);
   }
 
   // 7. Delegado de Entradas Dinámicas de Habilidades
@@ -1017,7 +1124,7 @@ function setupEventListeners() {
         state.personal.profile.push('');
         renderProfileForm();
       } else if (action === 'add-experience') {
-        state.experience.push({ title: '', company: '', period: '', bullets: [] });
+        state.experience.push({ title: '', company: '', period: '', startDate: '', endDate: '', current: false, bullets: [] });
         renderExperienceForm();
       } else if (action === 'add-education') {
         state.education.push({ title: '', institution: '', period: '', startDate: '', endDate: '', current: false, description: '', button: { text: 'Ver Certificado', url: '' } });
@@ -1354,6 +1461,7 @@ function setupEventListeners() {
         const parsed = JSON.parse(modalTextarea.value);
         if (parsed.personal && parsed.contact && parsed.experience) {
           state = parsed;
+          migrateState(state);
           saveState();
           renderAllForms();
           updatePreview();
@@ -1387,6 +1495,7 @@ function setupEventListeners() {
             const parsed = JSON.parse(evt.target.result);
             if (parsed.personal && parsed.contact && parsed.experience) {
               state = parsed;
+              migrateState(state);
               saveState();
               renderAllForms();
               updatePreview();
