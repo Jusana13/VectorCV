@@ -580,6 +580,26 @@ body {
           padding: 0 8px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
+
+          &[contenteditable="true"] {
+            cursor: text;
+            border-radius: 4px;
+            border: 1px dashed transparent;
+            transition: all 0.2s ease;
+            outline: none;
+            padding: 2px 8px;
+
+            &:hover {
+              border-color: rgba(201, 162, 39, 0.4);
+              background-color: rgba(255, 255, 255, 0.02);
+            }
+
+            &:focus {
+              border-color: var(--db-accent);
+              background-color: rgba(255, 255, 255, 0.04);
+              box-shadow: 0 0 0 2px var(--db-accent-glow);
+            }
+          }
         }
 
         .form-section {
@@ -646,6 +666,109 @@ body {
           textarea {
             resize: vertical;
             min-height: 120px;
+          }
+
+          input[type="date"] {
+            background-color: var(--db-input-bg);
+            border: 1px solid var(--db-border);
+            color: white;
+            padding: 10px 12px;
+            font-size: 13px;
+            border-radius: 6px;
+            outline: none;
+            transition: all 0.2s;
+            font-family: inherit;
+            position: relative;
+            cursor: pointer;
+            
+            &::-webkit-calendar-picker-indicator {
+              background: transparent;
+              color: transparent;
+              cursor: pointer;
+              height: auto;
+              width: auto;
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              opacity: 0;
+            }
+            
+            /* Icono de calendario dorado personalizado */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23c9a227"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 36px;
+            
+            &:focus {
+              border-color: var(--db-accent);
+              box-shadow: 0 0 0 2px var(--db-accent-glow);
+            }
+            
+            &:disabled {
+              opacity: 0.4;
+              cursor: not-allowed;
+              background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2394a3b8"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z"/></svg>');
+            }
+          }
+
+          .date-picker-helper-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            margin-top: 8px;
+            width: 100%;
+            
+            .date-field {
+              display: flex;
+              flex-direction: column;
+              gap: 4px;
+              flex: 1;
+              
+              span {
+                font-size: 10px;
+                font-weight: 600;
+                color: var(--db-text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-left: 4px;
+              }
+              
+              input[type="date"] {
+                width: 100%;
+              }
+            }
+            
+            .presente-checkbox-label {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              cursor: pointer;
+              height: 38px;
+              padding-bottom: 2px;
+              user-select: none;
+              
+              input[type="checkbox"] {
+                accent-color: var(--db-accent);
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+              }
+              
+              span {
+                font-size: 10px;
+                font-weight: 600;
+                color: var(--db-text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+              }
+              
+              &:hover span {
+                color: var(--db-text);
+              }
+            }
           }
 
           .input-row {

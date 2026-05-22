@@ -170,7 +170,7 @@ function renderModerno(data) {
         <!-- EDUCATION -->
         <section class="section">
           <div class="section-title">
-            <h2>Formación Académica</h2>
+            <h2>${escapeHTML(data.sectionTitles?.education || 'Formación Académica')}</h2>
           </div>
           ${educationHTML}
         </section>
@@ -178,7 +178,7 @@ function renderModerno(data) {
         <!-- EXPERIENCE -->
         <section class="section">
           <div class="section-title">
-            <h2>Experiencia Laboral</h2>
+            <h2>${escapeHTML(data.sectionTitles?.experience || 'Experiencia Laboral')}</h2>
           </div>
           ${experienceHTML}
         </section>
@@ -198,7 +198,7 @@ function renderModerno(data) {
         <!-- SKILLS -->
         <section class="section">
           <div class="section-title">
-            <h2>Habilidades</h2>
+            <h2>${escapeHTML(data.sectionTitles?.skills || 'Habilidades')}</h2>
           </div>
           <div class="sidebar-list">
             ${skillsHTML}
@@ -208,7 +208,7 @@ function renderModerno(data) {
         <!-- LANGUAGES -->
         <section class="section">
           <div class="section-title">
-            <h2>Idiomas</h2>
+            <h2>${escapeHTML(data.sectionTitles?.languages || 'Idiomas')}</h2>
           </div>
           <div class="lang-grid">
             ${languagesHTML}
@@ -218,7 +218,7 @@ function renderModerno(data) {
         <!-- INTERESTS -->
         <section class="section">
           <div class="section-title">
-            <h2>Intereses</h2>
+            <h2>${escapeHTML(data.sectionTitles?.interests || 'Intereses')}</h2>
           </div>
           <div class="hobby-icons">
             ${interestsHTML}
@@ -364,7 +364,7 @@ function renderProfesional(data) {
           <!-- EDUCATION -->
           <section class="section">
             <div class="section-title">
-              <h2>Formación Académica</h2>
+              <h2>${escapeHTML(data.sectionTitles?.education || 'Formación Académica')}</h2>
             </div>
             ${educationHTML}
           </section>
@@ -372,7 +372,7 @@ function renderProfesional(data) {
           <!-- EXPERIENCE -->
           <section class="section">
             <div class="section-title">
-              <h2>Experiencia Laboral</h2>
+              <h2>${escapeHTML(data.sectionTitles?.experience || 'Experiencia Laboral')}</h2>
             </div>
             ${experienceHTML}
           </section>
@@ -392,7 +392,7 @@ function renderProfesional(data) {
           <!-- SKILLS -->
           <section class="section">
             <div class="section-title">
-              <h2>Habilidades</h2>
+              <h2>${escapeHTML(data.sectionTitles?.skills || 'Habilidades')}</h2>
             </div>
             <div class="sidebar-list">
               ${skillsHTML}
@@ -402,7 +402,7 @@ function renderProfesional(data) {
           <!-- LANGUAGES -->
           <section class="section">
             <div class="section-title">
-              <h2>Idiomas</h2>
+              <h2>${escapeHTML(data.sectionTitles?.languages || 'Idiomas')}</h2>
             </div>
             <div class="lang-grid">
               ${languagesHTML}
@@ -412,7 +412,7 @@ function renderProfesional(data) {
           <!-- INTERESTS -->
           <section class="section">
             <div class="section-title">
-              <h2>Intereses</h2>
+              <h2>${escapeHTML(data.sectionTitles?.interests || 'Intereses')}</h2>
             </div>
             <div class="hobby-icons">
               ${interestsHTML}
@@ -547,7 +547,7 @@ function renderMinimalista(data) {
           <!-- EXPERIENCE -->
           <section class="section">
             <div class="section-title">
-              <h2>Experiencia Laboral</h2>
+              <h2>${escapeHTML(data.sectionTitles?.experience || 'Experiencia Laboral')}</h2>
             </div>
             ${experienceHTML}
           </section>
@@ -555,7 +555,7 @@ function renderMinimalista(data) {
           <!-- EDUCATION -->
           <section class="section">
             <div class="section-title">
-              <h2>Formación Académica</h2>
+              <h2>${escapeHTML(data.sectionTitles?.education || 'Formación Académica')}</h2>
             </div>
             ${educationHTML}
           </section>
@@ -575,7 +575,7 @@ function renderMinimalista(data) {
           <!-- SKILLS -->
           <section class="section">
             <div class="section-title">
-              <h2>Habilidades</h2>
+              <h2>${escapeHTML(data.sectionTitles?.skills || 'Habilidades')}</h2>
             </div>
             <div class="sidebar-list">
               ${skillsHTML}
@@ -585,7 +585,7 @@ function renderMinimalista(data) {
           <!-- LANGUAGES -->
           <section class="section">
             <div class="section-title">
-              <h2>Idiomas</h2>
+              <h2>${escapeHTML(data.sectionTitles?.languages || 'Idiomas')}</h2>
             </div>
             <div class="lang-grid">
               ${languagesHTML}
@@ -595,7 +595,7 @@ function renderMinimalista(data) {
           <!-- INTERESTS -->
           <section class="section">
             <div class="section-title">
-              <h2>Intereses</h2>
+              <h2>${escapeHTML(data.sectionTitles?.interests || 'Intereses')}</h2>
             </div>
             <div class="hobby-list">
               ${interestsHTML}

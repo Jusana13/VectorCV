@@ -2,6 +2,105 @@
 import { renderCV, TEMPLATES } from '../templates/templates.js';
 import { INTEREST_ICONS, UI_ICONS } from './icon-library.js';
 
+// --- FUNCIONES AUXILIARES DE SINGULARIZACIÓN Y FORMATO ---
+
+// Función para obtener la forma singular en español de un título en plural
+function getSingularFromPlural(text) {
+  if (!text) return '';
+  const trimmed = text.trim();
+  const lower = trimmed.toLowerCase();
+
+  // Mapeos directos para coherencia semántica perfecta con los valores por defecto
+  if (lower === 'experiencia laboral' || lower === 'experiencia') return 'Puesto de Trabajo';
+  if (lower === 'formación académica' || lower === 'formacion academica' || lower === 'estudios') return 'Estudio';
+  if (lower === 'habilidades técnicas' || lower === 'habilidades tecnicas' || lower === 'habilidades') return 'Habilidad';
+  if (lower === 'idiomas') return 'Idioma';
+  if (lower === 'intereses y hobbies' || lower === 'intereses') return 'Interés';
+
+  // Reglas de singularización dinámica en español para palabras personalizadas
+  const words = trimmed.split(/\s+/);
+  const singularWords = words.map(word => {
+    const cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+    if (!cleanWord) return word;
+    const isUpperCase = cleanWord === cleanWord.toUpperCase() && cleanWord.length > 1;
+    const isTitleCase = cleanWord[0] === cleanWord[0].toUpperCase() && cleanWord.length > 1;
+
+    let lowerWord = cleanWord.toLowerCase();
+    let singular = lowerWord;
+
+    if (lowerWord.endsWith('ces')) {
+      singular = lowerWord.slice(0, -3) + 'z'; // actrices -> actriz
+    } else if (lowerWord.endsWith('ciones')) {
+      singular = lowerWord.slice(0, -6) + 'ción'; // formaciones -> formación
+    } else if (lowerWord.endsWith('siones')) {
+      singular = lowerWord.slice(0, -6) + 'sión'; // expresiones -> expresión
+    } else if (lowerWord.endsWith('ades')) {
+      singular = lowerWord.slice(0, -4) + 'ad'; // habilidades -> habilidad
+    } else if (lowerWord.endsWith('edes')) {
+      singular = lowerWord.slice(0, -4) + 'ed'; // redes -> red
+    } else if (lowerWord.endsWith('udes')) {
+      singular = lowerWord.slice(0, -4) + 'ud'; // virtudes -> virtud
+    } else if (lowerWord.endsWith('eses')) {
+      singular = lowerWord.slice(0, -4) + 'és'; // intereses -> interés
+    } else if (lowerWord.endsWith('les')) {
+      singular = lowerWord.slice(0, -2); // laborales -> laboral
+    } else if (lowerWord.endsWith('res')) {
+      singular = lowerWord.slice(0, -2); // sectores -> sector
+    } else if (lowerWord.endsWith('nes')) {
+      singular = lowerWord.slice(0, -2); // jóvenes -> joven
+    } else if (lowerWord.endsWith('as')) {
+      singular = lowerWord.slice(0, -1); // blandas -> blanda
+    } else if (lowerWord.endsWith('os')) {
+      singular = lowerWord.slice(0, -1); // proyectos -> proyecto
+    } else if (lowerWord.endsWith('s') && !lowerWord.endsWith('is') && !lowerWord.endsWith('us') && lowerWord.length > 2) {
+      singular = lowerWord.slice(0, -1);
+    }
+
+    if (isUpperCase) {
+      return singular.toUpperCase();
+    } else if (isTitleCase) {
+      return singular.charAt(0).toUpperCase() + singular.slice(1);
+    }
+    return singular;
+  });
+
+  return singularWords.join(' ');
+}
+
+// Devuelve el texto adecuado para el botón "Añadir" según el singular y la sección
+function getButtonText(singular, sectionKey) {
+  if (sectionKey === 'experience' && singular === 'Puesto de Trabajo') return 'Añadir Trabajo';
+  if (sectionKey === 'education' && singular === 'Estudio') return 'Añadir Formación';
+  return `Añadir ${singular}`;
+}
+
+// Formatea el período a partir de dos inputs tipo fecha y el checkbox "Presente"
+function formatPeriodDates(startDateVal, endDateVal, isCurrent) {
+  if (!startDateVal) return '';
+
+  const formatMonthYear = (dateStr) => {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length >= 2) {
+      return `${parts[1]}/${parts[0]}`; // MM/YYYY
+    }
+    return dateStr;
+  };
+
+  const startFormatted = formatMonthYear(startDateVal);
+
+  if (isCurrent) {
+    return `${startFormatted} - Presente`;
+  }
+
+  if (endDateVal) {
+    const endFormatted = formatMonthYear(endDateVal);
+    return `${startFormatted} - ${endFormatted}`;
+  }
+
+  return startFormatted;
+}
+
 // --- ESTADO GLOBAL ---
 let state = null;
 let currentZoomMode = 'fit'; // 'fit' o 'manual'
@@ -10,6 +109,13 @@ let zoomScale = 1.0;
 // Datos por defecto genéricos
 const defaultData = {
   activeTemplate: 'moderno',
+  sectionTitles: {
+    experience: 'Experiencia Laboral',
+    education: 'Formación Académica',
+    skills: 'Habilidades Técnicas',
+    languages: 'Idiomas',
+    interests: 'Intereses y Hobbies'
+  },
   personal: {
     name: 'AQUÍ VA TU NOMBRE',
     lastName: 'Y TUS APELLIDOS',
@@ -44,6 +150,9 @@ const defaultData = {
       title: 'Nombre de tu Grado o Formación Académica',
       institution: 'Nombre de la Institución o Escuela',
       period: 'Año Inicio - Año Fin',
+      startDate: '',
+      endDate: '',
+      current: false,
       description: 'Describe brevemente las materias de mayor importancia, proyectos realizados o competencias especiales desarrolladas durante tus estudios.',
       button: { text: 'Ver Certificado', url: '' }
     }
@@ -118,6 +227,24 @@ function loadState() {
   if (saved) {
     try {
       state = JSON.parse(saved);
+      // Asegurar compatibilidad de sectionTitles
+      if (!state.sectionTitles) {
+        state.sectionTitles = {};
+      }
+      const defaults = defaultData.sectionTitles;
+      for (const key in defaults) {
+        if (!state.sectionTitles[key]) {
+          state.sectionTitles[key] = defaults[key];
+        }
+      }
+      // Asegurar inicialización de campos de fecha en estudios
+      if (state.education) {
+        state.education.forEach(edu => {
+          if (edu.startDate === undefined) edu.startDate = '';
+          if (edu.endDate === undefined) edu.endDate = '';
+          if (edu.current === undefined) edu.current = false;
+        });
+      }
     } catch (e) {
       console.error("Error al cargar localStorage, usando datos por defecto", e);
       state = JSON.parse(JSON.stringify(defaultData));
@@ -234,9 +361,72 @@ function syncStaticInputs() {
       opt.classList.remove('active');
     }
   });
+
+  // Sincronizar leyendas editables (evitando reescribir si está enfocada por el usuario)
+  const editableLegends = document.querySelectorAll('legend[contenteditable="true"]');
+  editableLegends.forEach(legend => {
+    const sectionKey = legend.getAttribute('data-section-title');
+    const targetText = (state.sectionTitles && state.sectionTitles[sectionKey]) || defaultData.sectionTitles[sectionKey];
+    if (document.activeElement !== legend) {
+      if (legend.textContent !== targetText) {
+        legend.textContent = targetText;
+      }
+    }
+    updateSectionLabels(sectionKey);
+  });
   
   // Actualizar los pickers de colores del tema
   syncColorPickers();
+}
+
+// Sincronizar las etiquetas secundarias (tarjetas de repeater y botones) en base a los títulos personalizados de sección
+function updateSectionLabels(sectionKey) {
+  const titleText = (state.sectionTitles && state.sectionTitles[sectionKey]) || defaultData.sectionTitles[sectionKey] || '';
+  const singular = getSingularFromPlural(titleText);
+
+  let containerId = '';
+  let addAction = '';
+  if (sectionKey === 'experience') {
+    containerId = 'experience-list-container';
+    addAction = 'add-experience';
+  } else if (sectionKey === 'education') {
+    containerId = 'education-list-container';
+    addAction = 'add-education';
+  } else if (sectionKey === 'skills') {
+    containerId = 'skills-list-container';
+    addAction = 'add-skill';
+  } else if (sectionKey === 'languages') {
+    containerId = 'languages-list-container';
+    addAction = 'add-language';
+  }
+
+  if (containerId) {
+    const container = document.getElementById(containerId);
+    if (container) {
+      const cards = container.querySelectorAll('.repeater-card');
+      cards.forEach((card, index) => {
+        const titleSpan = card.querySelector('.repeater-title');
+        if (titleSpan) {
+          titleSpan.textContent = `${singular} #${index + 1}`;
+        }
+        
+        // Re-etiquetar el label principal del campo en Habilidades o Idiomas
+        if (sectionKey === 'skills' || sectionKey === 'languages') {
+          const labelField = card.querySelector('.form-group label');
+          if (labelField && !labelField.textContent.includes('Nivel') && !labelField.textContent.includes('Dominio')) {
+            labelField.textContent = singular;
+          }
+        }
+      });
+    }
+  }
+
+  if (addAction) {
+    const addBtnSpan = document.querySelector(`[data-action="${addAction}"] span`);
+    if (addBtnSpan) {
+      addBtnSpan.textContent = getButtonText(singular, sectionKey);
+    }
+  }
 }
 
 function syncColorPickers() {
@@ -286,12 +476,20 @@ function renderExperienceForm() {
   if (!container) return;
   container.innerHTML = '';
 
+  const titleText = (state.sectionTitles && state.sectionTitles.experience) || defaultData.sectionTitles.experience;
+  const singular = getSingularFromPlural(titleText);
+
+  const addBtnSpan = document.querySelector('[data-action="add-experience"] span');
+  if (addBtnSpan) {
+    addBtnSpan.textContent = getButtonText(singular, 'experience');
+  }
+
   state.experience.forEach((exp, index) => {
     const fieldset = document.createElement('fieldset');
     fieldset.className = 'repeater-card';
     fieldset.innerHTML = `
       <div class="repeater-header">
-        <span class="repeater-title">Puesto de Trabajo #${index + 1}</span>
+        <span class="repeater-title">${singular} #${index + 1}</span>
         <button type="button" class="btn-remove" data-action="remove-experience" data-index="${index}" title="Eliminar trabajo">
           ${UI_ICONS.trash}
         </button>
@@ -323,12 +521,24 @@ function renderEducationForm() {
   if (!container) return;
   container.innerHTML = '';
 
+  const titleText = (state.sectionTitles && state.sectionTitles.education) || defaultData.sectionTitles.education;
+  const singular = getSingularFromPlural(titleText);
+
+  const addBtnSpan = document.querySelector('[data-action="add-education"] span');
+  if (addBtnSpan) {
+    addBtnSpan.textContent = getButtonText(singular, 'education');
+  }
+
   state.education.forEach((edu, index) => {
+    const startDateVal = edu.startDate || '';
+    const endDateVal = edu.endDate || '';
+    const isCurrent = edu.current || false;
+
     const fieldset = document.createElement('fieldset');
     fieldset.className = 'repeater-card';
     fieldset.innerHTML = `
       <div class="repeater-header">
-        <span class="repeater-title">Estudio #${index + 1}</span>
+        <span class="repeater-title">${singular} #${index + 1}</span>
         <button type="button" class="btn-remove" data-action="remove-education" data-index="${index}" title="Eliminar estudio">
           ${UI_ICONS.trash}
         </button>
@@ -343,7 +553,22 @@ function renderEducationForm() {
       </div>
       <div class="form-group">
         <label>Período / Fechas</label>
-        <input type="text" class="edu-input" data-field="period" data-index="${index}" value="${edu.period || ''}">
+        <input type="text" class="edu-input edu-period-manual" data-field="period" data-index="${index}" value="${edu.period || ''}">
+        
+        <div class="date-picker-helper-row">
+          <div class="date-field">
+            <span>Desde</span>
+            <input type="date" class="edu-date-start" data-index="${index}" value="${startDateVal}">
+          </div>
+          <div class="date-field">
+            <span>Hasta</span>
+            <input type="date" class="edu-date-end" data-index="${index}" value="${endDateVal}" ${isCurrent ? 'disabled' : ''}>
+          </div>
+          <label class="presente-checkbox-label">
+            <input type="checkbox" class="edu-date-current" data-index="${index}" ${isCurrent ? 'checked' : ''}>
+            <span>Presente</span>
+          </label>
+        </div>
       </div>
       <div class="form-group">
         <label>Descripción</label>
@@ -372,19 +597,27 @@ function renderSkillsForm() {
   if (!container) return;
   container.innerHTML = '';
 
+  const titleText = (state.sectionTitles && state.sectionTitles.skills) || defaultData.sectionTitles.skills;
+  const singular = getSingularFromPlural(titleText);
+
+  const addBtnSpan = document.querySelector('[data-action="add-skill"] span');
+  if (addBtnSpan) {
+    addBtnSpan.textContent = getButtonText(singular, 'skills');
+  }
+
   state.skills.forEach((skill, index) => {
     const fieldset = document.createElement('fieldset');
     fieldset.className = 'repeater-card';
     fieldset.innerHTML = `
       <div class="repeater-header">
-        <span class="repeater-title">Habilidad #${index + 1}</span>
+        <span class="repeater-title">${singular} #${index + 1}</span>
         <button type="button" class="btn-remove" data-action="remove-skill" data-index="${index}" title="Eliminar habilidad">
           ${UI_ICONS.trash}
         </button>
       </div>
       <div class="input-row" style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; width: 100%;">
         <div class="form-group">
-          <label>Habilidad</label>
+          <label>${singular}</label>
           <input type="text" class="skill-input" data-field="name" data-index="${index}" value="${skill.name || ''}" placeholder="Ej. Linux">
         </div>
         <div class="form-group">
@@ -409,18 +642,26 @@ function renderLanguagesForm() {
   if (!container) return;
   container.innerHTML = '';
 
+  const titleText = (state.sectionTitles && state.sectionTitles.languages) || defaultData.sectionTitles.languages;
+  const singular = getSingularFromPlural(titleText);
+
+  const addBtnSpan = document.querySelector('[data-action="add-language"] span');
+  if (addBtnSpan) {
+    addBtnSpan.textContent = getButtonText(singular, 'languages');
+  }
+
   state.languages.forEach((lang, index) => {
     const fieldset = document.createElement('fieldset');
     fieldset.className = 'repeater-card';
     fieldset.innerHTML = `
       <div class="repeater-header">
-        <span class="repeater-title">Idioma #${index + 1}</span>
+        <span class="repeater-title">${singular} #${index + 1}</span>
         <button type="button" class="btn-remove" data-action="remove-language" data-index="${index}" title="Eliminar idioma">
           ${UI_ICONS.trash}
         </button>
       </div>
       <div class="form-group">
-        <label>Idioma</label>
+        <label>${singular}</label>
         <input type="text" class="lang-input" data-field="name" data-index="${index}" value="${lang.name || ''}" placeholder="Ej. Inglés">
       </div>
       <div class="input-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
@@ -584,20 +825,72 @@ function setupEventListeners() {
   // 6. Delegado de Entradas Dinámicas de Formación Académica
   const eduContainer = document.getElementById('education-list-container');
   if (eduContainer) {
+    // Escuchar cambios de entrada en campos de texto de la formación académica
     eduContainer.addEventListener('input', (e) => {
       const idx = parseInt(e.target.getAttribute('data-index'));
+      if (isNaN(idx)) return;
       
       if (e.target.classList.contains('edu-input')) {
         const field = e.target.getAttribute('data-field');
         state.education[idx][field] = e.target.value;
+        updatePreview();
+        saveState();
       } else if (e.target.classList.contains('edu-btn-input')) {
         const field = e.target.getAttribute('data-field');
         if (!state.education[idx].button) state.education[idx].button = { text: '', url: '' };
         state.education[idx].button[field] = e.target.value;
+        updatePreview();
+        saveState();
       }
-      
-      updatePreview();
-      saveState();
+    });
+
+    // Escuchar cambios en los selectores de fecha y checkbox de Presente
+    const handleDateChange = (e) => {
+      const idx = parseInt(e.target.getAttribute('data-index'));
+      if (isNaN(idx)) return;
+
+      if (e.target.classList.contains('edu-date-start')) {
+        state.education[idx].startDate = e.target.value;
+        const formatted = formatPeriodDates(state.education[idx].startDate, state.education[idx].endDate, state.education[idx].current);
+        state.education[idx].period = formatted;
+        
+        const manualInput = eduContainer.querySelector(`.edu-period-manual[data-index="${idx}"]`);
+        if (manualInput) manualInput.value = formatted;
+        
+        updatePreview();
+        saveState();
+      } else if (e.target.classList.contains('edu-date-end')) {
+        state.education[idx].endDate = e.target.value;
+        const formatted = formatPeriodDates(state.education[idx].startDate, state.education[idx].endDate, state.education[idx].current);
+        state.education[idx].period = formatted;
+        
+        const manualInput = eduContainer.querySelector(`.edu-period-manual[data-index="${idx}"]`);
+        if (manualInput) manualInput.value = formatted;
+        
+        updatePreview();
+        saveState();
+      } else if (e.target.classList.contains('edu-date-current')) {
+        state.education[idx].current = e.target.checked;
+        
+        const endInput = eduContainer.querySelector(`.edu-date-end[data-index="${idx}"]`);
+        if (endInput) endInput.disabled = e.target.checked;
+        
+        const formatted = formatPeriodDates(state.education[idx].startDate, state.education[idx].endDate, state.education[idx].current);
+        state.education[idx].period = formatted;
+        
+        const manualInput = eduContainer.querySelector(`.edu-period-manual[data-index="${idx}"]`);
+        if (manualInput) manualInput.value = formatted;
+        
+        updatePreview();
+        saveState();
+      }
+    };
+
+    eduContainer.addEventListener('change', handleDateChange);
+    eduContainer.addEventListener('input', (e) => {
+      if (e.target.classList.contains('edu-date-start') || e.target.classList.contains('edu-date-end')) {
+        handleDateChange(e);
+      }
     });
   }
 
@@ -727,7 +1020,7 @@ function setupEventListeners() {
         state.experience.push({ title: '', company: '', period: '', bullets: [] });
         renderExperienceForm();
       } else if (action === 'add-education') {
-        state.education.push({ title: '', institution: '', period: '', description: '', button: { text: 'Ver Certificado', url: '' } });
+        state.education.push({ title: '', institution: '', period: '', startDate: '', endDate: '', current: false, description: '', button: { text: 'Ver Certificado', url: '' } });
         renderEducationForm();
       } else if (action === 'add-skill') {
         state.skills.push({ name: '', level: 5 });
@@ -1175,6 +1468,44 @@ function setupEventListeners() {
     });
     ro.observe(previewPanel);
   }
+
+  // 16. Control de Leyendas de Sección Editables (Soporte dinámico para títulos personalizados)
+  const editableLegends = document.querySelectorAll('legend[contenteditable="true"]');
+  editableLegends.forEach(legend => {
+    const sectionKey = legend.getAttribute('data-section-title');
+    if (!sectionKey) return;
+
+    legend.addEventListener('input', () => {
+      if (!state.sectionTitles) state.sectionTitles = {};
+      state.sectionTitles[sectionKey] = legend.textContent;
+      
+      // Actualizar dinámicamente las etiquetas secundarias sin regenerar el DOM del formulario
+      updateSectionLabels(sectionKey);
+      
+      // Actualizar la vista previa del CV en tiempo real
+      updatePreview();
+      saveState();
+    });
+
+    legend.addEventListener('blur', () => {
+      const text = legend.textContent.trim();
+      legend.textContent = text || defaultData.sectionTitles[sectionKey];
+      
+      if (!state.sectionTitles) state.sectionTitles = {};
+      state.sectionTitles[sectionKey] = legend.textContent;
+      
+      updateSectionLabels(sectionKey);
+      updatePreview();
+      saveState();
+    });
+
+    legend.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        legend.blur();
+      }
+    });
+  });
 }
 
 // --- INSTANCIACIÓN DE LA APLICACIÓN ---
