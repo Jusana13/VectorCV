@@ -1,0 +1,460 @@
+/* ==========================================================================
+   PLANTILLA ASIMÉTRICO
+   Diseño con posicionamiento absoluto, banda oscura superior, foto grande
+   superpuesta y dos columnas de contenido.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+
+/* ==========================================================================
+   PÁGINA BASE Y RESET
+   ========================================================================== */
+
+.cv-page.asimetrico {
+  width: 210mm;
+  height: 297mm;
+  background: #efefef;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Montserrat', Arial, sans-serif;
+  color: #222;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* ==========================================================================
+     BANDA SUPERIOR DECORATIVA
+     Rectángulo oscuro que forma el fondo del encabezado
+     ========================================================================== */
+
+  .top-band {
+    position: absolute;
+    top: 0;
+    left: 285px;
+    width: 509px;
+    height: 330px;
+    background: var(--primary-color, #111316);
+  }
+
+  /* ==========================================================================
+     FOTO DE PERFIL
+     Imagen grande con posicionamiento absoluto superpuesto a la banda
+     ========================================================================== */
+
+  .photo {
+    position: absolute;
+    top: 45px;
+    left: 40px;
+    width: 360px;
+    height: 390px;
+    overflow: hidden;
+    background: linear-gradient(145deg, #bdbdbd, #9f9f9f);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    &.placeholder {
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+
+      svg {
+        width: 80%;
+        height: 80%;
+        fill: #94a3b8;
+      }
+    }
+
+    /* --- Formas de la foto --- */
+
+    &.shape-circle {
+      border-radius: 50%;
+    }
+    &.shape-rounded {
+      border-radius: 16px;
+    }
+    &.shape-square {
+      border-radius: 0;
+    }
+  }
+
+  /* ==========================================================================
+     ENCABEZADO / HEADER
+     Nombre, profesión y datos de contacto sobre la banda oscura
+     ========================================================================== */
+
+  .header {
+    position: absolute;
+    top: 10px;
+    left: 417px;
+    right: 40px;
+    color: #ffffff;
+    z-index: 5;
+    text-align: left;
+  }
+
+  /* --- Nombre --- */
+
+  .name-light {
+    font-size: 34px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    line-height: 1.08;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .name-bold {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    line-height: 1.02;
+    margin: 2px 0 18px;
+    color: #ffffff;
+  }
+
+  /* --- Profesión --- */
+
+  .role {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin: 0 0 24px;
+    color: var(--accent-color, #a68d73);
+    text-transform: uppercase;
+  }
+
+  /* --- Contacto --- */
+
+  .contact {
+    display: grid;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 400;
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255, 255, 255, 0.9);
+
+      a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        
+        &:hover {
+          color: var(--accent-color, #a68d73);
+        }
+      }
+      
+      .icon {
+        width: 15px;
+        height: 15px;
+        fill: var(--accent-color, #a68d73);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+  }
+
+  /* ==========================================================================
+     LAYOUT PRINCIPAL — DOS COLUMNAS
+     Columna izquierda y derecha con posicionamiento absoluto
+     ========================================================================== */
+
+  .left-col,
+  .right-col {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+  }
+
+  .left-col {
+    left: 0;
+    width: 50%;
+    padding-left: 40px;
+    padding-right: 30px;
+    padding-top: 460px;
+  }
+
+  .right-col {
+    right: 0;
+    width: 50%;
+    padding-left: 35px;
+    padding-right: 40px;
+    padding-top: 365px;
+  }
+
+  /* ==========================================================================
+     TÍTULOS DE SECCIÓN
+     Encabezados h2 con borde inferior acentuado
+     ========================================================================== */
+
+  h2.section-title {
+    margin: 0 0 16px;
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--primary-color, #111316);
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--accent-color, #a68d73);
+    padding-bottom: 4px;
+  }
+
+  .block {
+    margin-bottom: 28px;
+  }
+
+  /* ==========================================================================
+     PERFIL PROFESIONAL
+     ========================================================================== */
+
+  .profile-text {
+    margin: 0 0 10px;
+    font-size: 13px;
+    color: #4b4b4b;
+    line-height: 1.6;
+  }
+
+  /* ==========================================================================
+     EXPERIENCIA LABORAL
+     Ítems con línea lateral decorativa (::before)
+     ========================================================================== */
+
+  .org {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    letter-spacing: .2px;
+    color: var(--primary-color, #111316);
+  }
+
+  .sub {
+    margin: 0 0 10px;
+    font-size: 12.5px;
+    color: #5b5b5b;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .item-desc {
+    margin: 0 0 8px;
+    font-size: 12.5px;
+    color: #4b4b4b;
+    line-height: 1.6;
+  }
+
+  .edu-item {
+    margin-bottom: 20px;
+  }
+
+  ul {
+    margin: 0 0 12px;
+    padding-left: 16px;
+    color: #4b4b4b;
+    font-size: 12.5px;
+    line-height: 1.8;
+
+    li {
+      margin-bottom: 4px;
+    }
+  }
+
+  .exp-item {
+    position: relative;
+    padding-left: 18px;
+    margin-bottom: 24px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: var(--accent-color, #a68d73);
+    }
+  }
+
+  .job {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary-color, #111316);
+  }
+
+  .company {
+    margin: 0 0 10px;
+    font-size: 12.5px;
+    color: #666;
+    font-style: italic;
+  }
+
+  /* ==========================================================================
+     HABILIDADES
+     Lista vertical con estrellas de valoración
+     ========================================================================== */
+
+  .skills-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .skill-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12.5px;
+    color: #4b4b4b;
+
+    .skill-name {
+      font-weight: 500;
+    }
+
+    .stars {
+      color: var(--accent-color, #a68d73);
+      letter-spacing: 2px;
+      font-size: 14px;
+    }
+  }
+
+  /* ==========================================================================
+     IDIOMAS
+     Barras de progreso con nivel de dominio
+     ========================================================================== */
+
+  .languages-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .lang-item {
+    .lang-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      margin-bottom: 4px;
+      color: #4b4b4b;
+    }
+
+    .lang-bar-wrap {
+      width: 100%;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .lang-bar {
+      height: 100%;
+      background: var(--accent-color, #a68d73);
+      border-radius: 3px;
+    }
+  }
+
+  /* ==========================================================================
+     PERSONALIDAD
+     Etiquetas redondeadas con rasgos de personalidad
+     ========================================================================== */
+
+  .personality-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .personality-tag {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #4b4b4b;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 500;
+  }
+
+  /* ==========================================================================
+     INTERESES Y HOBBIES
+     Tarjetas con icono y texto
+     ========================================================================== */
+
+  .interests-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .interest-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 11.5px;
+    color: #4b4b4b;
+
+    .interest-icon {
+      width: 14px;
+      height: 14px;
+      fill: var(--accent-color, #a68d73);
+      display: inline-flex;
+      align-items: center;
+
+      svg {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+
+  /* ==========================================================================
+     BOTONES DE CERTIFICADO / PROYECTO
+     ========================================================================== */
+
+  .cert-btn {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 5px 12px;
+    background: var(--primary-color, #111316);
+    color: #ffffff !important;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    border: 1px solid var(--primary-color, #111316);
+
+    &:hover {
+      background: transparent;
+      color: var(--primary-color, #111316) !important;
+    }
+  }
+}

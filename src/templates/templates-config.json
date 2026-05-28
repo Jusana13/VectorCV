@@ -1,0 +1,290 @@
+[
+  {
+    "id": "moderno",
+    "name": "Moderno",
+    "thumbnail": "./src/templates/moderno/thumbnail.svg",
+    "defaultPhotoShape": "circle",
+    "defaultFont": "Plus Jakarta Sans",
+    "features": {
+      "buttons": true,
+      "skillLevels": true,
+      "languageLevels": true,
+      "personality": false,
+      "personalityLevels": false,
+      "techSkills": false
+    },
+    "tabOrder": [
+      "sec-personal",
+      "sec-education",
+      "sec-experience",
+      "sec-contact",
+      "sec-skills",
+      "sec-languages",
+      "sec-interests",
+      "sec-design"
+    ],
+    "colors": {
+      "primary": "Color Principal",
+      "accent": "Color de Acento",
+      "bgLight": "Fondo Claro"
+    }
+  },
+  {
+    "id": "profesional",
+    "name": "Profesional",
+    "thumbnail": "./src/templates/profesional/thumbnail.svg",
+    "defaultPhotoShape": "rounded",
+    "defaultFont": "Open Sans",
+    "features": {
+      "buttons": true,
+      "skillLevels": true,
+      "languageLevels": true,
+      "personality": false,
+      "personalityLevels": false,
+      "techSkills": false
+    },
+    "tabOrder": [
+      "sec-personal",
+      "sec-education",
+      "sec-experience",
+      "sec-contact",
+      "sec-skills",
+      "sec-languages",
+      "sec-interests",
+      "sec-design"
+    ],
+    "colors": {
+      "primary": "Color Principal",
+      "accent": "Color de Acento",
+      "sidebarBg": "Fondo de Barra Lateral"
+    }
+  },
+  {
+    "id": "minimalista",
+    "name": "Minimalista",
+    "thumbnail": "./src/templates/minimalista/thumbnail.svg",
+    "defaultPhotoShape": "square",
+    "defaultFont": "Inter",
+    "features": {
+      "buttons": true,
+      "skillLevels": true,
+      "languageLevels": false,
+      "personality": false,
+      "personalityLevels": false,
+      "techSkills": false
+    },
+    "tabOrder": [
+      "sec-personal",
+      "sec-contact",
+      "sec-experience",
+      "sec-education",
+      "sec-skills",
+      "sec-languages",
+      "sec-interests",
+      "sec-design"
+    ],
+    "colors": {
+      "primary": "Color Principal",
+      "accent": "Color de Acento"
+    }
+  },
+  {
+    "id": "creativo",
+    "name": "Creativo",
+    "thumbnail": "./src/templates/creativo/thumbnail.svg",
+    "defaultPhotoShape": "circle",
+    "defaultFont": "Plus Jakarta Sans",
+    "features": {
+      "buttons": true,
+      "skillLevels": false,
+      "languageLevels": false,
+      "personality": false,
+      "personalityLevels": false,
+      "techSkills": true
+    },
+    "tabOrder": [
+      "sec-personal",
+      "sec-contact",
+      "sec-experience",
+      "sec-education",
+      "sec-tech-skills",
+      "sec-languages",
+      "sec-skills",
+      "sec-design"
+    ],
+    "colors": {
+      "primary": "Color Principal",
+      "accent": "Color de Acento",
+      "bgLight": "Fondo Claro"
+    },
+    "sectionAliases": {
+      "skills": "Competencias"
+    },
+    "singularAliases": {
+      "skills": "Competencia"
+    }
+  },
+  {
+    "id": "rosa",
+    "name": "Rosa",
+    "thumbnail": "./src/templates/rosa/thumbnail.svg",
+    "defaultPhotoShape": "circle",
+    "defaultFont": "Inter",
+    "features": {
+      "buttons": true,
+      "skillLevels": true,
+      "languageLevels": false,
+      "personality": true,
+      "personalityLevels": true,
+      "techSkills": false,
+      "additionalInfoText": true
+    },
+    "tabOrder": [
+      "sec-personal",
+      "sec-education",
+      "sec-experience",
+      "sec-skills",
+      "sec-personality",
+      "sec-contact",
+      "sec-languages",
+      "sec-interests",
+      "sec-design"
+    ],
+    "colors": {
+      "primary": "Color Principal",
+      "accent": "Color de Acento",
+      "bgLight": "Fondo Claro"
+    },
+    "sectionAliases": {
+      "interests": "Adicional"
+    },
+    "singularAliases": {
+      "interests": "Adicional"
+    }
+  },
+  {
+    "id": "asimetrico",
+    "name": "Asimétrico",
+    "thumbnail": "./src/templates/asimetrico/thumbnail.svg",
+    "defaultPhotoShape": "square",
+    "defaultFont": "Montserrat",
+    "features": {
+      "buttons": true,
+      "skillLevels": true,
+      "languageLevels": true,
+      "personality": true,
+      "personalityLevels": false,
+      "techSkills": false
+    },
+    "tabOrder": [
+      "sec-personal",
+      "sec-contact",
+      "sec-education",
+      "sec-skills",
+      "sec-experience",
+      "sec-languages",
+      "sec-personality",
+      "sec-interests",
+      "sec-design"
+    ],
+    "colors": {
+      "primary": "Color Principal",
+      "accent": "Color de Acento"
+    }
+  },
+  {
+    "id": "sage",
+    "name": "Sage",
+    "thumbnail": "./src/templates/sage/thumbnail.svg",
+    "defaultPhotoShape": "circle",
+    "defaultFont": "Montserrat",
+    "features": {
+      "buttons": true,
+      "skillLevels": true,
+      "skillPercentage": true,
+      "languageLevels": true,
+      "personality": true,
+      "personalityLevels": false,
+      "techSkills": false
+    },
+    "tabOrder": [
+      "sec-personal",
+      "sec-contact",
+      "sec-education",
+      "sec-personality",
+      "sec-interests",
+      "sec-skills",
+      "sec-languages",
+      "sec-experience",
+      "sec-design"
+    ],
+    "colors": {
+      "primary": "Fondo de Cabecera (Sage)",
+      "accent": "Líneas y Texto Principal"
+    },
+    "defaultDataOverrides": {
+      "experience": 2
+    }
+  },
+  {
+    "id": "sobrio",
+    "name": "Sobrio",
+    "thumbnail": "./src/templates/sobrio/thumbnail.svg",
+    "defaultPhotoShape": "circle",
+    "defaultFont": "Montserrat",
+    "features": {
+      "buttons": false,
+      "skillLevels": false,
+      "languageLevels": false,
+      "personality": true,
+      "personalityLevels": false,
+      "techSkills": false
+    },
+    "tabOrder": [
+      "sec-personal",
+      "sec-contact",
+      "sec-education",
+      "sec-experience",
+      "sec-skills",
+      "sec-personality",
+      "sec-interests",
+      "sec-languages",
+      "sec-design"
+    ],
+    "colors": {
+      "primary": "Fondo Principal",
+      "accent": "Color de Texto"
+    },
+    "defaultDataOverrides": {
+      "education": 2
+    }
+  },
+  {
+    "id": "estrella",
+    "name": "Estrella",
+    "thumbnail": "./src/templates/estrella/thumbnail.svg",
+    "defaultPhotoShape": "circle",
+    "defaultFont": "Montserrat",
+    "features": {
+      "buttons": false,
+      "skillLevels": false,
+      "languageLevels": false,
+      "personality": false,
+      "personalityLevels": false,
+      "techSkills": false
+    },
+    "tabOrder": [
+      "sec-personal",
+      "sec-contact",
+      "sec-skills",
+      "sec-education",
+      "sec-experience",
+      "sec-design"
+    ],
+    "colors": {
+      "primary": "Líneas y Detalles (Estrella)",
+      "accent": "Fondo del Papel",
+      "textColor": "Texto del CV"
+    }
+  }
+]

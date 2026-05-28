@@ -1,0 +1,80 @@
+<svg viewBox="0 0 110 155" fill="none" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff; border-radius:4px; width:100%; height:100%;">
+  <!-- Header Section -->
+  <!-- Name -->
+  <rect x="10" y="10" width="38" height="5" rx="1" fill="var(--preview-primary, #111111)" />
+  <rect x="10" y="18" width="22" height="3" rx="0.5" fill="var(--preview-accent, #666666)" />
+  
+  <!-- Profile Photo (Rounded square on the right) -->
+  <rect x="81" y="8" width="18" height="18" rx="3" fill="#ffffff" stroke="#dddddd" stroke-width="1" />
+  
+  <!-- Header Divider Line -->
+  <line x1="10" y1="30" x2="100" y2="30" stroke="var(--preview-primary, #111111)" stroke-width="1.5" />
+
+  <!-- Layout: Two Columns -->
+  <!-- Left Column (Main Content) -->
+  <!-- Section: Profile -->
+  <rect x="10" y="38" width="28" height="3" rx="0.5" fill="var(--preview-primary, #111111)" />
+  <line x1="10" y1="43" x2="62" y2="43" stroke="var(--preview-primary, #111111)" stroke-width="0.75" />
+  <rect x="10" y="47" width="52" height="2" rx="0.5" fill="#e2e8f0" />
+  <rect x="10" y="51" width="48" height="2" rx="0.5" fill="#e2e8f0" />
+  <rect x="10" y="55" width="30" height="2" rx="0.5" fill="#e2e8f0" />
+
+  <!-- Section: Experience -->
+  <rect x="10" y="65" width="32" height="3" rx="0.5" fill="var(--preview-primary, #111111)" />
+  <line x1="10" y1="70" x2="62" y2="70" stroke="var(--preview-primary, #111111)" stroke-width="0.75" />
+  
+  <!-- Job 1 -->
+  <rect x="10" y="74" width="25" height="2.5" rx="0.5" fill="var(--preview-primary, #111111)" />
+  <rect x="52" y="74" width="10" height="2" rx="0.5" fill="var(--preview-accent, #666666)" />
+  <rect x="10" y="79" width="52" height="1.5" rx="0.5" fill="#e2e8f0" />
+  <rect x="10" y="82" width="45" height="1.5" rx="0.5" fill="#e2e8f0" />
+  
+  <!-- Job 2 -->
+  <rect x="10" y="89" width="30" height="2.5" rx="0.5" fill="var(--preview-primary, #111111)" />
+  <rect x="54" y="89" width="8" height="2" rx="0.5" fill="var(--preview-accent, #666666)" />
+  <rect x="10" y="94" width="52" height="1.5" rx="0.5" fill="#e2e8f0" />
+  <rect x="10" y="97" width="40" height="1.5" rx="0.5" fill="#e2e8f0" />
+
+  <!-- Section: Education -->
+  <rect x="10" y="108" width="32" height="3" rx="0.5" fill="var(--preview-primary, #111111)" />
+  <line x1="10" y1="113" x2="62" y2="113" stroke="var(--preview-primary, #111111)" stroke-width="0.75" />
+  <rect x="10" y="117" width="28" height="2.5" rx="0.5" fill="var(--preview-primary, #111111)" />
+  <rect x="10" y="122" width="52" height="1.5" rx="0.5" fill="#e2e8f0" />
+  <rect x="10" y="125" width="20" height="1.5" rx="0.5" fill="#e2e8f0" />
+
+  <!-- Right Column (Sidebar) -->
+  <!-- Section: Contact -->
+  <rect x="70" y="38" width="18" height="3" rx="0.5" fill="var(--preview-primary, #111111)" />
+  <line x1="70" y1="43" x2="100" y2="43" stroke="var(--preview-primary, #111111)" stroke-width="0.75" />
+  <rect x="70" y="47" width="28" height="1.5" rx="0.5" fill="#718096" />
+  <rect x="70" y="51" width="25" height="1.5" rx="0.5" fill="#718096" />
+  <rect x="70" y="55" width="28" height="1.5" rx="0.5" fill="#718096" />
+
+  <!-- Section: Skills -->
+  <rect x="70" y="65" width="20" height="3" rx="0.5" fill="var(--preview-primary, #111111)" />
+  <line x1="70" y1="70" x2="100" y2="70" stroke="var(--preview-primary, #111111)" stroke-width="0.75" />
+  
+  <rect x="70" y="74" width="15" height="2" rx="0.5" fill="#718096" />
+  <circle cx="92" cy="75" r="1" fill="var(--preview-primary, #111111)" /><circle cx="95" cy="75" r="1" fill="var(--preview-primary, #111111)" /><circle cx="98" cy="75" r="1" fill="var(--preview-primary, #111111)" />
+  
+  <rect x="70" y="80" width="18" height="2" rx="0.5" fill="#718096" />
+  <circle cx="92" cy="81" r="1" fill="var(--preview-primary, #111111)" /><circle cx="95" cy="81" r="1" fill="var(--preview-primary, #111111)" />
+  
+  <rect x="70" y="86" width="12" height="2" rx="0.5" fill="#718096" />
+  <circle cx="92" cy="87" r="1" fill="var(--preview-primary, #111111)" /><circle cx="95" cy="87" r="1" fill="var(--preview-primary, #111111)" /><circle cx="98" cy="87" r="1" fill="var(--preview-primary, #111111)" />
+
+  <!-- Section: Languages -->
+  <rect x="70" y="96" width="18" height="3" rx="0.5" fill="var(--preview-primary, #111111)" />
+  <line x1="70" y1="101" x2="100" y2="101" stroke="var(--preview-primary, #111111)" stroke-width="0.75" />
+  <rect x="70" y="105" width="15" height="2" rx="0.5" fill="#718096" />
+  <rect x="90" y="105" width="10" height="2" rx="0.5" fill="var(--preview-accent, #666666)" />
+  
+  <rect x="70" y="111" width="12" height="2" rx="0.5" fill="#718096" />
+  <rect x="92" y="111" width="8" height="2" rx="0.5" fill="var(--preview-accent, #666666)" />
+
+  <!-- Section: Hobbies -->
+  <rect x="70" y="121" width="18" height="3" rx="0.5" fill="var(--preview-primary, #111111)" />
+  <line x1="70" y1="126" x2="100" y2="126" stroke="var(--preview-primary, #111111)" stroke-width="0.75" />
+  <rect x="70" y="130" width="22" height="2" rx="0.5" fill="#718096" />
+  <rect x="70" y="135" width="25" height="2" rx="0.5" fill="#718096" />
+</svg>

@@ -1,23 +1,134 @@
-/* Creador de CV Dinámico - Diseñado y desarrollado por jusana */
-import { renderCV, TEMPLATES } from '../templates/templates.js';
+/* ==========================================================================
+   Creador de CV Dinámico — app.js
+   Lógica central: estado, renderizado, eventos, formularios y personalización.
+   Diseñado y desarrollado por jusana
+   ========================================================================== */
+
 import { INTEREST_ICONS, UI_ICONS } from './icon-library.js';
 
-// --- FUNCIONES AUXILIARES DE SINGULARIZACIÓN Y FORMATO ---
+/* ==========================================================================
+   FUNCIONES AUXILIARES DE SINGULARIZACIÓN Y FORMATO
+   Transformaciones de texto para adaptar etiquetas de sección por plantilla.
+   ========================================================================== */
 
-// Función para obtener la forma singular en español de un título en plural
+/**
+ * Obtiene el título de una sección adaptado por la plantilla activa en base a aliases declarados.
+ * @param {string} sectionKey - Clave identificadora de la sección (ej. 'skills', 'experience').
+ * @returns {string} El título traducido y adaptado de la sección.
+ * @description Si el título coincide con el valor global predeterminado y la plantilla activa declara
+ *              un alias específico en templates-config.json, se sirve dicho alias para mayor modularidad.
+ */
+function getSectionTitle(sectionKey) {
+  if (!state || !state.sectionTitles) return defaultData.sectionTitles[sectionKey] || '';
+  let title = state.sectionTitles[sectionKey];
+  if (!title) title = defaultData.sectionTitles[sectionKey] || '';
+
+  if (title === defaultData.sectionTitles[sectionKey] && templatesConfig) {
+    const activeTemplateConfig = templatesConfig.find(t => t.id === state.activeTemplate);
+    if (activeTemplateConfig?.sectionAliases?.[sectionKey]) {
+      return activeTemplateConfig.sectionAliases[sectionKey];
+    }
+  }
+  return title;
+}
+
+/**
+ * Obtiene el singular de una sección adaptado por la plantilla activa en base a aliases de configuración.
+ * @param {string} sectionKey - Clave identificadora de la sección (ej. 'skills', 'languages').
+ * @returns {string} La forma singular adaptada para la plantilla activa.
+ * @description Intenta leer un alias singular específico en templates-config.json. Como fallback,
+ *              aplica el algoritmo de singularización dinámica sobre el título de la sección.
+ */
+function getSingularForSection(sectionKey) {
+  if (templatesConfig) {
+    const activeTemplateConfig = templatesConfig.find(t => t.id === state.activeTemplate);
+    if (activeTemplateConfig?.singularAliases?.[sectionKey]) {
+      return activeTemplateConfig.singularAliases[sectionKey];
+    }
+  }
+  const title = getSectionTitle(sectionKey);
+  return getSingularFromPlural(title);
+}
+
+/**
+ * Resuelve dinámicamente un valor de campo por defecto en base al singular de sección de la plantilla activa.
+ * @param {string} value - El valor de texto original.
+ * @param {string} field - El nombre del campo (ej. 'name', 'title').
+ * @param {string} sectionKey - La sección correspondiente.
+ * @returns {string} El valor resuelto y traducido si corresponde, o el original.
+ * @description Mapea marcadores fijos (como 'Habilidad 1' o 'Nombre de tu Puesto de Trabajo') al
+ *              término singular personalizado de la plantilla activa (como 'Competencia 1').
+ */
+function resolveDefaultValue(value, field, sectionKey) {
+  if (!value || typeof value !== 'string') return value;
+  const singular = getSingularForSection(sectionKey);
+
+  if (sectionKey === 'skills' && field === 'name') {
+    const match = value.match(/^(?:Habilidad|Competencia)\s+(\d+)$/i);
+    if (match) return `${singular} ${match[1]}`;
+  }
+  if (sectionKey === 'techSkills' && field === 'name') {
+    const match = value.match(/^(?:Habilidad técnica|Habilidad|Competencia)\s+(\d+)$/i);
+    if (match) return `${singular} ${match[1]}`;
+  }
+  if (sectionKey === 'experience' && field === 'title') {
+    if (value === 'Nombre de tu Puesto de Trabajo' || value.startsWith('Nombre de tu ')) {
+      return `Nombre de tu ${singular}`;
+    }
+  }
+  if (sectionKey === 'education' && field === 'title') {
+    if (value === 'Nombre de tu Grado o Formación Académica' || value.startsWith('Nombre de tu ')) {
+      return `Nombre de tu ${singular}`;
+    }
+  }
+  return value;
+}
+
+/**
+ * Clona una plantilla HTML reemplazando marcadores estructurales y constantes de forma limpia.
+ * @param {string} templateId - El ID del elemento <template> en el HTML.
+ * @param {number} index - El índice (0-based) del elemento en la lista.
+ * @param {Object} [data={}] - Objeto clave-valor con marcadores adicionales a reemplazar.
+ * @returns {HTMLElement|null} El elemento clonado ya parseado y formateado, o null si falla.
+ */
+function getClonedTemplate(templateId, index, data = {}) {
+  const template = document.getElementById(templateId);
+  if (!template) {
+    console.error(`Plantilla no encontrada: ${templateId}`);
+    return null;
+  }
+  let html = template.innerHTML;
+
+  html = html.replace(/{index}/g, index + 1)
+    .replace(/{index-0}/g, index)
+    .replace(/{trashIcon}/g, UI_ICONS.trash || '');
+
+  Object.entries(data).forEach(([key, val]) => {
+    const placeholder = new RegExp(`{${key}}`, 'g');
+    html = html.replace(placeholder, val !== undefined && val !== null ? val : '');
+  });
+
+  const temp = document.createElement('div');
+  temp.innerHTML = html.trim();
+  return temp.firstElementChild;
+}
+
+/**
+ * Obtiene la forma singular en español de un título en plural usando mapeos fijos y reglas morfológicas.
+ * @param {string} text - El texto en plural a singularizar.
+ * @returns {string} El texto singularizado.
+ */
 function getSingularFromPlural(text) {
   if (!text) return '';
   const trimmed = text.trim();
   const lower = trimmed.toLowerCase();
 
-  // Mapeos directos para coherencia semántica perfecta con los valores por defecto
   if (lower === 'experiencia laboral' || lower === 'experiencia') return 'Puesto de Trabajo';
   if (lower === 'formación académica' || lower === 'formacion academica' || lower === 'estudios') return 'Estudio';
   if (lower === 'habilidades técnicas' || lower === 'habilidades tecnicas' || lower === 'habilidades') return 'Habilidad';
   if (lower === 'idiomas') return 'Idioma';
   if (lower === 'intereses y hobbies' || lower === 'intereses') return 'Interés';
 
-  // Reglas de singularización dinámica en español para palabras personalizadas
   const words = trimmed.split(/\s+/);
   const singularWords = words.map(word => {
     const cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
@@ -29,29 +140,29 @@ function getSingularFromPlural(text) {
     let singular = lowerWord;
 
     if (lowerWord.endsWith('ces')) {
-      singular = lowerWord.slice(0, -3) + 'z'; // actrices -> actriz
+      singular = lowerWord.slice(0, -3) + 'z';
     } else if (lowerWord.endsWith('ciones')) {
-      singular = lowerWord.slice(0, -6) + 'ción'; // formaciones -> formación
+      singular = lowerWord.slice(0, -6) + 'ción';
     } else if (lowerWord.endsWith('siones')) {
-      singular = lowerWord.slice(0, -6) + 'sión'; // expresiones -> expresión
+      singular = lowerWord.slice(0, -6) + 'sión';
     } else if (lowerWord.endsWith('ades')) {
-      singular = lowerWord.slice(0, -4) + 'ad'; // habilidades -> habilidad
+      singular = lowerWord.slice(0, -4) + 'ad';
     } else if (lowerWord.endsWith('edes')) {
-      singular = lowerWord.slice(0, -4) + 'ed'; // redes -> red
+      singular = lowerWord.slice(0, -4) + 'ed';
     } else if (lowerWord.endsWith('udes')) {
-      singular = lowerWord.slice(0, -4) + 'ud'; // virtudes -> virtud
+      singular = lowerWord.slice(0, -4) + 'ud';
     } else if (lowerWord.endsWith('eses')) {
-      singular = lowerWord.slice(0, -4) + 'és'; // intereses -> interés
+      singular = lowerWord.slice(0, -4) + 'és';
     } else if (lowerWord.endsWith('les')) {
-      singular = lowerWord.slice(0, -2); // laborales -> laboral
+      singular = lowerWord.slice(0, -2);
     } else if (lowerWord.endsWith('res')) {
-      singular = lowerWord.slice(0, -2); // sectores -> sector
+      singular = lowerWord.slice(0, -2);
     } else if (lowerWord.endsWith('nes')) {
-      singular = lowerWord.slice(0, -2); // jóvenes -> joven
+      singular = lowerWord.slice(0, -2);
     } else if (lowerWord.endsWith('as')) {
-      singular = lowerWord.slice(0, -1); // blandas -> blanda
+      singular = lowerWord.slice(0, -1);
     } else if (lowerWord.endsWith('os')) {
-      singular = lowerWord.slice(0, -1); // proyectos -> proyecto
+      singular = lowerWord.slice(0, -1);
     } else if (lowerWord.endsWith('s') && !lowerWord.endsWith('is') && !lowerWord.endsWith('us') && lowerWord.length > 2) {
       singular = lowerWord.slice(0, -1);
     }
@@ -67,14 +178,25 @@ function getSingularFromPlural(text) {
   return singularWords.join(' ');
 }
 
-// Devuelve el texto adecuado para el botón "Añadir" según el singular y la sección
+/**
+ * Devuelve el texto adecuado para el botón "Añadir" según el singular y la sección.
+ * @param {string} singular - El término singular (ej. 'Estudio').
+ * @param {string} sectionKey - La sección correspondiente (ej. 'education').
+ * @returns {string} El texto para el botón de la UI.
+ */
 function getButtonText(singular, sectionKey) {
   if (sectionKey === 'experience' && singular === 'Puesto de Trabajo') return 'Añadir Trabajo';
   if (sectionKey === 'education' && singular === 'Estudio') return 'Añadir Formación';
   return `Añadir ${singular}`;
 }
 
-// Formatea el período a partir de dos inputs tipo fecha y el checkbox "Presente"
+/**
+ * Formatea un período en formato MM/YYYY a partir de fechas y el estado de vigencia.
+ * @param {string} startDateVal - Fecha de inicio en formato YYYY-MM-DD.
+ * @param {string} endDateVal - Fecha de finalización en formato YYYY-MM-DD.
+ * @param {boolean} isCurrent - Indica si el puesto es actual (vigente).
+ * @returns {string} El período formateado legible (ej. '05/2020 - Presente').
+ */
 function formatPeriodDates(startDateVal, endDateVal, isCurrent) {
   if (!startDateVal) return '';
 
@@ -82,7 +204,7 @@ function formatPeriodDates(startDateVal, endDateVal, isCurrent) {
     if (!dateStr) return '';
     const parts = dateStr.split('-');
     if (parts.length >= 2) {
-      return `${parts[1]}/${parts[0]}`; // MM/YYYY
+      return `${parts[1]}/${parts[0]}`;
     }
     return dateStr;
   };
@@ -101,36 +223,36 @@ function formatPeriodDates(startDateVal, endDateVal, isCurrent) {
   return startFormatted;
 }
 
-// Analiza un período en formato de texto e intenta extraer las fechas (startDate, endDate, current) para selectores nativos
+/**
+ * Analiza un período textual de CV e intenta extraer fechas de inicio, fin y estado vigente.
+ * @param {string} periodText - El período de texto (ej. '03/2021 - 12/2024' o '2022 - Presente').
+ * @returns {Object} Un objeto con startDate, endDate y current listo para inputs de fecha.
+ */
 function parsePeriodToDates(periodText) {
   const result = { startDate: '', endDate: '', current: false };
   if (!periodText) return result;
-  
+
   const text = periodText.trim().toLowerCase();
-  
-  // Dividir por guion
   const parts = text.split(/[-–—]|a\s+|hasta\s+/).map(p => p.trim());
-  
+
   const parsePart = (str) => {
-    // Buscar formato MM/YYYY o M/YYYY
     const myMatch = str.match(/^(\d{1,2})\/(\d{4})$/);
     if (myMatch) {
       const month = myMatch[1].padStart(2, '0');
       const year = myMatch[2];
       return `${year}-${month}-01`;
     }
-    // Buscar formato YYYY
     const yMatch = str.match(/^(\d{4})$/);
     if (yMatch) {
       return `${yMatch[1]}-01-01`;
     }
     return '';
   };
-  
+
   if (parts.length >= 1 && parts[0]) {
     result.startDate = parsePart(parts[0]);
   }
-  
+
   if (parts.length >= 2 && parts[1]) {
     if (parts[1] === 'presente' || parts[1] === 'actual' || parts[1] === 'actualidad' || parts[1].includes('hoy')) {
       result.current = true;
@@ -138,35 +260,147 @@ function parsePeriodToDates(periodText) {
       result.endDate = parsePart(parts[1]);
     }
   }
-  
+
   return result;
 }
 
-// --- ESTADO GLOBAL ---
+
+/* ==========================================================================
+   CARGA DINÁMICA DE PLANTILLAS Y MINIATURAS
+   Importación lazy de módulos JS y CSS por plantilla con caché en memoria.
+   ========================================================================== */
+const templateCache = {};
+let templatesConfig = [];
+
+async function loadTemplate(templateId) {
+  if (templateCache[templateId]) {
+    return templateCache[templateId];
+  }
+  try {
+    const modulePath = `../templates/${templateId}/index.js?t=${Date.now()}`;
+    const module = await import(modulePath);
+
+    const cssResponse = await fetch(`./src/templates/${templateId}/style.css?t=${Date.now()}`);
+    const cssText = await cssResponse.text();
+
+    templateCache[templateId] = {
+      render: module.render,
+      css: cssText
+    };
+    return templateCache[templateId];
+  } catch (error) {
+    console.error(`Error al cargar la plantilla ${templateId}:`, error);
+    return null;
+  }
+}
+
+function injectTemplateCSS(cssText) {
+  let styleTag = document.getElementById('active-template-css');
+  if (!styleTag) {
+    styleTag = document.createElement('style');
+    styleTag.id = 'active-template-css';
+    document.head.appendChild(styleTag);
+  }
+  styleTag.textContent = cssText;
+}
+
+function updateThumbnailColors() {
+  if (!templatesConfig || templatesConfig.length === 0) return;
+  templatesConfig.forEach(tmpl => {
+    const optionDiv = document.querySelector(`.template-option[data-value="${tmpl.id}"]`);
+    if (optionDiv) {
+      const colors = state.colors[tmpl.id] || {};
+      if (colors.primary) optionDiv.style.setProperty('--preview-primary', colors.primary);
+      if (colors.accent) optionDiv.style.setProperty('--preview-accent', colors.accent);
+      if (colors.bgLight) optionDiv.style.setProperty('--preview-rose', colors.bgLight);
+    }
+  });
+}
+
+async function initTemplateSelector() {
+  const dropdownMenu = document.getElementById('template-dropdown-menu');
+  if (!dropdownMenu) return;
+  try {
+    if (!templatesConfig || templatesConfig.length === 0) {
+      const response = await fetch('./src/templates/templates-config.json');
+      templatesConfig = await response.json();
+    }
+    dropdownMenu.innerHTML = '';
+
+    for (const tmpl of templatesConfig) {
+      const optionDiv = document.createElement('div');
+      optionDiv.className = `template-option ${state.activeTemplate === tmpl.id ? 'active' : ''}`;
+      optionDiv.setAttribute('data-value', tmpl.id);
+
+      let svgHtml = '';
+      try {
+        const svgRes = await fetch(tmpl.thumbnail);
+        svgHtml = await svgRes.text();
+      } catch (err) {
+        console.error(`Error loading thumbnail for ${tmpl.id}:`, err);
+        svgHtml = `<div class="template-mini-preview">Miniatura</div>`;
+      }
+
+      optionDiv.innerHTML = `
+        <div class="template-mini-preview">
+          ${svgHtml}
+        </div>
+        <span class="template-name">${tmpl.name}</span>
+      `;
+
+      optionDiv.addEventListener('click', async () => {
+        state.activeTemplate = tmpl.id;
+        state.personal.photoShape = getDefaultPhotoShape(tmpl.id);
+        applyTemplateDefaultOverrides(tmpl.id);
+        renderAllForms();
+        syncColorPickers();
+        await updatePreview();
+        updateThumbnailColors();
+        saveState();
+        dropdownMenu.classList.remove('active');
+      });
+
+      dropdownMenu.appendChild(optionDiv);
+    }
+    updateThumbnailColors();
+  } catch (err) {
+    console.error("Error al cargar la configuración de plantillas:", err);
+  }
+}
+
+/* ==========================================================================
+   ESTADO GLOBAL Y DATOS POR DEFECTO
+   Variables de estado de la aplicación, zoom del previsualizador,
+   y plantilla base de datos iniciales para un CV nuevo.
+   ========================================================================== */
 let state = null;
 let currentZoomMode = 'fit'; // 'fit' o 'manual'
 let zoomScale = 1.0;
-
-// Datos por defecto genéricos
 const defaultData = {
   activeTemplate: 'moderno',
   sectionTitles: {
+    personalInfo: 'Información Personal',
+    profile: 'Perfil Profesional',
+    contact: 'Contacto',
     experience: 'Experiencia Laboral',
     education: 'Formación Académica',
     skills: 'Habilidades Técnicas',
     languages: 'Idiomas',
-    interests: 'Intereses y Hobbies'
+    interests: 'Intereses y Hobbies',
+    personality: 'Personalidad',
+    techSkills: 'Habilidades Técnicas'
   },
   personal: {
-    name: 'AQUÍ VA TU NOMBRE',
-    lastName: 'Y TUS APELLIDOS',
-    profession: 'Tu Profesión / Especialidad',
+    name: 'Nombres y',
+    lastName: 'Apellidos',
+    profession: 'Profesión / Especialidad',
     photo: '',
     photoShape: 'circle',
     profile: [
       'Describe aquí tu perfil profesional en uno o dos párrafos breves. Destaca tus principales competencias, experiencia y lo que puedes aportar a la empresa.',
       'Puedes añadir más párrafos de perfil o eliminarlos utilizando los botones de control de arriba.'
-    ]
+    ],
+    additionalInfo: "Disponible para incorporación inmediata y flexibilidad horaria en proyectos dinámicos."
   },
   contact: [
     { type: 'location', text: 'Ciudad, País' },
@@ -186,7 +420,8 @@ const defaultData = {
         'Detalla aquí un logro importante o una responsabilidad principal que tuviste.',
         'Procura iniciar cada viñeta con un verbo de acción claro y conciso.',
         'Puedes agregar tantas líneas de logros o tareas como necesites.'
-      ]
+      ],
+      button: { text: 'Ver Proyecto', url: 'https://ejemplo.com' }
     }
   ],
   education: [
@@ -211,14 +446,47 @@ const defaultData = {
     { name: 'Inglés', level: 'Avanzado', percentage: 75 }
   ],
   interests: ['tech', 'reading', 'sports'],
+  personality: [
+    { name: 'Liderazgo', level: 5 },
+    { name: 'Creativo', level: 4 },
+    { name: 'Organizado', level: 5 },
+    { name: 'Serio', level: 4 }
+  ],
+  techSkills: [
+    { name: "Habilidad técnica 1" },
+    { name: "Habilidad técnica 2" },
+    { name: "Habilidad técnica 3" },
+    { name: "Habilidad técnica 4" },
+    { name: "Habilidad técnica 5" }
+  ],
   colors: {
     moderno: { primary: '#2C2D30', accent: '#C9A227', bgLight: '#F3EFE6' },
     profesional: { primary: '#1b2a4a', accent: '#e8a838', sidebarBg: '#f4f6f8' },
-    minimalista: { primary: '#111111', accent: '#666666' }
+    minimalista: { primary: '#111111', accent: '#666666' },
+    creativo: { primary: '#222222', accent: '#f4b844', bgLight: '#fdf8ec' },
+    rosa: { primary: '#d63a3a', accent: '#f2b7b4', bgLight: '#f2b7b4' },
+    asimetrico: { primary: '#111316', accent: '#a68d73' },
+    sage: { primary: '#b5d3cd', accent: '#22252a' },
+    sobrio: { primary: '#EAEAE6', accent: '#222222' },
+    estrella: { primary: '#4D4D4B', accent: '#F8F7F4', textColor: '#5A5A58' }
+  },
+  fonts: {
+    moderno: 'Plus Jakarta Sans',
+    profesional: 'Open Sans',
+    minimalista: 'Inter',
+    creativo: 'Plus Jakarta Sans',
+    rosa: 'Inter',
+    asimetrico: 'Montserrat',
+    sage: 'Montserrat',
+    sobrio: 'Montserrat',
+    estrella: 'Montserrat'
   }
 };
 
-// --- AUTO-ESCALADO DEL PREVISUALIZADOR ---
+/* ==========================================================================
+   AUTO-ESCALADO DEL PREVISUALIZADOR
+   Ajusta la escala de la vista previa del CV al tamaño disponible del panel.
+   ========================================================================== */
 function scalePreview() {
   const previewPanel = document.getElementById('preview-panel');
   const previewWrapper = document.querySelector('.cv-preview-wrapper');
@@ -234,7 +502,7 @@ function scalePreview() {
     const scaleY = panelHeight / 1123;
     zoomScale = Math.min(scaleX, scaleY);
     zoomScale = Math.max(0.3, Math.min(zoomScale, 1.2)); // límites razonables
-    
+
     // Sincronizar controles UI
     const zoomRange = document.getElementById('zoom-range');
     const zoomLabel = document.getElementById('zoom-val-label');
@@ -248,27 +516,120 @@ function scalePreview() {
   previewContainer.style.transform = `scale(${zoomScale})`;
 }
 
-// --- ACTUALIZAR PREVISUALIZACIÓN ---
-function updatePreview() {
+/* ==========================================================================
+   ACTUALIZACIÓN DE LA PREVISUALIZACIÓN
+   Renderiza el HTML de la plantilla activa con el estado actual del usuario.
+   ========================================================================== */
+async function updatePreview() {
   const previewContainer = document.querySelector('.cv-preview-container');
   if (!previewContainer) return;
-  
-  // Renderizar la plantilla correspondiente
-  const html = renderCV(state, state.activeTemplate);
-  previewContainer.innerHTML = html;
-  
+
+  const template = await loadTemplate(state.activeTemplate);
+  if (template) {
+    injectTemplateCSS(template.css);
+
+    // Clonar el estado y resolver títulos y valores dinámicos
+    const stateForRender = JSON.parse(JSON.stringify(state));
+    if (stateForRender.sectionTitles) {
+      for (const key in stateForRender.sectionTitles) {
+        stateForRender.sectionTitles[key] = getSectionTitle(key);
+      }
+    }
+
+    // Resolver nombres e ítems por defecto para visualización
+    if (stateForRender.skills) {
+      stateForRender.skills = stateForRender.skills.map(s => ({
+        ...s,
+        name: resolveDefaultValue(s.name, 'name', 'skills')
+      }));
+    }
+    if (stateForRender.techSkills) {
+      stateForRender.techSkills = stateForRender.techSkills.map(ts => ({
+        ...ts,
+        name: resolveDefaultValue(ts.name, 'name', 'techSkills')
+      }));
+    }
+    if (stateForRender.experience) {
+      stateForRender.experience = stateForRender.experience.map(exp => ({
+        ...exp,
+        title: resolveDefaultValue(exp.title, 'title', 'experience')
+      }));
+    }
+    if (stateForRender.education) {
+      stateForRender.education = stateForRender.education.map(edu => ({
+        ...edu,
+        title: resolveDefaultValue(edu.title, 'title', 'education')
+      }));
+    }
+
+    const html = template.render(stateForRender);
+    previewContainer.innerHTML = html;
+  } else {
+    previewContainer.innerHTML = `<div style="padding: 20px; color: red;">Error al cargar la plantilla.</div>`;
+  }
+
+  // Aplicar la tipografía personalizada seleccionada para la plantilla activa
+  const activeFont = state.fonts?.[state.activeTemplate];
+  if (activeFont) {
+    injectDynamicFontCSS(activeFont);
+  }
+
   // Ajustar la escala por si cambió de plantilla o tamaño de contenedor
   scalePreview();
+  checkPageOverflow();
 }
 
-// --- GUARDAR Y CARGAR DEL LOCALSTORAGE ---
+/* ==========================================================================
+   SISTEMA DE DETECCIÓN DE DESBORDAMIENTO A4
+   Comprueba si el contenido del CV excede los límites de una página A4
+   y muestra un banner de advertencia visual al usuario.
+   ========================================================================== */
+function checkPageOverflow() {
+  const cvPage = document.querySelector('.cv-page');
+  const warningBanner = document.getElementById('overflow-warning');
+  if (!cvPage) return;
+
+  // Determinar si la altura total del contenido supera el límite fijo de 297mm
+  const isOverflowing = cvPage.scrollHeight > cvPage.clientHeight + 5;
+
+  if (isOverflowing) {
+    if (warningBanner) {
+      warningBanner.style.display = 'flex';
+    }
+    cvPage.classList.add('page-overflow');
+  } else {
+    if (warningBanner) {
+      warningBanner.style.display = 'none';
+    }
+    cvPage.classList.remove('page-overflow');
+  }
+}
+
+/* ==========================================================================
+   PERSISTENCIA Y MIGRACIÓN DE ESTADO (localStorage)
+   Serializa/deserializa el estado del CV, aplica migraciones defensivas
+   para compatibilidad con versiones anteriores del esquema de datos.
+   ========================================================================== */
 function saveState() {
   localStorage.setItem('cv_creator_state', JSON.stringify(state));
 }
 
 function migrateState(stateObj) {
   if (!stateObj) return;
-  
+
+  // Asegurar migración de nombres de marcador de posición antiguos a los nuevos simplificados
+  if (stateObj.personal) {
+    if (stateObj.personal.name === 'AQUÍ VA TU NOMBRE') {
+      stateObj.personal.name = 'Nombres y';
+    }
+    if (stateObj.personal.lastName === 'Y TUS APELLIDOS') {
+      stateObj.personal.lastName = 'Apellidos';
+    }
+    if (stateObj.personal.profession === 'Tu Profesión / Especialidad') {
+      stateObj.personal.profession = 'Profesión / Especialidad';
+    }
+  }
+
   // Asegurar compatibilidad de sectionTitles
   if (!stateObj.sectionTitles) {
     stateObj.sectionTitles = {};
@@ -279,14 +640,92 @@ function migrateState(stateObj) {
       stateObj.sectionTitles[key] = defaults[key];
     }
   }
-  
-  // Asegurar inicialización de campos de fecha en estudios
+
+  // Asegurar compatibilidad de colores para todas las plantillas y evitar referencias compartidas
+  if (!stateObj.colors) {
+    stateObj.colors = {};
+  }
+  const defaultColors = defaultData.colors;
+  for (const key in defaultColors) {
+    if (!stateObj.colors[key]) {
+      stateObj.colors[key] = JSON.parse(JSON.stringify(defaultColors[key]));
+    } else {
+      // Copiar propiedades de color individuales que falten (como los nuevos pickers de texto)
+      const tmplColors = defaultColors[key];
+      for (const colProp in tmplColors) {
+        if (stateObj.colors[key][colProp] === undefined) {
+          stateObj.colors[key][colProp] = tmplColors[colProp];
+        }
+      }
+    }
+  }
+
+
+
+  // Decoplar referencias de colores si son idénticas en memoria (evita bugs de sincronización)
+  const colorKeys = Object.keys(stateObj.colors);
+  if (colorKeys.length > 1) {
+    const firstRef = stateObj.colors[colorKeys[0]];
+    let allSameRef = true;
+    for (let i = 1; i < colorKeys.length; i++) {
+      if (stateObj.colors[colorKeys[i]] !== firstRef) {
+        allSameRef = false;
+        break;
+      }
+    }
+    if (allSameRef) {
+      colorKeys.forEach(k => {
+        stateObj.colors[k] = JSON.parse(JSON.stringify(stateObj.colors[k]));
+      });
+    }
+  }
+
+  // Asegurar inicialización de tipografías para todas las plantillas
+  if (!stateObj.fonts) {
+    stateObj.fonts = {};
+  }
+  if (templatesConfig && templatesConfig.length > 0) {
+    templatesConfig.forEach(tmpl => {
+      if (!stateObj.fonts[tmpl.id]) {
+        stateObj.fonts[tmpl.id] = tmpl.defaultFont || defaultData.fonts[tmpl.id] || 'Inter';
+      }
+    });
+  } else {
+    const defaultFonts = defaultData.fonts;
+    for (const key in defaultFonts) {
+      if (!stateObj.fonts[key]) {
+        stateObj.fonts[key] = defaultFonts[key];
+      }
+    }
+  }
+
+  // Asegurar inicialización de personalidad para plantilla Rosa
+  if (!stateObj.personality) {
+    stateObj.personality = JSON.parse(JSON.stringify(defaultData.personality));
+  }
+
+  // Asegurar inicialización de habilidades técnicas estructuradas para Jones
+  if (!stateObj.techSkills) {
+    if (stateObj.personal && typeof stateObj.personal.sidebarSkills === 'string' && stateObj.personal.sidebarSkills.trim() !== '') {
+      stateObj.techSkills = stateObj.personal.sidebarSkills.split('\n')
+        .filter(line => line.trim() !== '')
+        .map(line => ({ name: line.trim() }));
+    } else {
+      stateObj.techSkills = JSON.parse(JSON.stringify(defaultData.techSkills));
+    }
+  }
+
+  // Aplicar sobrescrituras de datos por defecto específicas de la plantilla
+  if (stateObj.activeTemplate) {
+    applyTemplateDefaultOverrides(stateObj.activeTemplate, stateObj);
+  }
+
   if (stateObj.education) {
     stateObj.education.forEach(edu => {
       if (edu.startDate === undefined) edu.startDate = '';
       if (edu.endDate === undefined) edu.endDate = '';
       if (edu.current === undefined) edu.current = false;
-      
+
       // Auto-parsear si están vacíos pero hay un period
       if (!edu.startDate && !edu.endDate && !edu.current && edu.period) {
         const parsed = parsePeriodToDates(edu.period);
@@ -296,14 +735,17 @@ function migrateState(stateObj) {
       }
     });
   }
-  
-  // Asegurar inicialización de campos de fecha en experiencia
+
+  // Asegurar inicialización de campos de fecha y botón en experiencia
   if (stateObj.experience) {
     stateObj.experience.forEach(exp => {
       if (exp.startDate === undefined) exp.startDate = '';
       if (exp.endDate === undefined) exp.endDate = '';
       if (exp.current === undefined) exp.current = false;
-      
+      if (!exp.button) {
+        exp.button = { text: 'Ver Proyecto', url: '' };
+      }
+
       // Auto-parsear si están vacíos pero hay un period
       if (!exp.startDate && !exp.endDate && !exp.current && exp.period) {
         const parsed = parsePeriodToDates(exp.period);
@@ -313,6 +755,247 @@ function migrateState(stateObj) {
       }
     });
   }
+}
+
+/* ==========================================================================
+   CONFIGURACIÓN DE PLANTILLAS Y SOBRESCRITURAS
+   Lectura de features, foto de perfil, overrides de contenido y detección
+   de ítems por defecto (shrinkage) para aislamiento de estado entre plantillas.
+   ========================================================================== */
+
+/**
+ * Obtiene la forma de la foto de perfil predeterminada para una plantilla específica.
+ * @param {string} templateId - El ID de la plantilla.
+ * @returns {string} La forma de la foto ('circle', 'rounded', 'square').
+ * @description Lee el valor de defaultPhotoShape configurado en el JSON de la plantilla activa.
+ *              Si no está configurado, retorna 'circle' por defecto.
+ */
+function getDefaultPhotoShape(templateId) {
+  if (templatesConfig) {
+    const config = templatesConfig.find(t => t.id === templateId);
+    if (config && config.defaultPhotoShape) {
+      return config.defaultPhotoShape;
+    }
+  }
+  return 'circle';
+}
+
+function getActiveTemplateFeatures() {
+  if (!templatesConfig || templatesConfig.length === 0) {
+    return {
+      buttons: true,
+      educationButtons: true,
+      experienceButtons: true,
+      skillLevels: true,
+      languageLevels: true,
+      personality: false,
+      personalityLevels: false,
+      techSkills: false
+    };
+  }
+  const activeTemplateConfig = templatesConfig.find(t => t.id === (state ? state.activeTemplate : 'moderno'));
+  const feat = (activeTemplateConfig && activeTemplateConfig.features) || {};
+  return {
+    buttons: feat.buttons !== undefined ? feat.buttons : true,
+    educationButtons: feat.educationButtons !== undefined ? feat.educationButtons : (feat.buttons !== undefined ? feat.buttons : true),
+    experienceButtons: feat.experienceButtons !== undefined ? feat.experienceButtons : (feat.buttons !== undefined ? feat.buttons : true),
+    skillLevels: feat.skillLevels !== undefined ? feat.skillLevels : true,
+    skillPercentage: feat.skillPercentage !== undefined ? feat.skillPercentage : false,
+    languageLevels: feat.languageLevels !== undefined ? feat.languageLevels : true,
+    personality: feat.personality !== undefined ? feat.personality : false,
+    personalityLevels: feat.personalityLevels !== undefined ? feat.personalityLevels : false,
+    techSkills: feat.techSkills !== undefined ? feat.techSkills : false
+  };
+}
+
+/**
+ * Compara recursivamente un elemento con su valor de plantilla predeterminado.
+ * @param {*} item - El elemento a comprobar (ej. objeto de experiencia o string de perfil).
+ * @param {*} defaultItem - El elemento por defecto usado como molde de comparación.
+ * @returns {boolean} True si todas las propiedades no modificadas equivalen al default, False si el usuario editó algo.
+ */
+function isDefaultItemValue(item, defaultItem) {
+  if (typeof defaultItem !== 'object' || defaultItem === null || typeof item !== 'object' || item === null) {
+    return item === defaultItem;
+  }
+  for (const key in defaultItem) {
+    if (typeof defaultItem[key] === 'object' && defaultItem[key] !== null) {
+      if (!isDefaultItemValue(item[key], defaultItem[key])) return false;
+    } else if (typeof defaultItem[key] === 'string' || typeof defaultItem[key] === 'number' || typeof defaultItem[key] === 'boolean') {
+      const val = item[key];
+      const defVal = defaultItem[key];
+      if (val !== undefined && val !== '' && val !== defVal) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/**
+ * Obtiene el valor de una colección desde el objeto de estado, soportando rutas profundas (ej: perfil).
+ * @param {Object} stateObj - El objeto de estado.
+ * @param {string} key - La clave identificadora de la colección.
+ * @returns {Array|undefined} La colección de datos o undefined.
+ */
+function getCollectionState(stateObj, key) {
+  if (key === 'profile') {
+    return stateObj && stateObj.personal ? stateObj.personal.profile : undefined;
+  }
+  return stateObj ? stateObj[key] : undefined;
+}
+
+/**
+ * Establece el valor de una colección en el objeto de estado, resolviendo rutas profundas de datos.
+ * @param {Object} stateObj - El objeto de estado.
+ * @param {string} key - La clave de la colección.
+ * @param {Array} value - El nuevo array de datos a asignar.
+ */
+function setCollectionState(stateObj, key, value) {
+  if (key === 'profile') {
+    if (stateObj && stateObj.personal) {
+      stateObj.personal.profile = value;
+    }
+  } else if (stateObj) {
+    stateObj[key] = value;
+  }
+}
+
+/**
+ * Obtiene la colección base por defecto (placeholders iniciales) para una clave dada.
+ * @param {string} key - La clave de la colección.
+ * @returns {Array|undefined} El array por defecto global.
+ */
+function getBaseDefaultCollection(key) {
+  if (key === 'profile') {
+    return defaultData.personal ? defaultData.personal.profile : undefined;
+  }
+  return defaultData[key];
+}
+
+/**
+ * Recopila todos los ítems por defecto (placeholders globales y de plantillas específicas) para una colección.
+ * @param {string} key - Clave de la colección (ej. 'experience', 'education').
+ * @returns {Array} Un array con todas las variantes de placeholders del sistema para esa clave.
+ * @description Utilizado por el algoritmo de encogimiento para identificar cuándo eliminar ítems no editados.
+ */
+function getTemplateDefaultItems(key) {
+  const defaults = [];
+  const baseDefault = getBaseDefaultCollection(key);
+
+  if (Array.isArray(baseDefault)) {
+    baseDefault.forEach(item => defaults.push(item));
+  }
+
+  if (templatesConfig) {
+    templatesConfig.forEach(config => {
+      let overrides = config.defaultDataOverrides && config.defaultDataOverrides[key];
+      if (typeof overrides === 'number') {
+        const baseItem = baseDefault && baseDefault[0];
+        if (baseItem !== undefined) {
+          defaults.push(baseItem);
+        }
+      } else if (Array.isArray(overrides)) {
+        overrides.forEach(item => defaults.push(item));
+      }
+    });
+  }
+
+  // Legacy defaults compatibility list to clean up old localStorage pollution
+  if (key === 'experience') {
+    defaults.push({
+      title: "Nombre de tu Segundo Puesto de Trabajo",
+      company: "Nombre de la Segunda Empresa o Entidad",
+      period: "Año Inicio - Año Fin",
+      startDate: "",
+      endDate: "",
+      current: false,
+      bullets: [
+        "Describe una contribución relevante realizada en este puesto.",
+        "Utiliza métricas siempre que sea posible (ej. aumenté ventas, reduje costes)."
+      ],
+      button: { text: "Ver Proyecto", url: "https://ejemplo.com" }
+    });
+  }
+
+  return defaults;
+}
+
+/**
+ * Comprueba si un elemento equivale a cualquiera de los placeholders por defecto del sistema.
+ * @param {*} item - El elemento a evaluar.
+ * @param {string} key - La clave de la colección correspondiente.
+ * @returns {boolean} True si coincide con algún default del sistema, False de lo contrario.
+ */
+function isItemDefault(item, key) {
+  const defaults = getTemplateDefaultItems(key);
+  for (const defItem of defaults) {
+    if (isDefaultItemValue(item, defItem)) return true;
+  }
+  return false;
+}
+
+/**
+ * Aplica las sobrescrituras de contenido por defecto de la plantilla seleccionada al estado de forma aislada.
+ * @param {string} templateId - El ID de la plantilla activa.
+ * @param {Object} [stateObj=state] - El objeto de estado a modificar.
+ * @description Si la plantilla define overrides numéricos u objetos, expande el estado si es necesario.
+ *              Si no hay overrides para una clave y los elementos extra son placeholders sin editar,
+ *              los encoge (shrinkage) de forma segura para evitar filtraciones de registros entre plantillas.
+ */
+function applyTemplateDefaultOverrides(templateId, stateObj = state) {
+  if (!stateObj || !templatesConfig || templatesConfig.length === 0) return;
+  const config = templatesConfig.find(t => t.id === templateId);
+
+  const collectionKeys = ['education', 'experience', 'skills', 'languages', 'personality', 'techSkills', 'interests', 'profile'];
+
+  collectionKeys.forEach(key => {
+    let overrides = config && config.defaultDataOverrides && config.defaultDataOverrides[key];
+    const baseDefault = getBaseDefaultCollection(key);
+
+    if (typeof overrides === 'number') {
+      const count = overrides;
+      overrides = [];
+      for (let i = 0; i < count; i++) {
+        const baseItem = baseDefault && baseDefault[0];
+        if (baseItem !== undefined) {
+          overrides.push(JSON.parse(JSON.stringify(baseItem)));
+        }
+      }
+    }
+
+    const stateVal = getCollectionState(stateObj, key);
+
+    if (overrides && Array.isArray(overrides)) {
+      if (!stateVal) {
+        setCollectionState(stateObj, key, JSON.parse(JSON.stringify(overrides)));
+      } else if (stateVal.length < overrides.length) {
+        const diff = overrides.length - stateVal.length;
+        for (let i = 0; i < diff; i++) {
+          const overrideIndex = overrides.length - diff + i;
+          stateVal.push(JSON.parse(JSON.stringify(overrides[overrideIndex])));
+        }
+      }
+    } else {
+      if (stateVal && baseDefault && Array.isArray(stateVal) && Array.isArray(baseDefault)) {
+        const defaultLen = baseDefault.length;
+        if (stateVal.length > defaultLen) {
+          let allExtrasAreDefaults = true;
+
+          for (let i = defaultLen; i < stateVal.length; i++) {
+            if (!isItemDefault(stateVal[i], key)) {
+              allExtrasAreDefaults = false;
+              break;
+            }
+          }
+
+          if (allExtrasAreDefaults) {
+            setCollectionState(stateObj, key, stateVal.slice(0, defaultLen));
+          }
+        }
+      }
+    }
+  });
 }
 
 function loadState() {
@@ -327,10 +1010,15 @@ function loadState() {
     }
   } else {
     state = JSON.parse(JSON.stringify(defaultData));
+    state.personal.photoShape = getDefaultPhotoShape(state.activeTemplate);
   }
+  applyTemplateDefaultOverrides(state.activeTemplate, state);
 }
 
-// --- HELPER PARA RUTAS DE DATOS PROFUNDAS ---
+/* ==========================================================================
+   HELPERS PARA ACCESO A RUTAS DE DATOS PROFUNDAS
+   Lectura y escritura de propiedades anidadas usando notación de punto.
+   ========================================================================== */
 function getDeepValue(obj, path) {
   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 }
@@ -346,9 +1034,11 @@ function setDeepValue(obj, path, value) {
   current[parts[parts.length - 1]] = value;
 }
 
-// --- GESTIÓN DE FORMULARIOS ---
-
-// Sincronizar inputs estáticos
+/* ==========================================================================
+   GESTIÓN DE FORMULARIOS — SINCRONIZACIÓN
+   Sincroniza los valores del estado global con los inputs del panel lateral,
+   incluyendo foto de perfil, selectores de forma, teléfono y colores.
+   ========================================================================== */
 function syncStaticInputs() {
   const inputs = document.querySelectorAll('[data-bind]');
   inputs.forEach(input => {
@@ -394,14 +1084,14 @@ function syncStaticInputs() {
   const prefixSelect = document.getElementById('phone-prefix-select');
   const numberInput = document.getElementById('phone-number-input');
   const fullInputHidden = document.getElementById('phone-full-input');
-  
+
   if (prefixSelect && numberInput) {
     const prefixes = Array.from(prefixSelect.options).map(opt => opt.value);
     prefixes.sort((a, b) => b.length - a.length);
-    
+
     let matchedPrefix = '+34'; // default
     let restNumber = fullPhone;
-    
+
     for (const pref of prefixes) {
       if (fullPhone.startsWith(pref)) {
         matchedPrefix = pref;
@@ -409,7 +1099,7 @@ function syncStaticInputs() {
         break;
       }
     }
-    
+
     prefixSelect.value = matchedPrefix;
     numberInput.value = restNumber;
     if (fullInputHidden) {
@@ -420,12 +1110,9 @@ function syncStaticInputs() {
   // Sincronizar selector visual de plantilla
   const triggerBtnText = document.getElementById('current-template-text');
   if (triggerBtnText) {
-    const templateNames = {
-      moderno: 'Moderno',
-      profesional: 'Profesional',
-      minimalista: 'Minimalista'
-    };
-    triggerBtnText.textContent = `Plantilla: ${templateNames[state.activeTemplate] || 'Moderno'}`;
+    const activeTemplateConfig = templatesConfig ? templatesConfig.find(t => t.id === state.activeTemplate) : null;
+    const displayName = activeTemplateConfig ? activeTemplateConfig.name : 'Moderno';
+    triggerBtnText.textContent = `Plantilla: ${displayName}`;
   }
 
   // Marcar la opción activa en el dropdown de plantillas
@@ -438,11 +1125,127 @@ function syncStaticInputs() {
     }
   });
 
+  // Alternar campos del formulario según la plantilla activa y sus características (features)
+  const features = getActiveTemplateFeatures();
+
+  // Alternar clases de características en el editor
+  const editorPanel = document.querySelector('.editor-panel');
+  if (editorPanel) {
+    editorPanel.classList.toggle('hide-buttons', !features.buttons);
+    editorPanel.classList.toggle('hide-education-buttons', !features.educationButtons);
+    editorPanel.classList.toggle('hide-experience-buttons', !features.experienceButtons);
+    editorPanel.classList.toggle('hide-skill-levels', !features.skillLevels);
+  }
+
+  // Reordenar los botones de las pestañas (tabs) según la configuración de la plantilla activa
+  const activeTemplateConfig = templatesConfig.find(t => t.id === state.activeTemplate);
+  const navTabs = document.querySelector('.editor-tabs');
+  if (navTabs) {
+    const tabs = Array.from(navTabs.querySelectorAll('.tab-btn'));
+    const defaultOrder = [
+      'sec-personal',
+      'sec-contact',
+      'sec-education',
+      'sec-experience',
+      'sec-tech-skills',
+      'sec-skills',
+      'sec-personality',
+      'sec-languages',
+      'sec-interests',
+      'sec-design'
+    ];
+    const order = (activeTemplateConfig && activeTemplateConfig.tabOrder) || defaultOrder;
+    tabs.forEach(tab => {
+      const target = tab.getAttribute('data-target');
+      if (order.includes(target)) {
+        tab.style.display = '';
+        navTabs.appendChild(tab);
+      } else {
+        tab.style.display = 'none';
+        // Si la pestaña oculta estaba activa, redirigir a Datos Personales
+        if (tab.classList.contains('active')) {
+          const firstTab = tabs.find(t => t.getAttribute('data-target') === 'sec-personal');
+          if (firstTab) firstTab.click();
+        }
+      }
+    });
+  }
+
+
+
+  const tabPersonality = document.getElementById('tab-personality');
+  if (tabPersonality) {
+    if (features.personality) {
+      tabPersonality.style.display = 'block';
+      renderPersonalityForm();
+    } else {
+      tabPersonality.style.display = 'none';
+      if (tabPersonality.classList.contains('active')) {
+        const firstTab = document.querySelector('.tab-btn[data-target="sec-personal"]');
+        if (firstTab) firstTab.click();
+      }
+    }
+  }
+
+  // Forzar re-renderizado de formularios con campos condicionales al cambiar de plantilla
+  renderSkillsForm();
+  renderLanguagesForm();
+  renderInterestsForm();
+
+  // Sincronizar botones de tabs según la plantilla
+  const tabTechSkills = document.getElementById('tab-tech-skills');
+  const tabSkills = document.getElementById('tab-skills');
+
+  if (tabTechSkills) {
+    if (features.techSkills) {
+      tabTechSkills.style.display = 'block';
+      tabTechSkills.textContent = 'Habilidades';
+      renderTechSkillsForm();
+    } else {
+      tabTechSkills.style.display = 'none';
+      if (tabTechSkills.classList.contains('active')) {
+        const firstTab = document.querySelector('.tab-btn[data-target="sec-personal"]');
+        if (firstTab) firstTab.click();
+      }
+    }
+  }
+
+  if (tabSkills) {
+    tabSkills.textContent = features.techSkills ? 'Competencias' : 'Habilidades';
+  }
+
+  const interestsGrid = document.getElementById('interests-grid-container');
+  const rosaAdditionalInfo = document.getElementById('rosa-additional-info-container');
+  const tabInterests = document.querySelector('.tab-btn[data-target="sec-interests"]');
+
+  if (tabInterests) {
+    const hasInterestsInOrder = activeTemplateConfig && activeTemplateConfig.tabOrder && activeTemplateConfig.tabOrder.includes('sec-interests');
+    if (!hasInterestsInOrder) {
+      tabInterests.style.display = 'none';
+      if (tabInterests.classList.contains('active')) {
+        const firstTab = document.querySelector('.tab-btn[data-target="sec-personal"]');
+        if (firstTab) firstTab.click();
+      }
+    } else {
+      tabInterests.style.display = 'block';
+      tabInterests.textContent = getSectionTitle('interests');
+
+      const showTextArea = features.additionalInfoText;
+      if (showTextArea) {
+        if (interestsGrid) interestsGrid.style.display = 'none';
+        if (rosaAdditionalInfo) rosaAdditionalInfo.style.display = 'block';
+      } else {
+        if (interestsGrid) interestsGrid.style.display = '';
+        if (rosaAdditionalInfo) rosaAdditionalInfo.style.display = 'none';
+      }
+    }
+  }
+
   // Sincronizar leyendas editables (evitando reescribir si está enfocada por el usuario)
   const editableLegends = document.querySelectorAll('legend[contenteditable="true"]');
   editableLegends.forEach(legend => {
     const sectionKey = legend.getAttribute('data-section-title');
-    const targetText = (state.sectionTitles && state.sectionTitles[sectionKey]) || defaultData.sectionTitles[sectionKey];
+    const targetText = getSectionTitle(sectionKey);
     if (document.activeElement !== legend) {
       if (legend.textContent !== targetText) {
         legend.textContent = targetText;
@@ -450,15 +1253,19 @@ function syncStaticInputs() {
     }
     updateSectionLabels(sectionKey);
   });
-  
+
   // Actualizar los pickers de colores del tema
   syncColorPickers();
+  updateThumbnailColors();
+
+  // Actualizar el selector de tipografía del CV
+  syncFontSelector();
 }
 
-// Sincronizar las etiquetas secundarias (tarjetas de repeater y botones) en base a los títulos personalizados de sección
+/* --- Sincronización de Etiquetas de Sección (tarjetas repeater y botones) --- */
 function updateSectionLabels(sectionKey) {
-  const titleText = (state.sectionTitles && state.sectionTitles[sectionKey]) || defaultData.sectionTitles[sectionKey] || '';
-  const singular = getSingularFromPlural(titleText);
+  const titleText = getSectionTitle(sectionKey);
+  const singular = getSingularForSection(sectionKey);
 
   let containerId = '';
   let addAction = '';
@@ -485,7 +1292,7 @@ function updateSectionLabels(sectionKey) {
         if (titleSpan) {
           titleSpan.textContent = `${singular} #${index + 1}`;
         }
-        
+
         // Re-etiquetar el label principal del campo en Habilidades o Idiomas
         if (sectionKey === 'skills' || sectionKey === 'languages') {
           const labelField = card.querySelector('.form-group label');
@@ -507,46 +1314,130 @@ function updateSectionLabels(sectionKey) {
 
 function syncColorPickers() {
   const activeTmpl = state.activeTemplate;
-  const colors = state.colors[activeTmpl] || {};
-  
-  const primaryPicker = document.getElementById('color-primary');
-  const accentPicker = document.getElementById('color-accent');
-  
-  if (primaryPicker && colors.primary) {
-    primaryPicker.value = colors.primary;
-  }
-  if (accentPicker && colors.accent) {
-    accentPicker.value = colors.accent;
-  }
+  const container = document.querySelector('.color-picker-grid');
+  if (!container) return;
+
+  const activeTemplateConfig = templatesConfig ? templatesConfig.find(t => t.id === activeTmpl) : null;
+  const colorsDef = activeTemplateConfig?.colors || { primary: "Color Principal", accent: "Color de Acento" };
+  const currentColors = state.colors[activeTmpl] || {};
+
+  container.innerHTML = '';
+
+  Object.entries(colorsDef).forEach(([token, label]) => {
+    const value = currentColors[token] || '#000000';
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'color-picker-item';
+    itemDiv.innerHTML = `
+      <input type="color" id="color-${token}" data-token="${token}" value="${value}">
+      <span>${label}</span>
+    `;
+    container.appendChild(itemDiv);
+
+    // Add input listener
+    const input = itemDiv.querySelector('input');
+    input.addEventListener('input', (e) => {
+      state.colors[activeTmpl][token] = e.target.value;
+      updatePreview();
+      updateThumbnailColors();
+      saveState();
+    });
+  });
 }
 
-// Renderizar Perfil (textarea múltiple)
+/**
+ * Lista de tipografías soportadas por el editor, disponibles en el dropdown del panel de Diseño.
+ * @constant {string[]}
+ * @description Cada entrada debe coincidir con una familia importada en styles.css vía Google Fonts.
+ *              Para añadir nuevas tipografías, basta con importarlas en el CSS y añadirlas aquí.
+ */
+const SUPPORTED_FONTS = ['Inter', 'Montserrat', 'Open Sans', 'Plus Jakarta Sans'];
+
+/**
+ * Inyecta o actualiza una regla CSS dinámica para aplicar la tipografía seleccionada al CV previsualizador.
+ * @param {string} fontName - El nombre de la familia tipográfica a aplicar (ej. 'Montserrat').
+ * @description Crea o reutiliza un elemento <style id="dynamic-cv-font"> en el <head> del documento.
+ *              La regla utiliza `!important` para sobreescribir las fuentes declaradas en el CSS de cada
+ *              plantilla, garantizando que la elección del usuario prevalezca tanto en pantalla como en
+ *              la impresión/exportación a PDF (window.print).
+ */
+function injectDynamicFontCSS(fontName) {
+  let styleTag = document.getElementById('dynamic-cv-font');
+  if (!styleTag) {
+    styleTag = document.createElement('style');
+    styleTag.id = 'dynamic-cv-font';
+    document.head.appendChild(styleTag);
+  }
+  styleTag.textContent = `.cv-page, .cv-page * { font-family: '${fontName}', sans-serif !important; }`;
+}
+
+/**
+ * Sincroniza el selector de tipografía del panel de Diseño con el estado de la plantilla activa.
+ * @description Pobla dinámicamente las opciones del dropdown `#font-family-select` con las tipografías
+ *              de SUPPORTED_FONTS, establece el valor seleccionado en base a `state.fonts[activeTemplate]`,
+ *              y vincula el evento `change` para actualizar el estado, inyectar la fuente y persistir.
+ *              Sigue el mismo patrón modular que `syncColorPickers()`.
+ */
+function syncFontSelector() {
+  const select = document.getElementById('font-family-select');
+  if (!select) return;
+
+  const activeTmpl = state.activeTemplate;
+  const currentFont = state.fonts?.[activeTmpl] || defaultData.fonts[activeTmpl] || 'Inter';
+
+  // Poblar opciones solo si están vacías o han cambiado
+  select.innerHTML = '';
+  SUPPORTED_FONTS.forEach(font => {
+    const option = document.createElement('option');
+    option.value = font;
+    option.textContent = font;
+    option.style.fontFamily = `'${font}', sans-serif`;
+    if (font === currentFont) option.selected = true;
+    select.appendChild(option);
+  });
+
+  // Remover listeners previos clonando el nodo (evita duplicados en cada sync)
+  const newSelect = select.cloneNode(true);
+  select.parentNode.replaceChild(newSelect, select);
+
+  newSelect.addEventListener('change', (e) => {
+    if (!state.fonts) state.fonts = {};
+    state.fonts[state.activeTemplate] = e.target.value;
+    injectDynamicFontCSS(e.target.value);
+    updatePreview();
+    saveState();
+  });
+}
+
+/* ==========================================================================
+   GESTIÓN DE FORMULARIOS — RENDERIZADO DE SECCIONES
+   Genera dinámicamente las tarjetas de edición para cada sección del CV:
+   perfil, experiencia, educación, habilidades, personalidad, idiomas e intereses.
+   ========================================================================== */
+
+/* --- Perfil Profesional (textarea múltiple) --- */
 function renderProfileForm() {
   const container = document.getElementById('profile-paragraphs-container');
   if (!container) return;
   container.innerHTML = '';
 
   state.personal.profile.forEach((text, index) => {
-    const fieldset = document.createElement('fieldset');
-    fieldset.className = 'repeater-card';
-    fieldset.innerHTML = `
-      <div class="repeater-header">
-        <span class="repeater-title">Párrafo ${index + 1}</span>
-        ${state.personal.profile.length > 1 ? `
-          <button type="button" class="btn-remove" data-action="remove-profile" data-index="${index}" title="Eliminar párrafo">
-            ${UI_ICONS.trash}
-          </button>
-        ` : ''}
-      </div>
-      <div class="form-group">
-        <textarea class="profile-paragraph-input" data-index="${index}">${text}</textarea>
-      </div>
-    `;
-    container.appendChild(fieldset);
+    const card = getClonedTemplate('template-profile-card', index);
+    if (!card) return;
+
+    // Asignar valor al textarea
+    const textarea = card.querySelector('.profile-paragraph-input');
+    if (textarea) textarea.value = text;
+
+    // Si solo hay un elemento, quitar el botón de eliminar
+    if (state.personal.profile.length <= 1) {
+      card.querySelector('.btn-remove')?.remove();
+    }
+
+    container.appendChild(card);
   });
 }
 
-// Renderizar Experiencia Laboral
+/* --- Experiencia Laboral --- */
 function renderExperienceForm() {
   const container = document.getElementById('experience-list-container');
   if (!container) return;
@@ -561,56 +1452,51 @@ function renderExperienceForm() {
   }
 
   state.experience.forEach((exp, index) => {
-    const startDateVal = exp.startDate || '';
-    const endDateVal = exp.endDate || '';
-    const isCurrent = exp.current || false;
+    const card = getClonedTemplate('template-experience-card', index, { singular });
+    if (!card) return;
 
-    const fieldset = document.createElement('fieldset');
-    fieldset.className = 'repeater-card';
-    fieldset.innerHTML = `
-      <div class="repeater-header">
-        <span class="repeater-title">${singular} #${index + 1}</span>
-        <button type="button" class="btn-remove" data-action="remove-experience" data-index="${index}" title="Eliminar trabajo">
-          ${UI_ICONS.trash}
-        </button>
-      </div>
-      <div class="form-group">
-        <label>Cargo / Título</label>
-        <input type="text" class="exp-input" data-field="title" data-index="${index}" value="${exp.title || ''}">
-      </div>
-      <div class="form-group">
-        <label>Empresa</label>
-        <input type="text" class="exp-input" data-field="company" data-index="${index}" value="${exp.company || ''}">
-      </div>
-      <div class="form-group">
-        <label>Período / Fechas</label>
-        <div class="date-picker-helper-row">
-          <div class="date-inputs-row">
-            <div class="date-field">
-              <span>Desde</span>
-              <input type="date" class="exp-date-start" data-index="${index}" value="${startDateVal}">
-            </div>
-            <div class="date-field">
-              <span>Hasta</span>
-              <input type="date" class="exp-date-end" data-index="${index}" value="${endDateVal}" ${isCurrent ? 'disabled' : ''}>
-            </div>
-          </div>
-          <label class="presente-checkbox-label">
-            <input type="checkbox" class="exp-date-current" data-index="${index}" ${isCurrent ? 'checked' : ''}>
-            <span>Trabajo actual</span>
-          </label>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Logros o Tareas (Uno por línea)</label>
-        <textarea class="exp-bullets-input" data-index="${index}" placeholder="Ingresa cada logro en una línea distinta">${(exp.bullets || []).join('\n')}</textarea>
-      </div>
-    `;
-    container.appendChild(fieldset);
+    // Asignar campos de texto
+    const titleInput = card.querySelector('.exp-input[data-field="title"]');
+    if (titleInput) titleInput.value = exp.title || '';
+
+    const companyInput = card.querySelector('.exp-input[data-field="company"]');
+    if (companyInput) companyInput.value = exp.company || '';
+
+    // Asignar fechas
+    const startInput = card.querySelector('.exp-date-start');
+    if (startInput) startInput.value = exp.startDate || '';
+
+    const endInput = card.querySelector('.exp-date-end');
+    if (endInput) {
+      endInput.value = exp.endDate || '';
+      if (exp.current) {
+        endInput.disabled = true;
+      }
+    }
+
+    const currentCheckbox = card.querySelector('.exp-date-current');
+    if (currentCheckbox) {
+      currentCheckbox.checked = !!exp.current;
+    }
+
+    // Bullets (logros)
+    const bulletsTextarea = card.querySelector('.exp-bullets-input');
+    if (bulletsTextarea) {
+      bulletsTextarea.value = (exp.bullets || []).join('\n');
+    }
+
+    // Campos de botón opcional
+    const btnTextInput = card.querySelector('.exp-btn-input[data-field="text"]');
+    if (btnTextInput) btnTextInput.value = exp.button?.text || 'Ver Proyecto';
+
+    const btnUrlInput = card.querySelector('.exp-btn-input[data-field="url"]');
+    if (btnUrlInput) btnUrlInput.value = exp.button?.url || '';
+
+    container.appendChild(card);
   });
 }
 
-// Renderizar Formación Académica
+/* --- Formación Académica --- */
 function renderEducationForm() {
   const container = document.getElementById('education-list-container');
   if (!container) return;
@@ -625,113 +1511,182 @@ function renderEducationForm() {
   }
 
   state.education.forEach((edu, index) => {
-    const startDateVal = edu.startDate || '';
-    const endDateVal = edu.endDate || '';
-    const isCurrent = edu.current || false;
+    const card = getClonedTemplate('template-education-card', index, { singular });
+    if (!card) return;
 
-    const fieldset = document.createElement('fieldset');
-    fieldset.className = 'repeater-card';
-    fieldset.innerHTML = `
-      <div class="repeater-header">
-        <span class="repeater-title">${singular} #${index + 1}</span>
-        <button type="button" class="btn-remove" data-action="remove-education" data-index="${index}" title="Eliminar estudio">
-          ${UI_ICONS.trash}
-        </button>
-      </div>
-      <div class="form-group">
-        <label>Titulación / Curso</label>
-        <input type="text" class="edu-input" data-field="title" data-index="${index}" value="${edu.title || ''}">
-      </div>
-      <div class="form-group">
-        <label>Institución / Escuela</label>
-        <input type="text" class="edu-input" data-field="institution" data-index="${index}" value="${edu.institution || ''}">
-      </div>
-      <div class="form-group">
-        <label>Período / Fechas</label>
-        <div class="date-picker-helper-row">
-          <div class="date-inputs-row">
-            <div class="date-field">
-              <span>Desde</span>
-              <input type="date" class="edu-date-start" data-index="${index}" value="${startDateVal}">
-            </div>
-            <div class="date-field">
-              <span>Hasta</span>
-              <input type="date" class="edu-date-end" data-index="${index}" value="${endDateVal}" ${isCurrent ? 'disabled' : ''}>
-            </div>
-          </div>
-          <label class="presente-checkbox-label">
-            <input type="checkbox" class="edu-date-current" data-index="${index}" ${isCurrent ? 'checked' : ''}>
-            <span>Cursando actualmente</span>
-          </label>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Descripción</label>
-        <textarea class="edu-input" data-field="description" data-index="${index}">${edu.description || ''}</textarea>
-      </div>
-      
-      <fieldset class="form-fieldset nested-fieldset">
-        <legend>Enlace Opcional (Certificado / Portfolio)</legend>
-        <div class="form-group">
-          <label>Texto del Botón</label>
-          <input type="text" class="edu-btn-input" data-field="text" data-index="${index}" value="${edu.button?.text || 'Ver Certificado'}">
-        </div>
-        <div class="form-group">
-          <label>URL del Enlace (Vacío para ocultar)</label>
-          <input type="url" class="edu-btn-input" data-field="url" data-index="${index}" value="${edu.button?.url || ''}" placeholder="https://...">
-        </div>
-      </fieldset>
-    `;
-    container.appendChild(fieldset);
+    // Asignar campos de texto
+    const titleInput = card.querySelector('.edu-input[data-field="title"]');
+    if (titleInput) titleInput.value = edu.title || '';
+
+    const instInput = card.querySelector('.edu-input[data-field="institution"]');
+    if (instInput) instInput.value = edu.institution || '';
+
+    // Asignar fechas
+    const startInput = card.querySelector('.edu-date-start');
+    if (startInput) startInput.value = edu.startDate || '';
+
+    const endInput = card.querySelector('.edu-date-end');
+    if (endInput) {
+      endInput.value = edu.endDate || '';
+      if (edu.current) {
+        endInput.disabled = true;
+      }
+    }
+
+    const currentCheckbox = card.querySelector('.edu-date-current');
+    if (currentCheckbox) {
+      currentCheckbox.checked = !!edu.current;
+    }
+
+    // Descripción
+    const descTextarea = card.querySelector('textarea[data-field="description"]');
+    if (descTextarea) descTextarea.value = edu.description || '';
+
+    // Campos de botón opcional
+    const btnTextInput = card.querySelector('.edu-btn-input[data-field="text"]');
+    if (btnTextInput) btnTextInput.value = edu.button?.text || 'Ver Certificado';
+
+    const btnUrlInput = card.querySelector('.edu-btn-input[data-field="url"]');
+    if (btnUrlInput) btnUrlInput.value = edu.button?.url || '';
+
+    container.appendChild(card);
   });
 }
 
-// Renderizar Habilidades Técnicas
+/* --- Habilidades --- */
 function renderSkillsForm() {
   const container = document.getElementById('skills-list-container');
   if (!container) return;
   container.innerHTML = '';
 
-  const titleText = (state.sectionTitles && state.sectionTitles.skills) || defaultData.sectionTitles.skills;
-  const singular = getSingularFromPlural(titleText);
+  const titleText = getSectionTitle('skills');
+  const singular = getSingularForSection('skills');
 
   const addBtnSpan = document.querySelector('[data-action="add-skill"] span');
   if (addBtnSpan) {
     addBtnSpan.textContent = getButtonText(singular, 'skills');
   }
 
+  const features = getActiveTemplateFeatures();
+  const showLevel = features.skillLevels;
+  const showPercentage = features.skillPercentage;
+  const templateId = (showLevel && showPercentage) ? 'template-skill-percentage-card' : 'template-skill-card';
+
   state.skills.forEach((skill, index) => {
-    const fieldset = document.createElement('fieldset');
-    fieldset.className = 'repeater-card';
-    fieldset.innerHTML = `
-      <div class="repeater-header">
-        <span class="repeater-title">${singular} #${index + 1}</span>
-        <button type="button" class="btn-remove" data-action="remove-skill" data-index="${index}" title="Eliminar habilidad">
-          ${UI_ICONS.trash}
-        </button>
-      </div>
-      <div class="input-row" style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; width: 100%;">
-        <div class="form-group">
-          <label>${singular}</label>
-          <input type="text" class="skill-input" data-field="name" data-index="${index}" value="${skill.name || ''}" placeholder="Ej. Linux">
-        </div>
-        <div class="form-group">
-          <label>Nivel (1 - 5)</label>
-          <select class="skill-input" data-field="level" data-index="${index}">
-            <option value="1" ${skill.level === 1 ? 'selected' : ''}>1 ★</option>
-            <option value="2" ${skill.level === 2 ? 'selected' : ''}>2 ★★</option>
-            <option value="3" ${skill.level === 3 ? 'selected' : ''}>3 ★★★</option>
-            <option value="4" ${skill.level === 4 ? 'selected' : ''}>4 ★★★★</option>
-            <option value="5" ${skill.level === 5 ? 'selected' : ''}>5 ★★★★★</option>
-          </select>
-        </div>
-      </div>
-    `;
-    container.appendChild(fieldset);
+    let percent = skill.percentage;
+    if (percent === undefined) {
+      percent = skill.level ? skill.level * 20 : 60;
+    }
+
+    const card = getClonedTemplate(templateId, index, { singular, percentage: percent });
+    if (!card) return;
+
+    // Asignar nombre resolviendo defaults
+    const nameInput = card.querySelector('input[data-field="name"]');
+    if (nameInput) nameInput.value = resolveDefaultValue(skill.name || '', 'name', 'skills');
+
+    if (showLevel && showPercentage) {
+      const rangeInput = card.querySelector('.skill-input-range');
+      if (rangeInput) {
+        rangeInput.value = percent;
+      }
+    } else {
+      // Configurar clases de grid y nivel de forma programática
+      const inputRow = card.querySelector('.input-row');
+      if (inputRow) {
+        inputRow.classList.add(showLevel ? 'skill-grid-with-level' : 'skill-grid-no-level');
+      }
+      const levelGroup = card.querySelector('.level-group');
+      if (levelGroup) {
+        levelGroup.style.display = showLevel ? '' : 'none';
+      }
+
+      // Asignar nivel en select
+      const select = card.querySelector('select[data-field="level"]');
+      const levelLabel = card.querySelector('.level-group label');
+      if (select) {
+        if (levelLabel) levelLabel.textContent = 'Nivel (1 - 5)';
+        select.innerHTML = `
+          <option value="1">1 ★</option>
+          <option value="2">2 ★★</option>
+          <option value="3">3 ★★★</option>
+          <option value="4">4 ★★★★</option>
+          <option value="5">5 ★★★★★</option>
+        `;
+        select.value = skill.level || 3;
+      }
+    }
+
+    container.appendChild(card);
   });
 }
 
-// Renderizar Idiomas
+/* --- Personalidad / Cualidades --- */
+function renderPersonalityForm() {
+  const container = document.getElementById('personality-list-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const addBtnSpan = document.querySelector('[data-action="add-personality"] span');
+  if (addBtnSpan) {
+    addBtnSpan.textContent = 'Añadir Cualidad';
+  }
+
+  const features = getActiveTemplateFeatures();
+  const list = state.personality || [];
+  list.forEach((pers, index) => {
+    const card = getClonedTemplate('template-personality-card', index);
+    if (!card) return;
+
+    // Configurar clases de grid y nivel de forma programática
+    const inputRow = card.querySelector('.personality-grid');
+    if (inputRow) {
+      inputRow.classList.toggle('hide-levels', !features.personalityLevels);
+    }
+    const levelGroup = card.querySelector('.level-group');
+    if (levelGroup) {
+      levelGroup.style.display = features.personalityLevels ? '' : 'none';
+    }
+
+    // Asignar nombre
+    const nameInput = card.querySelector('input[data-field="name"]');
+    if (nameInput) nameInput.value = pers.name || '';
+
+    // Asignar nivel en select
+    const select = card.querySelector('select[data-field="level"]');
+    if (select) {
+      select.value = pers.level || 3;
+    }
+
+    container.appendChild(card);
+  });
+}
+
+/* --- Habilidades Técnicas (sidebar Creativo) --- */
+function renderTechSkillsForm() {
+  const container = document.getElementById('tech-skills-list-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const addBtnSpan = document.querySelector('[data-action="add-tech-skill"] span');
+  if (addBtnSpan) {
+    addBtnSpan.textContent = 'Añadir Habilidad Técnica';
+  }
+
+  const list = state.techSkills || [];
+  list.forEach((ts, index) => {
+    const card = getClonedTemplate('template-tech-skill-card', index);
+    if (!card) return;
+
+    // Asignar nombre
+    const nameInput = card.querySelector('input[data-field="name"]');
+    if (nameInput) nameInput.value = ts.name || '';
+
+    container.appendChild(card);
+  });
+}
+
+/* --- Idiomas --- */
 function renderLanguagesForm() {
   const container = document.getElementById('languages-list-container');
   if (!container) return;
@@ -745,36 +1700,33 @@ function renderLanguagesForm() {
     addBtnSpan.textContent = getButtonText(singular, 'languages');
   }
 
+  const features = getActiveTemplateFeatures();
+  const showPercentage = features.languageLevels;
+  const templateId = showPercentage ? 'template-language-percentage-card' : 'template-language-simple-card';
+
   state.languages.forEach((lang, index) => {
-    const fieldset = document.createElement('fieldset');
-    fieldset.className = 'repeater-card';
-    fieldset.innerHTML = `
-      <div class="repeater-header">
-        <span class="repeater-title">${singular} #${index + 1}</span>
-        <button type="button" class="btn-remove" data-action="remove-language" data-index="${index}" title="Eliminar idioma">
-          ${UI_ICONS.trash}
-        </button>
-      </div>
-      <div class="form-group">
-        <label>${singular}</label>
-        <input type="text" class="lang-input" data-field="name" data-index="${index}" value="${lang.name || ''}" placeholder="Ej. Inglés">
-      </div>
-      <div class="input-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-        <div class="form-group">
-          <label>Nivel Texto</label>
-          <input type="text" class="lang-input" data-field="level" data-index="${index}" value="${lang.level || ''}" placeholder="Ej. B2 o Nativo">
-        </div>
-        <div class="form-group">
-          <label>Dominio (%): <strong class="percent-label">${lang.percentage || 100}%</strong></label>
-          <input type="range" class="lang-input-range" data-index="${index}" min="0" max="100" value="${lang.percentage || 100}" style="accent-color: var(--db-accent);">
-        </div>
-      </div>
-    `;
-    container.appendChild(fieldset);
+    const card = getClonedTemplate(templateId, index, { singular, percentage: lang.percentage || 100 });
+    if (!card) return;
+
+    // Asignar nombre e idioma
+    const nameInput = card.querySelector('input[data-field="name"]');
+    if (nameInput) nameInput.value = lang.name || '';
+
+    const levelInput = card.querySelector('input[data-field="level"]');
+    if (levelInput) levelInput.value = lang.level || '';
+
+    if (showPercentage) {
+      const rangeInput = card.querySelector('.lang-input-range');
+      if (rangeInput) {
+        rangeInput.value = lang.percentage || 100;
+      }
+    }
+
+    container.appendChild(card);
   });
 }
 
-// Renderizar Selector de Intereses
+/* --- Intereses y Hobbies --- */
 function renderInterestsForm() {
   const container = document.getElementById('interests-grid-container');
   if (!container) return;
@@ -794,23 +1746,28 @@ function renderInterestsForm() {
   });
 }
 
-// Renderizar todo el panel lateral de formularios
+/* --- Renderizado Completo del Panel Lateral --- */
 function renderAllForms() {
   syncStaticInputs();
   renderProfileForm();
   renderExperienceForm();
   renderEducationForm();
   renderSkillsForm();
+  renderPersonalityForm();
+  renderTechSkillsForm();
   renderLanguagesForm();
   renderInterestsForm();
 }
 
-// --- CONFIGURACIÓN DE EVENT LISTENERS ---
+/* ==========================================================================
+   CONFIGURACIÓN DE EVENT LISTENERS
+   Vincula todos los eventos del panel lateral (inputs, botones, drag & drop,
+   teclado, zoom, impresión y edición inline de títulos de sección).
+   ========================================================================== */
 function setupEventListeners() {
   // 1. Selector de Plantillas Visual (Dropdown con Miniaturas)
   const triggerBtn = document.getElementById('btn-template-select-trigger');
   const dropdownMenu = document.getElementById('template-dropdown-menu');
-  const templateOptions = document.querySelectorAll('.template-option');
 
   if (triggerBtn && dropdownMenu) {
     triggerBtn.addEventListener('click', (e) => {
@@ -825,21 +1782,6 @@ function setupEventListeners() {
         dropdownMenu.classList.remove('active');
       }
     });
-
-    // Cambiar la plantilla al hacer clic en una opción
-    templateOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        const val = option.getAttribute('data-value');
-        if (val) {
-          state.activeTemplate = val;
-          syncStaticInputs();
-          syncColorPickers();
-          updatePreview();
-          saveState();
-          dropdownMenu.classList.remove('active');
-        }
-      });
-    });
   }
 
   // 2. Cambio de Pestañas (Tabs) con auto-scroll
@@ -848,7 +1790,7 @@ function setupEventListeners() {
     tab.addEventListener('click', () => {
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      
+
       // Mover los tabs automáticamente para centrar el tab activo en la barra de scroll
       const container = document.querySelector('nav.editor-tabs');
       if (container) {
@@ -865,7 +1807,7 @@ function setupEventListeners() {
       const targetSectionId = tab.getAttribute('data-target');
       const sections = document.querySelectorAll('.form-section');
       sections.forEach(s => s.classList.remove('active'));
-      
+
       const targetSection = document.getElementById(targetSectionId);
       if (targetSection) {
         targetSection.classList.add('active');
@@ -918,10 +1860,10 @@ function setupEventListeners() {
         saveState();
       } else if (e.target.classList.contains('exp-date-current')) {
         state.experience[idx].current = e.target.checked;
-        
+
         const endInput = expContainer.querySelector(`.exp-date-end[data-index="${idx}"]`);
         if (endInput) endInput.disabled = e.target.checked;
-        
+
         state.experience[idx].period = formatPeriodDates(state.experience[idx].startDate, state.experience[idx].endDate, state.experience[idx].current);
         updatePreview();
         saveState();
@@ -931,10 +1873,16 @@ function setupEventListeners() {
     expContainer.addEventListener('input', (e) => {
       const idx = parseInt(e.target.getAttribute('data-index'));
       if (isNaN(idx)) return;
-      
+
       if (e.target.classList.contains('exp-input')) {
         const field = e.target.getAttribute('data-field');
         state.experience[idx][field] = e.target.value;
+        updatePreview();
+        saveState();
+      } else if (e.target.classList.contains('exp-btn-input')) {
+        const field = e.target.getAttribute('data-field');
+        if (!state.experience[idx].button) state.experience[idx].button = { text: 'Ver Proyecto', url: '' };
+        state.experience[idx].button[field] = e.target.value;
         updatePreview();
         saveState();
       } else if (e.target.classList.contains('exp-bullets-input')) {
@@ -968,10 +1916,10 @@ function setupEventListeners() {
         saveState();
       } else if (e.target.classList.contains('edu-date-current')) {
         state.education[idx].current = e.target.checked;
-        
+
         const endInput = eduContainer.querySelector(`.edu-date-end[data-index="${idx}"]`);
         if (endInput) endInput.disabled = e.target.checked;
-        
+
         state.education[idx].period = formatPeriodDates(state.education[idx].startDate, state.education[idx].endDate, state.education[idx].current);
         updatePreview();
         saveState();
@@ -981,7 +1929,7 @@ function setupEventListeners() {
     eduContainer.addEventListener('input', (e) => {
       const idx = parseInt(e.target.getAttribute('data-index'));
       if (isNaN(idx)) return;
-      
+
       if (e.target.classList.contains('edu-input')) {
         const field = e.target.getAttribute('data-field');
         state.education[idx][field] = e.target.value;
@@ -1005,14 +1953,59 @@ function setupEventListeners() {
   const skillsContainer = document.getElementById('skills-list-container');
   if (skillsContainer) {
     skillsContainer.addEventListener('input', (e) => {
+      const idx = parseInt(e.target.getAttribute('data-index'));
+      if (isNaN(idx)) return;
+
       if (e.target.classList.contains('skill-input')) {
+        const field = e.target.getAttribute('data-field');
+        let value = e.target.value;
+        if (field === 'level') value = parseInt(value);
+        state.skills[idx][field] = value;
+      } else if (e.target.classList.contains('skill-input-range')) {
+        const val = parseInt(e.target.value);
+        state.skills[idx].percentage = val;
+        state.skills[idx].level = Math.max(1, Math.min(5, Math.round(val / 20)));
+
+        const percentLabel = e.target.closest('.form-group').querySelector('.percent-label');
+        if (percentLabel) percentLabel.textContent = `${val}%`;
+      }
+
+      updatePreview();
+      saveState();
+    });
+  }
+
+  // 7.5. Delegado de Entradas Dinámicas de Personalidad
+  const personalityContainer = document.getElementById('personality-list-container');
+  if (personalityContainer) {
+    personalityContainer.addEventListener('input', (e) => {
+      if (e.target.classList.contains('pers-input')) {
         const idx = parseInt(e.target.getAttribute('data-index'));
         const field = e.target.getAttribute('data-field');
         let value = e.target.value;
-        
+
         if (field === 'level') value = parseInt(value);
-        state.skills[idx][field] = value;
-        
+        if (!state.personality) state.personality = [];
+        state.personality[idx][field] = value;
+
+        updatePreview();
+        saveState();
+      }
+    });
+  }
+
+  // 7.6. Delegado de Entradas Dinámicas de Habilidades Técnicas (Jones Sidebar)
+  const techSkillsContainer = document.getElementById('tech-skills-list-container');
+  if (techSkillsContainer) {
+    techSkillsContainer.addEventListener('input', (e) => {
+      if (e.target.classList.contains('tech-skill-input')) {
+        const idx = parseInt(e.target.getAttribute('data-index'));
+        const field = e.target.getAttribute('data-field');
+        let value = e.target.value;
+
+        if (!state.techSkills) state.techSkills = [];
+        state.techSkills[idx][field] = value;
+
         updatePreview();
         saveState();
       }
@@ -1024,18 +2017,18 @@ function setupEventListeners() {
   if (langContainer) {
     langContainer.addEventListener('input', (e) => {
       const idx = parseInt(e.target.getAttribute('data-index'));
-      
+
       if (e.target.classList.contains('lang-input')) {
         const field = e.target.getAttribute('data-field');
         state.languages[idx][field] = e.target.value;
       } else if (e.target.classList.contains('lang-input-range')) {
         const val = parseInt(e.target.value);
         state.languages[idx].percentage = val;
-        
+
         // Actualizar el porcentaje de texto al lado
         const percentLabel = e.target.closest('.form-group').querySelector('.percent-label');
         if (percentLabel) percentLabel.textContent = `${val}%`;
-        
+
         // Ajuste en el caso de Idiomas: autocompletar texto a partir del porcentaje
         if (val <= 25) {
           state.languages[idx].level = 'Básico';
@@ -1046,12 +2039,12 @@ function setupEventListeners() {
         } else {
           state.languages[idx].level = 'Nativo / C2';
         }
-        
+
         // Sincronizar el input de texto de nivel
         const levelInput = e.target.closest('.repeater-card').querySelector('input[data-field="level"]');
         if (levelInput) levelInput.value = state.languages[idx].level;
       }
-      
+
       updatePreview();
       saveState();
     });
@@ -1065,7 +2058,7 @@ function setupEventListeners() {
       if (card) {
         const key = card.getAttribute('data-interest');
         const checkbox = card.querySelector('input[type="checkbox"]');
-        
+
         // Si no se hizo click directamente en el checkbox, alternar su estado
         if (e.target !== checkbox) {
           checkbox.checked = !checkbox.checked;
@@ -1080,7 +2073,7 @@ function setupEventListeners() {
           card.classList.remove('selected');
           state.interests = state.interests.filter(item => item !== key);
         }
-        
+
         updatePreview();
         saveState();
       }
@@ -1091,6 +2084,26 @@ function setupEventListeners() {
   document.addEventListener('click', (e) => {
     const removeBtn = e.target.closest('.btn-remove');
     const addBtn = e.target.closest('.btn-add');
+    const clearLinkBtn = e.target.closest('.btn-clear-link');
+
+    if (clearLinkBtn) {
+      const action = clearLinkBtn.getAttribute('data-action');
+      const idx = parseInt(clearLinkBtn.getAttribute('data-index'));
+
+      if (action === 'clear-experience-link') {
+        if (state.experience[idx]) {
+          state.experience[idx].button = { text: 'Ver Proyecto', url: '' };
+          renderExperienceForm();
+        }
+      } else if (action === 'clear-education-link') {
+        if (state.education[idx]) {
+          state.education[idx].button = { text: 'Ver Certificado', url: '' };
+          renderEducationForm();
+        }
+      }
+      updatePreview();
+      saveState();
+    }
 
     if (removeBtn) {
       const action = removeBtn.getAttribute('data-action');
@@ -1108,6 +2121,14 @@ function setupEventListeners() {
       } else if (action === 'remove-skill') {
         state.skills.splice(idx, 1);
         renderSkillsForm();
+      } else if (action === 'remove-personality') {
+        if (!state.personality) state.personality = [];
+        state.personality.splice(idx, 1);
+        renderPersonalityForm();
+      } else if (action === 'remove-tech-skill') {
+        if (!state.techSkills) state.techSkills = [];
+        state.techSkills.splice(idx, 1);
+        renderTechSkillsForm();
       } else if (action === 'remove-language') {
         state.languages.splice(idx, 1);
         renderLanguagesForm();
@@ -1132,6 +2153,14 @@ function setupEventListeners() {
       } else if (action === 'add-skill') {
         state.skills.push({ name: '', level: 5 });
         renderSkillsForm();
+      } else if (action === 'add-personality') {
+        if (!state.personality) state.personality = [];
+        state.personality.push({ name: '', level: 5 });
+        renderPersonalityForm();
+      } else if (action === 'add-tech-skill') {
+        if (!state.techSkills) state.techSkills = [];
+        state.techSkills.push({ name: '' });
+        renderTechSkillsForm();
       } else if (action === 'add-language') {
         state.languages.push({ name: '', level: 'Básico', percentage: 25 });
         renderLanguagesForm();
@@ -1161,7 +2190,7 @@ function setupEventListeners() {
         const reader = new FileReader();
         reader.onload = (evt) => {
           state.personal.photo = evt.target.result;
-          
+
           const imgPreview = document.getElementById('avatar-preview-img');
           const svgPreview = document.querySelector('.avatar-preview .placeholder-svg');
           if (imgPreview && svgPreview) {
@@ -1185,7 +2214,7 @@ function setupEventListeners() {
       if (btn) {
         const shape = btn.getAttribute('data-shape');
         state.personal.photoShape = shape;
-        
+
         // Sincroniza la clase active para la retroalimentación visual en los controles
         const shapeButtons = shapeTogglesSide.querySelectorAll('.shape-toggle-btn');
         shapeButtons.forEach(b => b.classList.remove('active'));
@@ -1197,7 +2226,7 @@ function setupEventListeners() {
           previewBox.classList.remove('shape-circle', 'shape-rounded', 'shape-square');
           previewBox.classList.add(`shape-${shape}`);
         }
-        
+
         updatePreview();
         saveState();
       }
@@ -1207,7 +2236,7 @@ function setupEventListeners() {
   const prefixSelect = document.getElementById('phone-prefix-select');
   const numberInput = document.getElementById('phone-number-input');
   const fullInputHidden = document.getElementById('phone-full-input');
-  
+
   const updatePhoneState = () => {
     if (prefixSelect && numberInput && fullInputHidden) {
       const fullValue = `${prefixSelect.value} ${numberInput.value.trim()}`.trim();
@@ -1219,7 +2248,7 @@ function setupEventListeners() {
       }
     }
   };
-  
+
   if (prefixSelect) {
     prefixSelect.addEventListener('change', updatePhoneState);
   }
@@ -1245,32 +2274,32 @@ function setupEventListeners() {
         'User-Agent': 'CVDinamicoApp/1.0 (julio@ejemplo.com)'
       }
     })
-    .then(res => res.json())
-    .then(data => {
-      if (!data || data.length === 0) {
-        if (addressSuggestions) addressSuggestions.style.display = 'none';
-        return;
-      }
-      if (addressSuggestions) {
-        addressSuggestions.innerHTML = '';
-        data.forEach(item => {
-          const li = document.createElement('li');
-          li.textContent = item.display_name;
-          li.addEventListener('click', () => {
-            addressInput.value = item.display_name;
-            addressSuggestions.style.display = 'none';
-            if (state.contact && state.contact[0]) {
-              state.contact[0].text = item.display_name;
-              updatePreview();
-              saveState();
-            }
+      .then(res => res.json())
+      .then(data => {
+        if (!data || data.length === 0) {
+          if (addressSuggestions) addressSuggestions.style.display = 'none';
+          return;
+        }
+        if (addressSuggestions) {
+          addressSuggestions.innerHTML = '';
+          data.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item.display_name;
+            li.addEventListener('click', () => {
+              addressInput.value = item.display_name;
+              addressSuggestions.style.display = 'none';
+              if (state.contact && state.contact[0]) {
+                state.contact[0].text = item.display_name;
+                updatePreview();
+                saveState();
+              }
+            });
+            addressSuggestions.appendChild(li);
           });
-          addressSuggestions.appendChild(li);
-        });
-        addressSuggestions.style.display = 'block';
-      }
-    })
-    .catch(err => console.error("Error al buscar dirección:", err));
+          addressSuggestions.style.display = 'block';
+        }
+      })
+      .catch(err => console.error("Error al buscar dirección:", err));
   };
 
   if (addressInput) {
@@ -1320,24 +2349,24 @@ function setupEventListeners() {
                 'User-Agent': 'CVDinamicoApp/1.0 (julio@ejemplo.com)'
               }
             })
-            .then(res => res.json())
-            .then(data => {
-              btnGeolocation.disabled = false;
-              btnGeolocation.style.opacity = '1';
-              if (data && data.display_name) {
-                if (addressInput) addressInput.value = data.display_name;
-                if (state.contact && state.contact[0]) {
-                  state.contact[0].text = data.display_name;
-                  updatePreview();
-                  saveState();
+              .then(res => res.json())
+              .then(data => {
+                btnGeolocation.disabled = false;
+                btnGeolocation.style.opacity = '1';
+                if (data && data.display_name) {
+                  if (addressInput) addressInput.value = data.display_name;
+                  if (state.contact && state.contact[0]) {
+                    state.contact[0].text = data.display_name;
+                    updatePreview();
+                    saveState();
+                  }
                 }
-              }
-            })
-            .catch(err => {
-              btnGeolocation.disabled = false;
-              btnGeolocation.style.opacity = '1';
-              console.error("Error en reverse-geocoding Nominatim:", err);
-            });
+              })
+              .catch(err => {
+                btnGeolocation.disabled = false;
+                btnGeolocation.style.opacity = '1';
+                console.error("Error en reverse-geocoding Nominatim:", err);
+              });
           },
           (error) => {
             btnGeolocation.disabled = false;
@@ -1354,23 +2383,19 @@ function setupEventListeners() {
   }
 
   // 12. Controladores de Color Pickers de Temas
-  const primaryPicker = document.getElementById('color-primary');
-  const accentPicker = document.getElementById('color-accent');
+  const btnResetColors = document.getElementById('btn-reset-colors');
 
-  if (primaryPicker) {
-    primaryPicker.addEventListener('input', (e) => {
+  if (btnResetColors) {
+    btnResetColors.addEventListener('click', () => {
       const activeTmpl = state.activeTemplate;
-      state.colors[activeTmpl].primary = e.target.value;
-      updatePreview();
-      saveState();
-    });
-  }
-  if (accentPicker) {
-    accentPicker.addEventListener('input', (e) => {
-      const activeTmpl = state.activeTemplate;
-      state.colors[activeTmpl].accent = e.target.value;
-      updatePreview();
-      saveState();
+      const defaultColors = defaultData.colors[activeTmpl];
+      if (defaultColors) {
+        state.colors[activeTmpl] = JSON.parse(JSON.stringify(defaultColors));
+        syncColorPickers();
+        updatePreview();
+        updateThumbnailColors();
+        saveState();
+      }
     });
   }
 
@@ -1401,8 +2426,11 @@ function setupEventListeners() {
   if (btnConfirmResetSubmit && confirmModal) {
     btnConfirmResetSubmit.addEventListener('click', (e) => {
       e.preventDefault();
+      const currentActiveTemplate = state.activeTemplate;
       localStorage.removeItem('cv_creator_state');
       state = JSON.parse(JSON.stringify(defaultData));
+      state.activeTemplate = currentActiveTemplate;
+      state.personal.photoShape = getDefaultPhotoShape(state.activeTemplate);
       saveState();
       renderAllForms();
       updatePreview();
@@ -1587,10 +2615,10 @@ function setupEventListeners() {
     legend.addEventListener('input', () => {
       if (!state.sectionTitles) state.sectionTitles = {};
       state.sectionTitles[sectionKey] = legend.textContent;
-      
+
       // Actualizar dinámicamente las etiquetas secundarias sin regenerar el DOM del formulario
       updateSectionLabels(sectionKey);
-      
+
       // Actualizar la vista previa del CV en tiempo real
       updatePreview();
       saveState();
@@ -1599,10 +2627,10 @@ function setupEventListeners() {
     legend.addEventListener('blur', () => {
       const text = legend.textContent.trim();
       legend.textContent = text || defaultData.sectionTitles[sectionKey];
-      
+
       if (!state.sectionTitles) state.sectionTitles = {};
       state.sectionTitles[sectionKey] = legend.textContent;
-      
+
       updateSectionLabels(sectionKey);
       updatePreview();
       saveState();
@@ -1617,10 +2645,25 @@ function setupEventListeners() {
   });
 }
 
-// --- INSTANCIACIÓN DE LA APLICACIÓN ---
-document.addEventListener('DOMContentLoaded', () => {
+/* ==========================================================================
+   INSTANCIACIÓN DE LA APLICACIÓN
+   Punto de entrada: precarga la configuración de plantillas, carga el estado
+   del localStorage, inicializa el selector, renderiza los formularios y
+   arranca la vista previa del CV.
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', async () => {
+  // Precargar configuración de plantillas antes de cargar el estado
+  try {
+    const response = await fetch('./src/templates/templates-config.json');
+    templatesConfig = await response.json();
+  } catch (err) {
+    console.error("Error al precargar la configuración de plantillas en inicio:", err);
+  }
+
   loadState();
+  await initTemplateSelector();
   renderAllForms();
-  updatePreview();
+  await updatePreview();
+  updateThumbnailColors();
   setupEventListeners();
 });

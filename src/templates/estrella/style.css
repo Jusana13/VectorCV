@@ -1,0 +1,474 @@
+/* ==========================================================================
+   PLANTILLA ESTRELLA (STAR TEMPLATE)
+   Hoja de estilos de la plantilla Estrella.
+   Layout de dos columnas con divisores ornamentados con estrellas y cruces.
+   ========================================================================== */
+
+.cv-page.estrella {
+  width: 210mm;
+  height: 297mm;
+  min-height: 297mm;
+  padding: 55px 45px;
+  background-color: var(--accent, #F8F7F4);
+  font-family: 'Montserrat', sans-serif;
+  color: var(--text-color, #5A5A58);
+  position: relative;
+  overflow: hidden;
+
+  /* Reseteo de márgenes internos de la plantilla */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Enlaces dentro del CV */
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  /* ==========================================================================
+     ENCABEZADO / HEADER
+     ========================================================================== */
+
+  .cv-header {
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .cv-name {
+    font-size: 34px;
+    font-weight: 400;
+    letter-spacing: 5px;
+    color: var(--primary, #4D4D4B);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  /* Fila del Subtítulo flanked by lines */
+  .cv-subtitle-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .subtitle-line {
+    width: 60px;
+    height: 1.5px;
+    background-color: var(--primary, #4D4D4B);
+  }
+
+  .cv-subtitle {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--primary, #4D4D4B);
+    text-transform: uppercase;
+  }
+
+  /* Sección de Foto de Perfil y Decoraciones Horizontales */
+  .profile-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    position: relative;
+  }
+
+  /* Contenedor de la Foto Circular */
+  .profile-pic-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3.5px solid var(--primary, #4D4D4B);
+    background-color: var(--accent, #F8F7F4);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    flex-shrink: 0;
+    overflow: hidden;
+
+    img.profile-pic {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .profile-pic-placeholder {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: #D6D5D1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      svg {
+        width: 65%;
+        height: 65%;
+        fill: var(--primary, #4D4D4B);
+      }
+    }
+  }
+
+  /* Líneas horizontales decorativas */
+  .line-decor {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .left-decor {
+    margin-right: -10px;
+  }
+
+  .right-decor {
+    margin-left: -10px;
+  }
+
+  .horizontal-line {
+    height: 1.5px;
+    background-color: var(--primary, #4D4D4B);
+    width: 100%;
+  }
+
+  .left-decor .horizontal-line {
+    width: 75%;
+  }
+
+  .right-decor .horizontal-line {
+    width: 75%;
+    margin-left: 25%;
+  }
+
+  /* Contenedores de las estrellas y cruces en la fila del perfil */
+  .decor-container {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .left-decor .decor-container {
+    left: 75%;
+  }
+
+  .right-decor .decor-container {
+    left: 25%;
+  }
+
+  /* Estilos de los iconos decorativos SVG */
+  .star-svg {
+    width: 22px;
+    height: 22px;
+    z-index: 2;
+    transform: rotate(45deg);
+  }
+
+  .cross-svg {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    z-index: 3;
+  }
+
+  /* Cruces diagonales de la decoración izquierda */
+  .decor-container .cross-top {
+    top: -4px;
+    right: -1px;
+  }
+
+  .decor-container .cross-bottom {
+    bottom: -4px;
+    right: -5px;
+  }
+
+  /* Resumen Profesional */
+  .profile-summary {
+    max-width: 620px;
+    margin: 0 auto 12px;
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--text-color, #5A5A58);
+    text-align: center;
+    font-weight: 400;
+  }
+
+  /* Listado de Contacto */
+  .contact-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--primary, #4D4D4B);
+    margin-bottom: 20px;
+    border-bottom: 1.5px solid var(--primary, #4D4D4B);
+    padding-bottom: 15px;
+
+    span {
+      letter-spacing: 0.5px;
+    }
+
+    .separator {
+      color: var(--text-color, #5A5A58);
+      opacity: 0.5;
+      font-weight: 300;
+    }
+  }
+
+  /* ==========================================================================
+     CUERPO PRINCIPAL / LAYOUT
+     ========================================================================== */
+
+  .cv-body {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 5px;
+  }
+
+  .body-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .left-col {
+    width: 35%;
+  }
+
+  .right-col {
+    width: 58%;
+  }
+
+  /* Divisor Vertical Ornamentado */
+  .vertical-divider-container {
+    position: absolute;
+    left: 38%;
+    top: -15px;
+    bottom: -15px;
+    width: 30px;
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+
+  .vertical-line {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1.5px;
+    top: 15px;
+    bottom: 15px;
+    background-color: var(--primary, #4D4D4B);
+  }
+
+  .vertical-decor {
+    position: absolute;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--accent, #F8F7F4);
+  }
+
+  .decor-top {
+    top: 0;
+    transform: translate(-50%, -50%);
+  }
+
+  .decor-bottom {
+    bottom: 0;
+    transform: translate(-50%, 50%);
+  }
+
+  /* Cruces de la decoración vertical */
+  .decor-top .cross-right {
+    top: 5px;
+    right: 2px;
+  }
+
+  .decor-bottom .cross-left {
+    top: -4px;
+    left: 1px;
+  }
+
+  .decor-bottom .cross-bottom-dot {
+    bottom: -6px;
+    left: 4px;
+  }
+
+  /* ==========================================================================
+     BLOQUES DE SECCIÓN Y CONTENIDO
+     ========================================================================== */
+
+  .section-block {
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--primary, #4D4D4B);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+  }
+
+  /* Lista de Habilidades (Left Column) */
+  .skills-list {
+    list-style-type: none;
+  }
+
+  .skills-list li {
+    font-size: 11px;
+    line-height: 1.6;
+    position: relative;
+    padding-left: 12px;
+    margin-bottom: 6px;
+    color: var(--text-color, #5A5A58);
+  }
+
+  .skills-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--primary, #4D4D4B);
+    font-size: 11px;
+  }
+
+  /* Divisor inter-sección de columna izquierda */
+  .col-divider-line {
+    width: 100%;
+    height: 1.5px;
+    background-color: var(--primary, #4D4D4B);
+    margin: 12px 0 18px;
+  }
+
+  /* Bloques de Educación (Left Column) */
+  .education-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 15px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .edu-degree {
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0.5px;
+    color: var(--primary, #4D4D4B);
+    text-transform: uppercase;
+  }
+
+  .edu-institution {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--text-color, #5A5A58);
+  }
+
+  .edu-date {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-color, #5A5A58);
+    opacity: 0.7;
+  }
+
+  /* Bloques de Experiencia (Right Column) */
+  .experience-item {
+    margin-bottom: 20px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .exp-role-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 3px;
+  }
+
+  .exp-role {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--primary, #4D4D4B);
+    text-transform: uppercase;
+  }
+
+  .exp-date {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-color, #5A5A58);
+    opacity: 0.7;
+  }
+
+  .exp-company {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-color, #5A5A58);
+    margin-bottom: 8px;
+  }
+
+  /* Lista de tareas/logros de experiencia */
+  .exp-bullets {
+    list-style-type: none;
+  }
+
+  .exp-bullets li {
+    font-size: 10.5px;
+    line-height: 1.5;
+    position: relative;
+    padding-left: 12px;
+    margin-bottom: 5px;
+    color: var(--text-color, #5A5A58);
+    text-align: justify;
+  }
+
+  .exp-bullets li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--primary, #4D4D4B);
+    font-size: 11px;
+  }
+}
+
+/* ==========================================================================
+   ESTILOS DE IMPRESIÓN
+   ========================================================================== */
+@media print {
+  .cv-page.estrella {
+    background-color: var(--accent, #F8F7F4) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

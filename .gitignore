@@ -22,3 +22,9 @@ yarn-error.log*
 
 # Local configuration/state files
 .env*.local
+
+# Dotnet Server
+dotnet-server/
+
+# Reference assets
+cvs soon/

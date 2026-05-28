@@ -1,0 +1,390 @@
+/* ==========================================================================
+   PLANTILLA ROSA
+   Diseño de dos columnas con columna izquierda de color y columna derecha
+   con foto centrada y líneas decorativas rojas.
+   ========================================================================== */
+
+.cv-page.rosa {
+  width: 210mm;
+  height: 297mm;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  color: #333333;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* ==========================================================================
+     COLUMNA IZQUIERDA
+     Sección principal con fondo rosa: perfil, experiencia, formación, etc.
+     ========================================================================== */
+
+  .left-column {
+    width: 124mm;
+    height: 100%;
+    background-color: var(--rose-bg, #f2b7b4);
+    padding: 30px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden;
+  }
+
+  /* --- Encabezado Izquierdo --- */
+
+  .left-header {
+    margin-bottom: 4px;
+  }
+
+  .profession-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #ffffff !important;
+    border-bottom: 1.5px solid #ffffff;
+    padding-bottom: 6px;
+    margin: 0 0 10px 0;
+    letter-spacing: 1px;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  /* --- Perfil Profesional --- */
+
+  .profile-summary {
+    font-size: 11px;
+    line-height: 1.45;
+    color: #333333;
+
+    .profile-text {
+      margin: 0 0 6px 0;
+    }
+  }
+
+  /* --- Títulos de Sección (Columna Izquierda) --- */
+
+  .left-column .section {
+    margin-bottom: 2px;
+  }
+
+  .left-column .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.5);
+    padding-bottom: 3px;
+
+    .bullet {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background-color: #ffffff;
+      display: inline-block;
+    }
+
+    h2 {
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff !important;
+      margin: 0;
+      letter-spacing: 1px;
+      font-family: 'Montserrat', sans-serif;
+    }
+  }
+
+  /* --- Listas de Ítems (Experiencia / Formación) --- */
+
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .left-column .item {
+    margin-bottom: 2px;
+  }
+
+  .left-column .item-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #333333;
+    margin-bottom: 2px;
+    line-height: 1.3;
+  }
+
+  .left-column .item-desc {
+    font-size: 10px;
+    line-height: 1.35;
+    color: #333333;
+    margin: 0;
+  }
+
+  .left-column ul.compact-list {
+    margin: 3px 0;
+    padding-left: 14px;
+    font-size: 10px;
+    line-height: 1.35;
+    color: #333333;
+
+    li {
+      margin-bottom: 2px;
+    }
+  }
+
+  /* --- Habilidades (Columna Izquierda) --- */
+
+  .skills-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .skill-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10.5px;
+    color: #333333;
+    font-weight: 600;
+  }
+
+  .dots-container {
+    display: flex;
+    gap: 4px;
+    font-size: 13px;
+    line-height: 1;
+
+    .dot {
+      &.filled {
+        color: #ffffff;
+      }
+
+      &.empty {
+        color: rgba(255, 255, 255, 0.45);
+      }
+    }
+  }
+
+  /* ==========================================================================
+     COLUMNA DERECHA
+     Foto de perfil, nombre, contacto, secciones adicionales y líneas rojas
+     ========================================================================== */
+
+  .right-column {
+    width: 86mm;
+    height: 100%;
+    background-color: #ffffff;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* --- Línea Decorativa Superior --- */
+
+  .top-red-line {
+    width: 3px;
+    height: 65px;
+    background-color: var(--primary, #d63a3a);
+    margin-bottom: 0;
+  }
+
+  /* --- Foto de Perfil --- */
+
+  .photo-container {
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .photo-wrap {
+    width: 190px;
+    height: 190px;
+    border: 3px solid var(--primary, #d63a3a);
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+
+    &.shape-circle {
+      border-radius: 50%;
+
+      img {
+        border-radius: 50%;
+      }
+    }
+
+    &.shape-rounded {
+      border-radius: 12px;
+
+      img {
+        border-radius: 8px;
+      }
+    }
+
+    &.shape-square {
+      border-radius: 0;
+
+      img {
+        border-radius: 0;
+      }
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  /* --- Nombre --- */
+
+  .name-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary, #d63a3a);
+    text-align: center;
+    text-transform: uppercase;
+    margin: 0 0 15px 0;
+    letter-spacing: 0.5px;
+    font-family: 'Montserrat', sans-serif;
+
+    .last-name {
+      font-weight: 800;
+    }
+  }
+
+  /* --- Contacto --- */
+
+  .contact-details {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 15px;
+  }
+
+  .contact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    border-bottom: 1px dotted #e2e8f0;
+    padding-bottom: 3px;
+    font-size: 10.5px;
+  }
+
+  .contact-label {
+    font-weight: 700;
+    color: #666666;
+  }
+
+  .contact-val {
+    color: #333333;
+    text-align: right;
+    word-break: break-all;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+  }
+
+  /* --- Línea Decorativa Central --- */
+
+  .middle-red-line {
+    width: 3px;
+    height: 35px;
+    background-color: var(--primary, #d63a3a);
+    margin-bottom: 15px;
+  }
+
+  /* --- Secciones Derecha (Idiomas, Info Adicional) --- */
+
+  .right-section {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .right-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1.5px solid var(--primary, #d63a3a);
+    padding-bottom: 3px;
+
+    .bullet-red {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background-color: var(--primary, #d63a3a);
+      display: inline-block;
+    }
+
+    h2 {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--primary, #d63a3a);
+      margin: 0;
+      letter-spacing: 1px;
+      font-family: 'Montserrat', sans-serif;
+    }
+  }
+
+  .right-section-content {
+    font-size: 10.5px;
+    color: #444444;
+    line-height: 1.4;
+
+    &.additional-info {
+      p {
+        margin: 0;
+      }
+    }
+  }
+
+  /* --- Idiomas --- */
+
+  .lang-row {
+    margin-bottom: 4px;
+  }
+
+  /* --- Línea Decorativa Inferior --- */
+
+  .bottom-red-line {
+    width: 3px;
+    flex-grow: 1;
+    min-height: 30px;
+    background-color: var(--primary, #d63a3a);
+    margin-top: 10px;
+  }
+
+  /* ==========================================================================
+     BOTONES DE CERTIFICADO / PROYECTO
+     ========================================================================== */
+
+  .cert-btn {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 2px 6px;
+    background: #ffffff;
+    color: var(--primary, #d63a3a) !important;
+    text-decoration: none;
+    font-size: 8px;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}

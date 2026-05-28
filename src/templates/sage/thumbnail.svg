@@ -1,0 +1,94 @@
+<svg viewBox="0 0 110 155" fill="none" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff; border-radius:4px; width:100%; height:100%;">
+  <!-- Page Background (White) -->
+  <rect x="0" y="0" width="110" height="155" fill="#ffffff" />
+
+  <!-- Header Band (Sage green) -->
+  <rect x="0" y="0" width="110" height="22" fill="var(--preview-primary, #b5d3cd)" />
+
+  <!-- Center Double Circular Border Profile Photo -->
+  <circle cx="55" cy="22" r="16.5" fill="none" stroke="var(--preview-accent, #22252a)" stroke-width="0.6" />
+  <circle cx="55" cy="22" r="14" fill="#9f9f9f" stroke="var(--preview-accent, #22252a)" stroke-width="1.2" />
+
+  <!-- Dotted Connector Lines (Left & Right) -->
+  <line x1="12" y1="12" x2="38" y2="12" stroke="var(--preview-accent, #22252a)" stroke-width="0.5" stroke-dasharray="1 1" opacity="0.6" />
+  <line x1="12" y1="18" x2="38" y2="18" stroke="var(--preview-accent, #22252a)" stroke-width="0.5" stroke-dasharray="1 1" opacity="0.6" />
+  
+  <line x1="72" y1="12" x2="98" y2="12" stroke="var(--preview-accent, #22252a)" stroke-width="0.5" stroke-dasharray="1 1" opacity="0.6" />
+  <line x1="72" y1="18" x2="98" y2="18" stroke="var(--preview-accent, #22252a)" stroke-width="0.5" stroke-dasharray="1 1" opacity="0.6" />
+
+  <!-- Left Contact Elements -->
+  <circle cx="36" cy="12" r="2" fill="var(--preview-accent, #22252a)" />
+  <circle cx="36" cy="18" r="2" fill="var(--preview-accent, #22252a)" />
+  <rect x="14" y="11" width="16" height="2" rx="0.3" fill="var(--preview-accent, #22252a)" opacity="0.8" />
+  <rect x="10" y="17" width="20" height="2" rx="0.3" fill="var(--preview-accent, #22252a)" opacity="0.8" />
+
+  <!-- Right Contact Elements -->
+  <circle cx="74" cy="12" r="2" fill="var(--preview-accent, #22252a)" />
+  <circle cx="74" cy="18" r="2" fill="var(--preview-accent, #22252a)" />
+  <rect x="80" y="11" width="16" height="2" rx="0.3" fill="var(--preview-accent, #22252a)" opacity="0.8" />
+  <rect x="80" y="17" width="20" height="2" rx="0.3" fill="var(--preview-accent, #22252a)" opacity="0.8" />
+
+  <!-- Name Amelia Sharp centered -->
+  <rect x="35" y="44" width="20" height="4.5" rx="0.5" fill="var(--preview-accent, #22252a)" />
+  <rect x="57" y="44" width="18" height="4.5" rx="0.5" fill="var(--preview-primary, #b5d3cd)" />
+  <!-- Subtitle sales associate -->
+  <rect x="42" y="52" width="26" height="2.5" rx="0.3" fill="var(--preview-accent, #22252a)" />
+
+  <!-- Dotted line above profile -->
+  <line x1="14" y1="59" x2="96" y2="59" stroke="var(--preview-accent, #22252a)" stroke-width="0.5" stroke-dasharray="1 1" opacity="0.6" />
+  <!-- Profile description lines -->
+  <rect x="20" y="64" width="70" height="2" rx="0.3" fill="#666666" />
+  <rect x="25" y="68" width="60" height="2" rx="0.3" fill="#666666" />
+
+  <!-- Three Columns Section -->
+  <!-- Dotted line behind pills -->
+  <line x1="14" y1="78" x2="96" y2="78" stroke="var(--preview-accent, #22252a)" stroke-width="0.5" stroke-dasharray="1 1" opacity="0.6" />
+  <!-- Column header pills -->
+  <rect x="14" y="75" width="22" height="6" rx="3" fill="var(--preview-accent, #22252a)" />
+  <rect x="44" y="75" width="22" height="6" rx="3" fill="var(--preview-accent, #22252a)" />
+  <rect x="74" y="75" width="22" height="6" rx="3" fill="var(--preview-accent, #22252a)" />
+
+  <!-- Column 1: Education -->
+  <rect x="14" y="87" width="22" height="2" fill="#22252a" />
+  <rect x="14" y="91" width="18" height="1.5" fill="var(--preview-primary, #b5d3cd)" />
+  <rect x="14" y="94" width="22" height="1.5" fill="#888888" />
+
+  <!-- Column 2: Personality -->
+  <rect x="47" y="87" width="16" height="2" fill="#22252a" />
+  <rect x="45" y="91" width="20" height="2" fill="#22252a" />
+  <rect x="48" y="95" width="14" height="2" fill="#22252a" />
+
+  <!-- Column 3: Skills with progress bars -->
+  <rect x="74" y="87" width="14" height="1.5" fill="#22252a" />
+  <rect x="74" y="90" width="22" height="2" rx="1" fill="#e2e8f0" />
+  <rect x="74" y="90" width="16" height="2" rx="1" fill="var(--preview-accent, #22252a)" />
+  <rect x="74" y="94" width="16" height="1.5" fill="#22252a" />
+  <rect x="74" y="97" width="22" height="2" rx="1" fill="#e2e8f0" />
+  <rect x="74" y="97" width="12" height="2" rx="1" fill="var(--preview-accent, #22252a)" />
+
+  <!-- Work Experience Section -->
+  <!-- Dotted line behind section pill -->
+  <line x1="14" y1="108" x2="96" y2="108" stroke="var(--preview-accent, #22252a)" stroke-width="0.5" stroke-dasharray="1 1" opacity="0.6" />
+  <!-- Experience pill -->
+  <rect x="38" y="105" width="34" height="6" rx="3" fill="var(--preview-accent, #22252a)" />
+
+  <!-- Exp Row 1 -->
+  <rect x="14" y="117" width="24" height="12" rx="1" fill="var(--preview-primary, #b5d3cd)" />
+  <rect x="17" y="120" width="18" height="2" fill="var(--preview-accent, #22252a)" />
+  <rect x="19" y="124" width="14" height="2" fill="var(--preview-accent, #22252a)" opacity="0.7" />
+
+  <rect x="44" y="117" width="40" height="2" fill="var(--preview-accent, #22252a)" />
+  <rect x="44" y="121" width="52" height="1.5" fill="#888888" />
+  <circle cx="46" cy="126" r="0.6" fill="#444444" />
+  <rect x="49" y="125.5" width="44" height="1" fill="#888888" />
+  <circle cx="46" cy="129" r="0.6" fill="#444444" />
+  <rect x="49" y="128.5" width="40" height="1" fill="#888888" />
+
+  <!-- Exp Row 2 -->
+  <rect x="14" y="134" width="24" height="12" rx="1" fill="var(--preview-primary, #b5d3cd)" />
+  <rect x="17" y="137" width="18" height="2" fill="var(--preview-accent, #22252a)" />
+  <rect x="19" y="141" width="14" height="2" fill="var(--preview-accent, #22252a)" opacity="0.7" />
+
+  <rect x="44" y="134" width="36" height="2" fill="var(--preview-accent, #22252a)" />
+  <rect x="44" y="138" width="48" height="1.5" fill="#888888" />
+</svg>

@@ -1,0 +1,428 @@
+/* ==========================================================================
+   PLANTILLA CREATIVO
+   Layout de dos columnas con flex, fondo SVG decorativo con curvas doradas,
+   sidebar izquierda con foto y contacto, contenido principal a la derecha.
+   ========================================================================== */
+
+.cv-page.creativo {
+  width: 210mm;
+  height: 297mm;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--primary, #222222);
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* ==========================================================================
+     FONDO DECORATIVO
+     SVG absoluto que dibuja las curvas doradas de fondo
+     ========================================================================== */
+
+  .creativo-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 210mm;
+    height: 297mm;
+    z-index: 1;
+    pointer-events: none;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  }
+
+  /* ==========================================================================
+     SIDEBAR
+     Columna izquierda con foto, contacto, habilidades e idiomas
+     ========================================================================== */
+
+  .sidebar {
+    width: 76mm;
+    height: 100%;
+    padding: 15mm 20px 20px 25px;
+    /* Spans down to align items safely under the golden top-left wave */
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    z-index: 2;
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  /* ==========================================================================
+     FOTO DE PERFIL
+     Contenedor centrado con formas intercambiables (circle, rounded, square)
+     ========================================================================== */
+
+  .photo-container {
+    display: flex;
+    justify-content: center;
+    margin-right: 60px;
+  }
+
+  .photo-wrap {
+    width: 180px;
+    height: 180px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    svg {
+      width: 60%;
+      height: 60%;
+      fill: #94a3b8;
+    }
+
+    /* --- Variantes de forma de la foto --- */
+
+    &.shape-circle {
+      border-radius: 50%;
+
+      img {
+        border-radius: 50%;
+      }
+    }
+
+    &.shape-rounded {
+      border-radius: 14px;
+
+      img {
+        border-radius: 10px;
+      }
+    }
+
+    &.shape-square {
+      border-radius: 0;
+
+      img {
+        border-radius: 0;
+      }
+    }
+  }
+
+  /* ==========================================================================
+     CONTACTO (SIDEBAR)
+     Sección glassmorphism con grid de iconos y textos
+     ========================================================================== */
+
+  .contact-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(5px);
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+
+  .contact-item {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--primary, #222222);
+
+    .contact-icon {
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      svg {
+        width: 14px;
+        height: 14px;
+        fill: var(--primary, #222222);
+      }
+    }
+
+    .contact-text {
+      line-height: 1.35;
+      word-break: break-all;
+
+      a {
+        color: inherit;
+        text-decoration: none;
+        font-weight: 500;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  /* ==========================================================================
+     SECCIONES DE LA SIDEBAR
+     Habilidades, idiomas y personalidad con listas de bullets
+     ========================================================================== */
+
+  .sidebar-section {
+    display: flex;
+    flex-direction: column;
+
+    h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--primary, #222222);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 2.5px solid var(--accent, #f4b844);
+      padding-bottom: 4px;
+      margin: 0 0 10px 0;
+    }
+
+    .bullet-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .bullet-item {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 11px;
+      color: #333333;
+      line-height: 1.4;
+
+      .list-bullet {
+        width: 5px;
+        height: 5px;
+        background-color: var(--accent, #f4b844);
+        border-radius: 50%;
+        flex-shrink: 0;
+        align-self: center;
+      }
+
+      .bullet-text {
+        font-weight: 500;
+
+        strong {
+          font-weight: 700;
+          color: var(--primary, #222222);
+        }
+      }
+    }
+  }
+
+  /* ==========================================================================
+     CONTENIDO PRINCIPAL
+     Columna derecha con header, perfil, experiencia y formación
+     ========================================================================== */
+
+  .main-content {
+    flex: 1;
+    height: 100%;
+    padding: 25mm 30px 20px 20px;
+    /* Pushed top padding to align with the golden header curve */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 2;
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  /* ==========================================================================
+     ENCABEZADO / HEADER
+     Profesión y nombre del candidato en la zona principal
+     ========================================================================== */
+
+  .header {
+    margin-bottom: 8px;
+
+    .profession {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary, #222222);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 0 0 4px 0;
+    }
+
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--primary, #222222);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0;
+      line-height: 1.15;
+    }
+  }
+
+  /* ==========================================================================
+     SECCIONES DE CONTENIDO
+     Perfil profesional, experiencia laboral y formación académica
+     ========================================================================== */
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px;
+
+    /* --- Títulos de sección con borde dorado inferior --- */
+
+    h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--primary, #222222);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      border-bottom: 2px solid var(--accent, #f4b844);
+      padding-bottom: 4px;
+      margin: 0 0 12px 0;
+    }
+
+    /* --- Perfil Profesional --- */
+
+    .profile-text {
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: #444444;
+      margin: 0 0 8px 0;
+    }
+
+    /* --- Contenedor de items (experiencia, formación) --- */
+
+    .items-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .item {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .item-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary, #222222);
+      margin-bottom: 2px;
+    }
+
+    .item-subtitle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+
+    .item-subtitle {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #444444;
+    }
+
+    .item-date {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent, #f4b844);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+
+      .date-bullet {
+        width: 4px;
+        height: 4px;
+        background-color: var(--accent, #f4b844);
+        border-radius: 50%;
+        display: inline-block;
+      }
+    }
+
+    .item-desc {
+      font-size: 11px;
+      line-height: 1.45;
+      color: #555555;
+      margin: 0;
+    }
+
+    /* --- Listas de bullets dentro de items --- */
+
+    .item-bullets-wrapper {
+      margin-top: 4px;
+    }
+
+    ul.bullets-list {
+      margin: 0;
+      padding-left: 15px;
+      font-size: 11px;
+      line-height: 1.45;
+      color: #555555;
+
+      li {
+        margin-bottom: 3px;
+      }
+    }
+
+    /* --- Botones de Certificado / Proyecto --- */
+
+    .cert-btn {
+      align-self: flex-start;
+      margin-top: 8px;
+      padding: 3px 8px;
+      background-color: var(--accent, #f4b844);
+      color: #ffffff !important;
+      text-decoration: none;
+      font-size: 9px;
+      font-weight: 700;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.85;
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   IMPRESIÓN
+   Ajustes para impresión: forzar dimensiones y preservar colores
+   ========================================================================== */
+
+@media print {
+  .cv-page.creativo {
+    width: 210mm !important;
+    height: 297mm !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    border: none !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

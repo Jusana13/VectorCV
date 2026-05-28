@@ -57,63 +57,7 @@
           </button>
 
           <div id="template-dropdown-menu" class="template-dropdown-menu">
-            <div class="template-option active" data-value="moderno">
-              <div class="template-mini-preview moderno">
-                <div class="mini-header"></div>
-                <div class="mini-body">
-                  <div class="mini-content-col">
-                    <div class="mini-line mini-title"></div>
-                    <div class="mini-line"></div>
-                    <div class="mini-line"></div>
-                  </div>
-                  <div class="mini-sidebar-col">
-                    <div class="mini-avatar"></div>
-                    <div class="mini-line"></div>
-                    <div class="mini-line"></div>
-                  </div>
-                </div>
-              </div>
-              <span class="template-name">Moderno</span>
-            </div>
-
-            <div class="template-option" data-value="profesional">
-              <div class="template-mini-preview profesional">
-                <div class="mini-stripe"></div>
-                <div class="mini-right-side">
-                  <div class="mini-header">
-                    <div class="mini-avatar"></div>
-                  </div>
-                  <div class="mini-body">
-                    <div class="mini-content-col">
-                      <div class="mini-line mini-title"></div>
-                      <div class="mini-line"></div>
-                    </div>
-                    <div class="mini-sidebar-col">
-                      <div class="mini-line"></div>
-                      <div class="mini-line"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <span class="template-name">Profesional</span>
-            </div>
-
-            <div class="template-option" data-value="minimalista">
-              <div class="template-mini-preview minimalista">
-                <div class="mini-header">
-                  <div class="mini-line mini-title" style="width: 50%;"></div>
-                  <div class="mini-avatar"></div>
-                </div>
-                <div class="mini-body">
-                  <div class="mini-main-full">
-                    <div class="mini-line"></div>
-                    <div class="mini-line"></div>
-                    <div class="mini-line"></div>
-                  </div>
-                </div>
-              </div>
-              <span class="template-name">Minimalista</span>
-            </div>
+            <!-- Renderizado dinámico de opciones de plantilla -->
           </div>
         </div>
 
@@ -154,13 +98,15 @@
       <!-- Panel Izquierdo: Formularios -->
       <aside class="editor-panel">
 
-        <!-- Pestañas de Navegación -->
         <nav class="editor-tabs">
           <button class="tab-btn active" data-target="sec-personal">Personal</button>
           <button class="tab-btn" data-target="sec-contact">Contacto</button>
           <button class="tab-btn" data-target="sec-education">Estudios</button>
           <button class="tab-btn" data-target="sec-experience">Experiencia</button>
-          <button class="tab-btn" data-target="sec-skills">Habilidades</button>
+          <button class="tab-btn" data-target="sec-tech-skills" id="tab-tech-skills">Habs.
+            Técnicas</button>
+          <button class="tab-btn" data-target="sec-skills" id="tab-skills">Habilidades</button>
+          <button class="tab-btn" data-target="sec-personality" id="tab-personality">Personalidad</button>
           <button class="tab-btn" data-target="sec-languages">Idiomas</button>
           <button class="tab-btn" data-target="sec-interests">Intereses</button>
           <button class="tab-btn" data-target="sec-design">Diseño</button>
@@ -172,7 +118,7 @@
           <!-- SECCIÓN: Datos Personales -->
           <section id="sec-personal" class="form-section active">
             <fieldset class="form-fieldset">
-              <legend>Información Personal</legend>
+              <legend contenteditable="true" data-section-title="personalInfo" title="Haz clic para renombrar esta sección">Información Personal</legend>
               <div class="form-group">
                 <label>Nombre</label>
                 <input type="text" data-bind="personal.name" placeholder="Ej. Tu Nombre">
@@ -229,7 +175,8 @@
             </fieldset>
 
             <fieldset class="form-fieldset" style="margin-top: 15px;">
-              <legend>Perfil Profesional</legend>
+              <legend contenteditable="true" data-section-title="profile" title="Haz clic para renombrar esta sección">
+                Perfil Profesional</legend>
               <div id="profile-paragraphs-container" class="list-items-container">
                 <!-- Renderizado dinámico de párrafos de perfil -->
               </div>
@@ -245,7 +192,7 @@
           <!-- SECCIÓN: Contacto -->
           <section id="sec-contact" class="form-section">
             <fieldset class="form-fieldset">
-              <legend>Medios de Contacto</legend>
+              <legend contenteditable="true" data-section-title="contact" title="Haz clic para renombrar esta sección">Contacto</legend>
               <div class="form-group">
                 <label>Dirección / Ubicación</label>
                 <div class="address-container-rel">
@@ -265,7 +212,7 @@
                       </svg>
                     </button>
                   </div>
-                  <ul id="address-suggestions" class="address-suggestions-list" style="display: none;"></ul>
+                  <ul id="address-suggestions" class="address-suggestions-list"></ul>
                 </div>
               </div>
               <div class="form-group">
@@ -343,6 +290,7 @@
             <fieldset class="form-fieldset">
               <legend contenteditable="true" data-section-title="skills" title="Haz clic para renombrar esta sección">
                 Habilidades Técnicas</legend>
+
               <div id="skills-list-container" class="list-items-container">
                 <!-- Renderizado dinámico de habilidades -->
               </div>
@@ -351,6 +299,40 @@
                   <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                 </svg>
                 <span>Añadir Habilidad</span>
+              </button>
+            </fieldset>
+          </section>
+
+          <!-- SECCIÓN: Personalidad (Cualidades Rosa) -->
+          <section id="sec-personality" class="form-section">
+            <fieldset class="form-fieldset">
+              <legend contenteditable="true" data-section-title="personality"
+                title="Haz clic para renombrar esta sección">Personalidad (Cualidades)</legend>
+              <div id="personality-list-container" class="list-items-container">
+                <!-- Renderizado dinámico de cualidades de personalidad -->
+              </div>
+              <button type="button" class="btn-add" data-action="add-personality">
+                <svg class="btn-icon" viewBox="0 0 24 24">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                </svg>
+                <span>Añadir Cualidad</span>
+              </button>
+            </fieldset>
+          </section>
+
+          <!-- SECCIÓN: Habilidades Técnicas (Jones Sidebar) -->
+          <section id="sec-tech-skills" class="form-section">
+            <fieldset class="form-fieldset">
+              <legend contenteditable="true" data-section-title="techSkills"
+                title="Haz clic para renombrar esta sección">Habilidades Técnicas</legend>
+              <div id="tech-skills-list-container" class="list-items-container">
+                <!-- Renderizado dinámico de habilidades técnicas -->
+              </div>
+              <button type="button" class="btn-add" data-action="add-tech-skill">
+                <svg class="btn-icon" viewBox="0 0 24 24">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                </svg>
+                <span>Añadir Habilidad Técnica</span>
               </button>
             </fieldset>
           </section>
@@ -380,6 +362,17 @@
               <div id="interests-grid-container" class="interests-grid-editor">
                 <!-- Renderizado dinámico de checkboxes con iconos -->
               </div>
+              <div id="rosa-additional-info-container" style="display: none;">
+                <div class="repeater-card">
+                  <div class="repeater-header">
+                    <span class="repeater-title">Contenido de la Sección</span>
+                  </div>
+                  <div class="form-group">
+                    <textarea id="rosa-additional-info-input" data-bind="personal.additionalInfo"
+                      placeholder="Ej. Disponible para incorporación inmediata y flexibilidad horaria..."></textarea>
+                  </div>
+                </div>
+              </div>
             </fieldset>
           </section>
 
@@ -387,7 +380,7 @@
           <section id="sec-design" class="form-section">
             <fieldset class="form-fieldset">
               <legend>Personalización del Tema</legend>
-              <p style="font-size: 12px; color: var(--db-text-muted); line-height: 1.4; margin-bottom: 12px;">
+              <p class="db-info-text">
                 Ajusta la paleta de colores de la plantilla activa para adaptarla a tu identidad visual corporativa.
               </p>
               <div class="color-picker-grid">
@@ -400,6 +393,19 @@
                   <span>Color de Acento</span>
                 </div>
               </div>
+              <div class="font-selector-container">
+                <span class="font-selector-label">Tipografía del CV</span>
+                <div class="select-wrapper">
+                  <select id="font-family-select">
+                    <!-- Se carga dinámicamente mediante JS -->
+                  </select>
+                </div>
+              </div>
+              <div class="modal-footer-row">
+                <button type="button" id="btn-reset-colors" class="btn btn-secondary btn-secondary-custom">
+                  Restablecer Colores por Defecto
+                </button>
+              </div>
             </fieldset>
           </section>
 
@@ -407,13 +413,27 @@
 
         <!-- Pie de página del editor con créditos de autoría -->
         <footer class="editor-footer">
-          <span>Creado por <a href="https://github.com/Jusana13" target="_blank" rel="noopener noreferrer"
-              class="author-highlight">jusana</a></span>
+          <a href="https://github.com/Jusana13" target="_blank" rel="noopener noreferrer" class="github-footer-link">
+            <svg class="github-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+            </svg>
+            <span>Jusana13</span>
+          </a>
         </footer>
       </aside>
 
       <!-- Contenedor del Previsualizador con Zoom Fijo -->
       <div class="preview-panel-outer">
+        <!-- Banner de advertencia de desbordamiento de página -->
+        <div id="overflow-warning" class="overflow-warning-banner" style="display: none;">
+          <div class="overflow-warning-content">
+            <svg class="warning-icon-svg" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <span class="warning-text">El contenido supera el límite de una página A4. Algunos elementos podrían no mostrarse o imprimirse correctamente.</span>
+          </div>
+        </div>
+
         <!-- Panel Derecho: Previsualizador A4 -->
         <main id="preview-panel">
           <div class="cv-preview-wrapper">
@@ -472,7 +492,7 @@
           <input type="file" id="import-json-file" accept=".json">
         </div>
 
-        <p style="border-top: 1px dashed var(--db-border); padding-top: 12px; margin-top: 5px;"><strong>Opción
+        <p class="border-top-dashed"><strong>Opción
             2:</strong> Pega directamente el texto JSON exportado:</p>
         <textarea id="json-modal-text" placeholder='Pega el contenido JSON aquí...'></textarea>
       </div>
@@ -487,13 +507,12 @@
   <div id="confirm-modal" class="modal-overlay">
     <div class="modal-card modal-confirm-card">
       <div class="modal-header">
-        <div class="modal-title-wrapper" style="display: flex; align-items: center; gap: 8px;">
-          <svg class="modal-title-icon" viewBox="0 0 24 24"
-            style="width: 20px; height: 20px; fill: var(--db-btn-danger);">
+        <div class="modal-title-wrapper">
+          <svg class="modal-title-icon icon-danger-custom" viewBox="0 0 24 24">
             <path
               d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
           </svg>
-          <h4 style="margin: 0;">¿Confirmar Acción?</h4>
+          <h4 class="m-0">¿Confirmar Acción?</h4>
         </div>
         <button type="button" class="modal-close" title="Cerrar modal">
           <svg class="close-icon" viewBox="0 0 24 24">
@@ -503,11 +522,11 @@
         </button>
       </div>
       <div class="modal-body">
-        <p style="font-size: 13.5px; color: var(--db-text); line-height: 1.5; margin: 0;">
+        <p class="modal-body-text">
           ¿Estás seguro de que deseas limpiar todos los datos del currículum y restablecer los valores genéricos por
           defecto?
         </p>
-        <p style="font-size: 12px; color: var(--db-btn-danger); font-weight: 600; margin: 8px 0 0 0;">
+        <p class="modal-danger-text">
           Esta acción no se puede deshacer y se perderá todo el progreso actual.
         </p>
       </div>
@@ -517,6 +536,295 @@
       </div>
     </div>
   </div>
+
+  <!-- ========================================== -->
+  <!-- PLANTILLAS HTML PARA ELEMENTOS DINÁMICOS   -->
+  <!-- ========================================== -->
+
+  <!-- Plantilla: Párrafo de Perfil -->
+  <template id="template-profile-card">
+    <fieldset class="repeater-card">
+      <div class="repeater-header">
+        <span class="repeater-title">Párrafo {index}</span>
+        <button type="button" class="btn-remove" data-action="remove-profile" data-index="{index-0}"
+          title="Eliminar párrafo">
+          {trashIcon}
+        </button>
+      </div>
+      <div class="form-group">
+        <textarea class="profile-paragraph-input" data-index="{index-0}"></textarea>
+      </div>
+    </fieldset>
+  </template>
+
+  <!-- Plantilla: Experiencia Laboral -->
+  <template id="template-experience-card">
+    <fieldset class="repeater-card">
+      <div class="repeater-header">
+        <span class="repeater-title">{singular} #{index}</span>
+        <button type="button" class="btn-remove" data-action="remove-experience" data-index="{index-0}"
+          title="Eliminar trabajo">
+          {trashIcon}
+        </button>
+      </div>
+      <div class="form-group">
+        <label>Cargo / Título</label>
+        <input type="text" class="exp-input" data-field="title" data-index="{index-0}">
+      </div>
+      <div class="form-group">
+        <label>Empresa</label>
+        <input type="text" class="exp-input" data-field="company" data-index="{index-0}">
+      </div>
+      <div class="form-group">
+        <label>Período / Fechas</label>
+        <div class="date-picker-helper-row">
+          <div class="date-inputs-row">
+            <div class="date-field">
+              <span>Desde</span>
+              <input type="date" class="exp-date-start" data-index="{index-0}">
+            </div>
+            <div class="date-field">
+              <span>Hasta</span>
+              <input type="date" class="exp-date-end" data-index="{index-0}">
+            </div>
+          </div>
+          <label class="presente-checkbox-label">
+            <input type="checkbox" class="exp-date-current" data-index="{index-0}">
+            <span>Trabajo actual</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Logros o Tareas (Uno por línea)</label>
+        <textarea class="exp-bullets-input" data-index="{index-0}"
+          placeholder="Ingresa cada logro en una línea distinta"></textarea>
+      </div>
+
+      <fieldset class="form-fieldset nested-fieldset">
+        <legend>Enlace Opcional (Certificado / Proyecto)</legend>
+        <div class="form-group">
+          <label>Texto del Botón</label>
+          <input type="text" class="exp-btn-input" data-field="text" data-index="{index-0}">
+        </div>
+        <div class="form-group">
+          <label>URL del Enlace (Vacío para ocultar)</label>
+          <input type="url" class="exp-btn-input" data-field="url" data-index="{index-0}" placeholder="https://...">
+        </div>
+        <button type="button" class="btn-clear-link" data-action="clear-experience-link" data-index="{index-0}">
+          Borrar Enlace
+        </button>
+      </fieldset>
+    </fieldset>
+  </template>
+
+  <!-- Plantilla: Formación Académica -->
+  <template id="template-education-card">
+    <fieldset class="repeater-card">
+      <div class="repeater-header">
+        <span class="repeater-title">{singular} #{index}</span>
+        <button type="button" class="btn-remove" data-action="remove-education" data-index="{index-0}"
+          title="Eliminar estudio">
+          {trashIcon}
+        </button>
+      </div>
+      <div class="form-group">
+        <label>Titulación / Curso</label>
+        <input type="text" class="edu-input" data-field="title" data-index="{index-0}">
+      </div>
+      <div class="form-group">
+        <label>Institución / Escuela</label>
+        <input type="text" class="edu-input" data-field="institution" data-index="{index-0}">
+      </div>
+      <div class="form-group">
+        <label>Período / Fechas</label>
+        <div class="date-picker-helper-row">
+          <div class="date-inputs-row">
+            <div class="date-field">
+              <span>Desde</span>
+              <input type="date" class="edu-date-start" data-index="{index-0}">
+            </div>
+            <div class="date-field">
+              <span>Hasta</span>
+              <input type="date" class="edu-date-end" data-index="{index-0}">
+            </div>
+          </div>
+          <label class="presente-checkbox-label">
+            <input type="checkbox" class="edu-date-current" data-index="{index-0}">
+            <span>Cursando actualmente</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Descripción</label>
+        <textarea class="edu-input" data-field="description" data-index="{index-0}"></textarea>
+      </div>
+
+      <fieldset class="form-fieldset nested-fieldset">
+        <legend>Enlace Opcional (Certificado / Portfolio)</legend>
+        <div class="form-group">
+          <label>Texto del Botón</label>
+          <input type="text" class="edu-btn-input" data-field="text" data-index="{index-0}">
+        </div>
+        <div class="form-group">
+          <label>URL del Enlace (Vacío para ocultar)</label>
+          <input type="url" class="edu-btn-input" data-field="url" data-index="{index-0}" placeholder="https://...">
+        </div>
+        <button type="button" class="btn-clear-link" data-action="clear-education-link" data-index="{index-0}">
+          Borrar Enlace
+        </button>
+      </fieldset>
+    </fieldset>
+  </template>
+
+  <!-- Plantilla: Habilidad Técnica (con/sin estrellas) -->
+  <template id="template-skill-card">
+    <fieldset class="repeater-card">
+      <div class="repeater-header">
+        <span class="repeater-title">{singular} #{index}</span>
+        <button type="button" class="btn-remove" data-action="remove-skill" data-index="{index-0}"
+          title="Eliminar habilidad">
+          {trashIcon}
+        </button>
+      </div>
+      <div class="input-row">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" class="skill-input" data-field="name" data-index="{index-0}" placeholder="Ej. {singular}">
+        </div>
+        <div class="form-group level-group">
+          <label>Nivel (1 - 5)</label>
+          <select class="skill-input" data-field="level" data-index="{index-0}">
+            <option value="1">1 ★</option>
+            <option value="2">2 ★★</option>
+            <option value="3">3 ★★★</option>
+            <option value="4">4 ★★★★</option>
+            <option value="5">5 ★★★★★</option>
+          </select>
+        </div>
+      </div>
+    </fieldset>
+  </template>
+
+  <!-- Plantilla: Habilidad con Porcentaje/Barra Interactiva -->
+  <template id="template-skill-percentage-card">
+    <fieldset class="repeater-card">
+      <div class="repeater-header">
+        <span class="repeater-title">{singular} #{index}</span>
+        <button type="button" class="btn-remove" data-action="remove-skill" data-index="{index-0}"
+          title="Eliminar habilidad">
+          {trashIcon}
+        </button>
+      </div>
+      <div class="input-row skill-percentage-grid">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" class="skill-input" data-field="name" data-index="{index-0}" placeholder="Ej. {singular}">
+        </div>
+        <div class="form-group form-group-slider level-group">
+          <label class="slider-label">Nivel: <strong class="percent-label">{percentage}%</strong></label>
+          <input type="range" class="skill-input-range" data-index="{index-0}" min="0" max="100">
+        </div>
+      </div>
+    </fieldset>
+  </template>
+
+  <!-- Plantilla: Personalidad (Cualidades) -->
+  <template id="template-personality-card">
+    <fieldset class="repeater-card">
+      <div class="repeater-header">
+        <span class="repeater-title">Cualidad #{index}</span>
+        <button type="button" class="btn-remove" data-action="remove-personality" data-index="{index-0}"
+          title="Eliminar cualidad">
+          {trashIcon}
+        </button>
+      </div>
+      <div class="input-row personality-grid">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" class="pers-input" data-field="name" data-index="{index-0}" placeholder="Ej. Liderazgo">
+        </div>
+        <div class="form-group level-group">
+          <label>Nivel (1 - 5)</label>
+          <select class="pers-input" data-field="level" data-index="{index-0}">
+            <option value="1">1 ●</option>
+            <option value="2">2 ●●</option>
+            <option value="3">3 ●●●</option>
+            <option value="4">4 ●●●●</option>
+            <option value="5">5 ●●●●●</option>
+          </select>
+        </div>
+      </div>
+    </fieldset>
+  </template>
+
+  <!-- Plantilla: Habilidades Técnicas (Jones Sidebar) -->
+  <template id="template-tech-skill-card">
+    <fieldset class="repeater-card">
+      <div class="repeater-header">
+        <span class="repeater-title">Habilidad Técnica #{index}</span>
+        <button type="button" class="btn-remove" data-action="remove-tech-skill" data-index="{index-0}"
+          title="Eliminar habilidad técnica">
+          {trashIcon}
+        </button>
+      </div>
+      <div class="form-group">
+        <label>Descripción</label>
+        <input type="text" class="tech-skill-input" data-field="name" data-index="{index-0}"
+          placeholder="Ej. Experiencia con SQL (MySQL)">
+      </div>
+    </fieldset>
+  </template>
+
+  <!-- Plantilla: Idioma Simple (sin barra/porcentaje) -->
+  <template id="template-language-simple-card">
+    <fieldset class="repeater-card">
+      <div class="repeater-header">
+        <span class="repeater-title">{singular} #{index}</span>
+        <button type="button" class="btn-remove" data-action="remove-language" data-index="{index-0}"
+          title="Eliminar idioma">
+          {trashIcon}
+        </button>
+      </div>
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" class="lang-input" data-field="name" data-index="{index-0}" placeholder="Ej. Inglés">
+      </div>
+      <div class="input-row lang-simple-grid">
+        <div class="form-group">
+          <label>Nivel Texto</label>
+          <input type="text" class="lang-input" data-field="level" data-index="{index-0}" placeholder="Ej. B2 o Nativo">
+        </div>
+      </div>
+    </fieldset>
+  </template>
+
+  <!-- Plantilla: Idioma con Porcentaje/Barra Interactiva -->
+  <template id="template-language-percentage-card">
+    <fieldset class="repeater-card">
+      <div class="repeater-header">
+        <span class="repeater-title">{singular} #{index}</span>
+        <button type="button" class="btn-remove" data-action="remove-language" data-index="{index-0}"
+          title="Eliminar idioma">
+          {trashIcon}
+        </button>
+      </div>
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" class="lang-input" data-field="name" data-index="{index-0}" placeholder="Ej. Inglés">
+      </div>
+      <div class="input-row lang-percentage-grid">
+        <div class="form-group">
+          <label>Nivel Texto</label>
+          <input type="text" class="lang-input" data-field="level" data-index="{index-0}" placeholder="Ej. B2 o Nativo">
+        </div>
+        <div class="form-group form-group-slider">
+          <label class="slider-label">Dominio: <strong
+              class="percent-label">{percentage}%</strong></label>
+          <input type="range" class="lang-input-range" data-index="{index-0}" min="0" max="100">
+        </div>
+      </div>
+    </fieldset>
+  </template>
 
   <!-- Cargamos la lógica como Módulo ES6 -->
   <script type="module" src="./src/js/app.js"></script>

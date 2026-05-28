@@ -1,0 +1,366 @@
+/* ==========================================================================
+   PLANTILLA PROFESIONAL
+   Layout clásico con franja lateral izquierda decorativa, header navy,
+   contenido principal a la izquierda y sidebar gris claro a la derecha.
+   ========================================================================== */
+
+.cv-page.profesional {
+  width: 210mm;
+  height: 297mm;
+  background: #ffffff;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Open Sans', sans-serif;
+  color: #333333;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* --- Franja decorativa vertical izquierda --- */
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 28px;
+    height: 100%;
+    background: #0b1726;
+    z-index: 5;
+  }
+
+  /* ==========================================================================
+     ENCABEZADO / HEADER
+     Banda superior navy con nombre, profesión y foto de perfil
+     ========================================================================== */
+
+  .header {
+    position: relative;
+    background: var(--navy, #1b2a4a);
+    color: #ffffff;
+    padding: 30px;
+    margin-left: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+
+    .header-name {
+      h1 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        line-height: 1.15;
+        margin: 0;
+
+        span {
+          color: var(--gold, #e8a838);
+        }
+      }
+
+      .profession {
+        margin-top: 10px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        opacity: 0.9;
+        font-weight: 600;
+        color: #ffffff;
+      }
+    }
+  }
+
+  /* ==========================================================================
+     FOTO DE PERFIL
+     Foto rectangular con bordes redondeados dentro del header
+     ========================================================================== */
+
+  .photo-wrap {
+    width: 130px;
+    height: 130px;
+    border: 3px solid #ffffff;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #eeeeee;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  /* ==========================================================================
+     LAYOUT PRINCIPAL
+     Grid de dos columnas: contenido principal + sidebar gris
+     ========================================================================== */
+
+  .main-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    margin-left: 28px;
+    height: calc(100% - 214px);
+    background: #ffffff;
+  }
+
+  .main-content {
+    padding: 24px 32px;
+    overflow: hidden;
+  }
+
+  .sidebar {
+    background: var(--side, #f4f6f8);
+    border-left: 1px solid #e1e4e8;
+    padding: 24px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow: hidden;
+  }
+
+  /* ==========================================================================
+     TÍTULOS DE SECCIÓN
+     Encabezado h2 con borde izquierdo dorado
+     ========================================================================== */
+
+  .section {
+    margin-bottom: 22px;
+  }
+
+  .section-title {
+    border-left: 4px solid var(--gold, #e8a838);
+    padding-left: 12px;
+    margin-bottom: 14px;
+
+    h2 {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 15px;
+      text-transform: uppercase;
+      color: var(--navy, #1b2a4a);
+      letter-spacing: 1px;
+    }
+  }
+
+  /* ==========================================================================
+     EXPERIENCIA LABORAL Y FORMACIÓN ACADÉMICA
+     Items con título, fecha, subtítulo y descripción
+     ========================================================================== */
+
+  .item {
+    margin-bottom: 12px;
+  }
+
+  .item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 3px;
+  }
+
+  .item-title {
+    font-weight: 700;
+    font-size: 13.5px;
+    color: var(--navy, #1b2a4a);
+  }
+
+  .item-date {
+    font-size: 11px;
+    color: var(--gold, #e8a838);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .item-subtitle {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #666666;
+    margin-bottom: 4px;
+  }
+
+  .item-desc {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: #333333;
+    margin: 0;
+  }
+
+  /* ==========================================================================
+     PERFIL PROFESIONAL
+     Párrafos de resumen/perfil del candidato
+     ========================================================================== */
+
+  .profile-text {
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: #333333;
+    margin-bottom: 8px;
+  }
+
+  /* --- Botones de Certificado / Proyecto --- */
+
+  .cert-btn {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 3px 8px;
+    background: var(--navy, #1b2a4a);
+    color: white !important;
+    text-decoration: none;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &:hover {
+      opacity: 0.95;
+    }
+  }
+
+  /* ==========================================================================
+     CONTACTO
+     Grid vertical con iconos SVG y textos de contacto
+     ========================================================================== */
+
+  .contact-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .contact-item {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .contact-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--navy, #1b2a4a);
+    }
+  }
+
+  .contact-text {
+    font-size: 12.5px;
+    color: #333333;
+    word-break: break-all;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+  }
+
+  /* ==========================================================================
+     HABILIDADES
+     Listado de habilidades con valoración de estrellas
+     ========================================================================== */
+
+  .skill-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+
+  .stars {
+    color: var(--gold, #e8a838);
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  /* ==========================================================================
+     IDIOMAS
+     Grid de círculos SVG con progreso y nombre del idioma
+     ========================================================================== */
+
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .lang-circle {
+    text-align: center;
+  }
+
+  .circle-svg {
+    width: 46px;
+    height: 46px;
+    transform: rotate(-90deg);
+  }
+
+  .circle-bg {
+    fill: none;
+    stroke: rgba(27, 42, 74, 0.1);
+    stroke-width: 4;
+  }
+
+  .circle-progress {
+    fill: none;
+    stroke: var(--navy, #1b2a4a);
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s;
+  }
+
+  .lang-name {
+    display: block;
+    font-size: 9.5px;
+    margin-top: 4px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  /* ==========================================================================
+     INTERESES Y HOBBIES
+     Iconos SVG en disposición flex con wrap
+     ========================================================================== */
+
+  .hobby-icons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .hobby-icon {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--navy, #1b2a4a);
+    }
+  }
+
+  /* --- Listas compactas (bullets dentro de items) --- */
+
+  ul.compact-list {
+    margin: 6px 0;
+    padding-left: 18px;
+
+    li {
+      margin-bottom: 4px;
+    }
+  }
+}

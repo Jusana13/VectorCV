@@ -1,0 +1,82 @@
+<svg viewBox="0 0 110 155" fill="none" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff; border-radius:4px; width:100%; height:100%;">
+  <!-- Page Background (Dynamic Accent Color) -->
+  <rect x="0" y="0" width="110" height="155" fill="var(--preview-accent, #F8F7F4)" />
+
+  <!-- ==========================================================================
+     ENCABEZADO / HEADER
+     ========================================================================== -->
+  <!-- Name (Primary Color) -->
+  <rect x="35" y="10" width="40" height="5" rx="0.5" fill="var(--preview-primary, #4D4D4B)" />
+
+  <!-- Subtitle Flanked by Lines -->
+  <line x1="15" y1="20" x2="35" y2="20" stroke="var(--preview-primary, #4D4D4B)" stroke-width="0.5" />
+  <rect x="40" y="18.5" width="30" height="3" rx="0.3" fill="var(--preview-primary, #4D4D4B)" />
+  <line x1="75" y1="20" x2="95" y2="20" stroke="var(--preview-primary, #4D4D4B)" stroke-width="0.5" />
+
+  <!-- Profile circle flanked by lines and stars -->
+  <!-- Left Line and Star -->
+  <line x1="8" y1="35" x2="38" y2="35" stroke="var(--preview-primary, #4D4D4B)" stroke-width="0.6" />
+  <rect x="30" y="33" width="4" height="4" fill="var(--preview-primary, #4D4D4B)" transform="rotate(45 32 35)" />
+
+  <!-- Photo circular boundary -->
+  <circle cx="55" cy="35" r="9" stroke="var(--preview-primary, #4D4D4B)" stroke-width="0.8" fill="none" />
+  <circle cx="55" cy="35" r="7" fill="#D6D5D1" />
+
+  <!-- Right Line and Star -->
+  <line x1="72" y1="35" x2="102" y2="35" stroke="var(--preview-primary, #4D4D4B)" stroke-width="0.6" />
+  <rect x="76" y="33" width="4" height="4" fill="var(--preview-primary, #4D4D4B)" transform="rotate(45 78 35)" />
+
+  <!-- Summary lines -->
+  <rect x="25" y="49" width="60" height="1.2" rx="0.2" fill="var(--preview-primary, #4D4D4B)" opacity="0.6" />
+  <rect x="20" y="52" width="70" height="1.2" rx="0.2" fill="var(--preview-primary, #4D4D4B)" opacity="0.6" />
+
+  <!-- Contact divider -->
+  <line x1="8" y1="58" x2="102" y2="58" stroke="var(--preview-primary, #4D4D4B)" stroke-width="0.8" />
+
+  <!-- ==========================================================================
+     CUERPO / BODY
+     ========================================================================== -->
+  <!-- Vertical Column Divider -->
+  <line x1="42" y1="62" x2="42" y2="148" stroke="var(--preview-primary, #4D4D4B)" stroke-width="0.6" />
+  <!-- Divider Decorations (rotated squares representation) -->
+  <rect x="40.2" y="63" width="3.5" height="3.5" fill="var(--preview-primary, #4D4D4B)" transform="rotate(45 42 64.7)" />
+  <rect x="40.2" y="142" width="3.5" height="3.5" fill="var(--preview-primary, #4D4D4B)" transform="rotate(45 42 143.7)" />
+
+  <!-- Left Column (SKILLS & EDUCATION) -->
+  <!-- Skills Title -->
+  <rect x="8" y="64" width="20" height="3" rx="0.3" fill="var(--preview-primary, #4D4D4B)" />
+  <!-- Skills Items -->
+  <circle cx="10" cy="72" r="0.6" fill="var(--preview-primary, #4D4D4B)" />
+  <rect x="14" y="71.5" width="22" height="1" rx="0.1" fill="var(--preview-primary, #4D4D4B)" opacity="0.6" />
+  <circle cx="10" cy="75" r="0.6" fill="var(--preview-primary, #4D4D4B)" />
+  <rect x="14" y="74.5" width="18" height="1" rx="0.1" fill="var(--preview-primary, #4D4D4B)" opacity="0.6" />
+
+  <!-- Column Divider -->
+  <line x1="8" y1="80" x2="38" y2="80" stroke="var(--preview-primary, #4D4D4B)" stroke-width="0.5" />
+
+  <!-- Education Title -->
+  <rect x="8" y="85" width="20" height="3" rx="0.3" fill="var(--preview-primary, #4D4D4B)" />
+  <!-- Education Item -->
+  <rect x="8" y="92" width="28" height="1.5" rx="0.2" fill="var(--preview-primary, #4D4D4B)" />
+  <rect x="8" y="95" width="15" height="1" rx="0.1" fill="var(--preview-primary, #4D4D4B)" opacity="0.6" />
+  <rect x="8" y="97.5" width="24" height="1" rx="0.1" fill="var(--preview-primary, #4D4D4B)" opacity="0.5" />
+
+  <!-- Right Column (EXPERIENCE) -->
+  <!-- Experience Title -->
+  <rect x="48" y="64" width="24" height="3" rx="0.3" fill="var(--preview-primary, #4D4D4B)" />
+  <!-- Experience Item 1 -->
+  <rect x="48" y="72" width="25" height="1.5" rx="0.2" fill="var(--preview-primary, #4D4D4B)" />
+  <rect x="88" y="72" width="14" height="1" rx="0.1" fill="var(--preview-primary, #4D4D4B)" opacity="0.6" />
+  <rect x="48" y="75" width="20" height="1" rx="0.1" fill="var(--preview-primary, #4D4D4B)" opacity="0.6" />
+  <circle cx="51" cy="80" r="0.6" fill="var(--preview-primary, #4D4D4B)" />
+  <rect x="55" y="79.5" width="47" height="1" rx="0.1" fill="var(--preview-primary, #4D4D4B)" opacity="0.5" />
+  <circle cx="51" cy="83" r="0.6" fill="var(--preview-primary, #4D4D4B)" />
+  <rect x="55" y="82.5" width="43" height="1" rx="0.1" fill="var(--preview-primary, #4D4D4B)" opacity="0.5" />
+
+  <!-- Experience Item 2 -->
+  <rect x="48" y="90" width="22" height="1.5" rx="0.2" fill="var(--preview-primary, #4D4D4B)" />
+  <rect x="88" y="90" width="14" height="1" rx="0.1" fill="var(--preview-primary, #4D4D4B)" opacity="0.6" />
+  <rect x="48" y="93" width="18" height="1" rx="0.1" fill="var(--preview-primary, #4D4D4B)" opacity="0.6" />
+  <circle cx="51" cy="98" r="0.6" fill="var(--preview-primary, #4D4D4B)" />
+  <rect x="55" y="97.5" width="47" height="1" rx="0.1" fill="var(--preview-primary, #4D4D4B)" opacity="0.5" />
+</svg>
