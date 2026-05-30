@@ -94,6 +94,7 @@
     "thumbnail": "./src/templates/creativo/thumbnail.svg",
     "defaultPhotoShape": "circle",
     "defaultFont": "Plus Jakarta Sans",
+    "supportedFonts": ["Plus Jakarta Sans", "Inter"],
     "features": {
       "buttons": true,
       "skillLevels": false,
@@ -147,19 +148,13 @@
       "sec-personality",
       "sec-contact",
       "sec-languages",
-      "sec-interests",
+      "sec-additional",
       "sec-design"
     ],
     "colors": {
       "primary": "Color Principal",
       "accent": "Color de Acento",
       "bgLight": "Fondo Claro"
-    },
-    "sectionAliases": {
-      "interests": "Adicional"
-    },
-    "singularAliases": {
-      "interests": "Adicional"
     }
   },
   {
@@ -238,7 +233,9 @@
       "languageLevels": false,
       "personality": true,
       "personalityLevels": false,
-      "techSkills": false
+      "techSkills": false,
+      "photoPlaceholder": false,
+      "allowClearPhoto": true
     },
     "tabOrder": [
       "sec-personal",
@@ -269,7 +266,7 @@
       "buttons": false,
       "skillLevels": false,
       "languageLevels": false,
-      "personality": false,
+      "personality": true,
       "personalityLevels": false,
       "techSkills": false
     },
@@ -277,6 +274,7 @@
       "sec-personal",
       "sec-contact",
       "sec-skills",
+      "sec-personality",
       "sec-education",
       "sec-experience",
       "sec-design"

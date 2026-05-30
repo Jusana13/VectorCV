@@ -1,5 +1,19 @@
+/**
+ * @file index.js
+ * @description Plantilla de diseño "Rosa" para la generación de currículums.
+ * Presenta una estructura llamativa de dos columnas: una columna izquierda con
+ * fondo de color rosa suave (donde se ubica la experiencia y habilidades con indicadores
+ * de puntos) y una columna derecha de fondo blanco con la foto, datos de contacto
+ * e idiomas alineados verticalmente.
+ */
+
 import { escapeHTML, silhouetteSVG, CONTACT_ICONS } from '../helpers.js';
 
+/**
+ * Renderiza los puntos indicadores de nivel (1 a 5).
+ * @param {number} level - Nivel de la habilidad o rasgo.
+ * @returns {string} Fragmento HTML con los puntos rellenos e inacabados.
+ */
 function renderDots(level) {
   const max = 5;
   let dots = '';
@@ -13,19 +27,24 @@ function renderDots(level) {
   return `<span class="dots-container">${dots}</span>`;
 }
 
+/**
+ * Genera el HTML para la plantilla de currículum "Rosa".
+ * @param {Object} data - Datos del currículum del usuario.
+ * @returns {string} Fragmento HTML listo para renderizar.
+ */
 export function render(data) {
-  const colors = data.colors?.rosa || { primary: '#d63a3a', accent: '#d63a3a', bgLight: '#f2b7b4' };
+  const colors = data.colors?.rosa || { primary: '#d63a3a', accent: '#ff8a80', bgLight: '#ff8a80' };
   
-  // Name formatting: e.g. "Jean LAGACHE"
+  // Formato del nombre: nombre de pila y apellido en mayúsculas
   const firstName = data.personal.name || '';
   const lastName = (data.personal.lastName || '').toUpperCase();
   
-  // Profile summary
+  // Resumen del perfil profesional
   const profileHTML = (data.personal.profile || [])
     .map(p => `<p class="profile-text">${escapeHTML(p)}</p>`)
     .join('');
 
-  // Education list (Estudios)
+  // Lista de formación académica
   const educationHTML = (data.education || [])
     .map(edu => {
       const buttonHTML = edu.button?.url ? `
@@ -34,14 +53,19 @@ export function render(data) {
         </a>` : '';
       return `
         <div class="item">
-          <div class="item-title">${escapeHTML(edu.institution).toUpperCase()} | ${escapeHTML(edu.title).toUpperCase()} | ${escapeHTML(edu.period)}</div>
+          <div class="item-title">
+            <span class="item-company">${escapeHTML(edu.institution).toUpperCase()}</span>
+            <span class="item-sep">|</span>
+            <span class="item-role">${escapeHTML(edu.title)}</span>
+            <span class="item-date">(${escapeHTML(edu.period)})</span>
+          </div>
           <p class="item-desc">${escapeHTML(edu.description)}</p>
           ${buttonHTML}
         </div>`;
     })
     .join('');
 
-  // Experience list (Experiencia Laboral)
+  // Lista de experiencia laboral
   const experienceHTML = (data.experience || [])
     .map(exp => {
       const bulletsHTML = (exp.bullets || []).length > 0 ? `
@@ -56,7 +80,12 @@ export function render(data) {
 
       return `
         <div class="item">
-          <div class="item-title">${escapeHTML(exp.company).toUpperCase()} | ${escapeHTML(exp.title).toUpperCase()} | ${escapeHTML(exp.period)}</div>
+          <div class="item-title">
+            <span class="item-company">${escapeHTML(exp.company).toUpperCase()}</span>
+            <span class="item-sep">|</span>
+            <span class="item-role">${escapeHTML(exp.title)}</span>
+            <span class="item-date">(${escapeHTML(exp.period)})</span>
+          </div>
           ${bulletsHTML}
           ${buttonHTML}
         </div>`;
@@ -72,7 +101,7 @@ export function render(data) {
       </div>`)
     .join('');
 
-  // Personalidad
+  // Rasgos de personalidad
   const personalityHTML = (data.personality || [])
     .map(p => `
       <div class="skill-row">
@@ -81,12 +110,12 @@ export function render(data) {
       </div>`)
     .join('');
 
-  // Contact list formatted as Dirección, Móvil, Email
+  // Lista de contacto en formato de Dirección, Móvil y Email
   const addressItem = data.contact.find(c => c.type === 'location')?.text || 'Ciudad, País';
   const phoneItem = data.contact.find(c => c.type === 'phone')?.text || '+34 600 000 000';
   const emailItem = data.contact.find(c => c.type === 'email')?.text || 'correo@ejemplo.com';
 
-  // Languages (Idiomas) in right column
+  // Idiomas en la columna derecha
   const languagesHTML = (data.languages || [])
     .map(lang => `
       <div class="lang-row">
@@ -96,14 +125,18 @@ export function render(data) {
 
   const additionalInfoText = data.personal.additionalInfo || 'Disponible para incorporación inmediata y flexibilidad horaria en proyectos dinámicos.';
 
-  const photoHTML = data.personal.photo
-    ? `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}"><img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(data.personal.name || '')}"></div>`
-    : `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}">${silhouetteSVG}</div>`;
+  let photoHTML = '';
+  const showPlaceholder = data.features?.photoPlaceholder !== false;
+  if (data.personal.photo) {
+    photoHTML = `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}" style="background-image: url('${escapeHTML(data.personal.photo)}'); background-size: cover; background-position: center;"></div>`;
+  } else if (showPlaceholder) {
+    photoHTML = `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}">${silhouetteSVG}</div>`;
+  }
 
   return `
-    <article class="cv-page rosa" style="--primary: ${colors.primary}; --accent: ${colors.accent}; --rose-bg: ${colors.accent};">
+    <article class="cv-page rosa" style="--primary: ${colors.primary}; --accent: ${colors.accent};">
       
-      <!-- LEFT COLUMN (Pink background) -->
+      <!-- Columna izquierda (Fondo rosa/color primario) -->
       <section class="left-column">
         <header class="left-header">
           <h1 class="profession-title">${escapeHTML(data.personal.profession || 'Título del puesto').toUpperCase()}</h1>
@@ -111,8 +144,8 @@ export function render(data) {
             ${profileHTML}
           </div>
         </header>
-
-        <!-- ESTUDIOS -->
+ 
+        <!-- Estudios / Formación -->
         <div class="section">
           <div class="section-title">
             <span class="bullet"></span>
@@ -123,7 +156,7 @@ export function render(data) {
           </div>
         </div>
 
-        <!-- EXPERIENCIA LABORAL -->
+        <!-- Experiencia laboral -->
         <div class="section">
           <div class="section-title">
             <span class="bullet"></span>
@@ -134,7 +167,7 @@ export function render(data) {
           </div>
         </div>
 
-        <!-- HABILIDADES -->
+        <!-- Habilidades -->
         <div class="section">
           <div class="section-title">
             <span class="bullet"></span>
@@ -145,7 +178,7 @@ export function render(data) {
           </div>
         </div>
 
-        <!-- PERSONALIDAD -->
+        <!-- Personalidad -->
         <div class="section">
           <div class="section-title">
             <span class="bullet"></span>
@@ -157,20 +190,20 @@ export function render(data) {
         </div>
       </section>
 
-      <!-- RIGHT COLUMN (White background) -->
+      <!-- Columna derecha (Fondo blanco) -->
       <section class="right-column">
-        <!-- Top vertical line that runs behind the photo -->
+        <!-- Línea vertical superior que va detrás de la foto -->
         <div class="top-red-line"></div>
         
-        <!-- Photo Container -->
+        <!-- Contenedor de la foto de perfil -->
         <div class="photo-container">
           ${photoHTML}
         </div>
         
-        <!-- Name -->
+        <!-- Nombre completo -->
         <h2 class="name-title">${escapeHTML(firstName)} <span class="last-name">${escapeHTML(lastName)}</span></h2>
         
-        <!-- Contact details -->
+        <!-- Detalles de contacto -->
         <div class="contact-details">
           <div class="contact-row">
             <span class="contact-label">Dirección:</span>
@@ -186,10 +219,10 @@ export function render(data) {
           </div>
         </div>
 
-        <!-- Decorative vertical separator -->
+        <!-- Separador vertical decorativo -->
         <div class="middle-red-line"></div>
 
-        <!-- IDIOMAS -->
+        <!-- Idiomas -->
         <div class="right-section">
           <div class="right-section-title">
             <span class="bullet-red"></span>
@@ -200,18 +233,18 @@ export function render(data) {
           </div>
         </div>
 
-        <!-- INFORMACIÓN ADICIONAL -->
+        <!-- Información adicional -->
         <div class="right-section">
           <div class="right-section-title">
             <span class="bullet-red"></span>
-            <h2>${escapeHTML(data.sectionTitles?.interests || 'Información Adicional').toUpperCase()}</h2>
+            <h2>${escapeHTML(data.sectionTitles?.additional || 'Información Adicional').toUpperCase()}</h2>
           </div>
           <div class="right-section-content additional-info">
             <p>${escapeHTML(additionalInfoText)}</p>
           </div>
         </div>
 
-        <!-- Bottom decorative vertical line -->
+        <!-- Línea vertical decorativa inferior -->
         <div class="bottom-red-line"></div>
       </section>
 

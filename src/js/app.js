@@ -71,13 +71,21 @@ function resolveDefaultValue(value, field, sectionKey) {
     const match = value.match(/^(?:Habilidad técnica|Habilidad|Competencia)\s+(\d+)$/i);
     if (match) return `${singular} ${match[1]}`;
   }
+  if (sectionKey === 'languages' && field === 'name') {
+    const match = value.match(/^(?:Idioma)\s+(\d+)$/i);
+    if (match) return `${singular} ${match[1]}`;
+  }
+  if (sectionKey === 'personality' && field === 'name') {
+    const match = value.match(/^(?:Cualidad)\s+(\d+)$/i);
+    if (match) return `${singular} ${match[1]}`;
+  }
   if (sectionKey === 'experience' && field === 'title') {
-    if (value === 'Nombre de tu Puesto de Trabajo' || value.startsWith('Nombre de tu ')) {
+    if (value === 'Nombre de tu Puesto de Trabajo') {
       return `Nombre de tu ${singular}`;
     }
   }
   if (sectionKey === 'education' && field === 'title') {
-    if (value === 'Nombre de tu Grado o Formación Académica' || value.startsWith('Nombre de tu ')) {
+    if (value === 'Nombre de tu Grado o Formación Académica') {
       return `Nombre de tu ${singular}`;
     }
   }
@@ -307,30 +315,47 @@ function injectTemplateCSS(cssText) {
 function updateThumbnailColors() {
   if (!templatesConfig || templatesConfig.length === 0) return;
   templatesConfig.forEach(tmpl => {
-    const optionDiv = document.querySelector(`.template-option[data-value="${tmpl.id}"]`);
-    if (optionDiv) {
+    const cardDiv = document.querySelector(`.template-card[data-value="${tmpl.id}"]`);
+    if (cardDiv) {
       const colors = state.colors[tmpl.id] || {};
-      if (colors.primary) optionDiv.style.setProperty('--preview-primary', colors.primary);
-      if (colors.accent) optionDiv.style.setProperty('--preview-accent', colors.accent);
-      if (colors.bgLight) optionDiv.style.setProperty('--preview-rose', colors.bgLight);
+      if (colors.primary) cardDiv.style.setProperty('--preview-primary', colors.primary);
+      if (colors.accent) cardDiv.style.setProperty('--preview-accent', colors.accent);
+      if (colors.bgLight) cardDiv.style.setProperty('--preview-rose', colors.bgLight);
     }
   });
 }
 
+// --- Modal de Selector de Plantillas ---
+function openTemplateModal() {
+  const modal = document.getElementById('template-modal');
+  if (modal) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Evita scroll en el fondo
+  }
+}
+
+function closeTemplateModal() {
+  const modal = document.getElementById('template-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
 async function initTemplateSelector() {
-  const dropdownMenu = document.getElementById('template-dropdown-menu');
-  if (!dropdownMenu) return;
+  const gridContainer = document.getElementById('template-modal-grid');
+  if (!gridContainer) return;
   try {
     if (!templatesConfig || templatesConfig.length === 0) {
       const response = await fetch('./src/templates/templates-config.json');
       templatesConfig = await response.json();
     }
-    dropdownMenu.innerHTML = '';
+    gridContainer.innerHTML = '';
 
     for (const tmpl of templatesConfig) {
-      const optionDiv = document.createElement('div');
-      optionDiv.className = `template-option ${state.activeTemplate === tmpl.id ? 'active' : ''}`;
-      optionDiv.setAttribute('data-value', tmpl.id);
+      const cardDiv = document.createElement('div');
+      cardDiv.className = `template-card ${state.activeTemplate === tmpl.id ? 'active' : ''}`;
+      cardDiv.setAttribute('data-value', tmpl.id);
 
       let svgHtml = '';
       try {
@@ -338,17 +363,20 @@ async function initTemplateSelector() {
         svgHtml = await svgRes.text();
       } catch (err) {
         console.error(`Error loading thumbnail for ${tmpl.id}:`, err);
-        svgHtml = `<div class="template-mini-preview">Miniatura</div>`;
+        svgHtml = `<div class="template-card-preview">Miniatura</div>`;
       }
 
-      optionDiv.innerHTML = `
-        <div class="template-mini-preview">
+      cardDiv.innerHTML = `
+        <div class="template-card-preview">
           ${svgHtml}
         </div>
-        <span class="template-name">${tmpl.name}</span>
+        <div class="template-card-info">
+          <span class="template-card-name">${tmpl.name}</span>
+          <span class="template-badge">${state.activeTemplate === tmpl.id ? 'Activa' : 'Seleccionar'}</span>
+        </div>
       `;
 
-      optionDiv.addEventListener('click', async () => {
+      cardDiv.addEventListener('click', async () => {
         state.activeTemplate = tmpl.id;
         state.personal.photoShape = getDefaultPhotoShape(tmpl.id);
         applyTemplateDefaultOverrides(tmpl.id);
@@ -357,10 +385,19 @@ async function initTemplateSelector() {
         await updatePreview();
         updateThumbnailColors();
         saveState();
-        dropdownMenu.classList.remove('active');
+        closeTemplateModal();
       });
 
-      dropdownMenu.appendChild(optionDiv);
+      gridContainer.appendChild(cardDiv);
+    }
+    
+    // Sincronizar el texto del botón trigger
+    const currentTemplateText = document.getElementById('current-template-text');
+    if (currentTemplateText) {
+      const activeTmplConfig = templatesConfig.find(t => t.id === state.activeTemplate);
+      if (activeTmplConfig) {
+        currentTemplateText.textContent = `Plantilla: ${activeTmplConfig.name}`;
+      }
     }
     updateThumbnailColors();
   } catch (err) {
@@ -388,85 +425,69 @@ const defaultData = {
     languages: 'Idiomas',
     interests: 'Intereses y Hobbies',
     personality: 'Personalidad',
-    techSkills: 'Habilidades Técnicas'
+    techSkills: 'Habilidades Técnicas',
+    additional: 'Información Adicional'
   },
   personal: {
-    name: 'Nombres y',
-    lastName: 'Apellidos',
-    profession: 'Profesión / Especialidad',
+    name: '',
+    lastName: '',
+    profession: '',
     photo: '',
     photoShape: 'circle',
-    profile: [
-      'Describe aquí tu perfil profesional en uno o dos párrafos breves. Destaca tus principales competencias, experiencia y lo que puedes aportar a la empresa.',
-      'Puedes añadir más párrafos de perfil o eliminarlos utilizando los botones de control de arriba.'
-    ],
-    additionalInfo: "Disponible para incorporación inmediata y flexibilidad horaria en proyectos dinámicos."
+    profile: [''],
+    additionalInfo: ''
   },
   contact: [
-    { type: 'location', text: 'Ciudad, País' },
-    { type: 'email', text: 'correo@ejemplo.com', href: 'mailto:correo@ejemplo.com' },
-    { type: 'phone', text: '+34 600 000 000' },
-    { type: 'web', text: 'tuweb.com', href: 'https://tuweb.com' }
+    { type: 'location', text: '' },
+    { type: 'email', text: '', href: '' },
+    { type: 'phone', text: '' },
+    { type: 'web', text: '', href: '' }
   ],
   experience: [
     {
-      title: 'Nombre de tu Puesto de Trabajo',
-      company: 'Nombre de la Empresa o Entidad',
-      period: 'Año Inicio - Año Fin (o Actual)',
+      title: '',
+      company: '',
+      period: '',
       startDate: '',
       endDate: '',
       current: false,
-      bullets: [
-        'Detalla aquí un logro importante o una responsabilidad principal que tuviste.',
-        'Procura iniciar cada viñeta con un verbo de acción claro y conciso.',
-        'Puedes agregar tantas líneas de logros o tareas como necesites.'
-      ],
-      button: { text: 'Ver Proyecto', url: 'https://ejemplo.com' }
+      bullets: [''],
+      button: { text: '', url: '' }
     }
   ],
   education: [
     {
-      title: 'Nombre de tu Grado o Formación Académica',
-      institution: 'Nombre de la Institución o Escuela',
-      period: 'Año Inicio - Año Fin',
+      title: '',
+      institution: '',
+      period: '',
       startDate: '',
       endDate: '',
       current: false,
-      description: 'Describe brevemente las materias de mayor importancia, proyectos realizados o competencias especiales desarrolladas durante tus estudios.',
-      button: { text: 'Ver Certificado', url: 'https://ejemplo.com' }
+      description: '',
+      button: { text: '', url: '' }
     }
   ],
   skills: [
-    { name: 'Habilidad 1', level: 5 },
-    { name: 'Habilidad 2', level: 4 },
-    { name: 'Habilidad 3', level: 3 }
+    { name: '', level: 5 }
   ],
   languages: [
-    { name: 'Español', level: 'Nativo', percentage: 100 },
-    { name: 'Inglés', level: 'Avanzado', percentage: 75 }
+    { name: '', level: 'Nativo', percentage: 100 }
   ],
   interests: ['tech', 'reading', 'sports'],
   personality: [
-    { name: 'Liderazgo', level: 5 },
-    { name: 'Creativo', level: 4 },
-    { name: 'Organizado', level: 5 },
-    { name: 'Serio', level: 4 }
+    { name: '', level: 5 }
   ],
   techSkills: [
-    { name: "Habilidad técnica 1" },
-    { name: "Habilidad técnica 2" },
-    { name: "Habilidad técnica 3" },
-    { name: "Habilidad técnica 4" },
-    { name: "Habilidad técnica 5" }
+    { name: '' }
   ],
   colors: {
     moderno: { primary: '#2C2D30', accent: '#C9A227', bgLight: '#F3EFE6' },
     profesional: { primary: '#1b2a4a', accent: '#e8a838', sidebarBg: '#f4f6f8' },
     minimalista: { primary: '#111111', accent: '#666666' },
     creativo: { primary: '#222222', accent: '#f4b844', bgLight: '#fdf8ec' },
-    rosa: { primary: '#d63a3a', accent: '#f2b7b4', bgLight: '#f2b7b4' },
+    rosa: { primary: '#d63a3a', accent: '#ff8a80', bgLight: '#ff8a80' },
     asimetrico: { primary: '#111316', accent: '#a68d73' },
-    sage: { primary: '#b5d3cd', accent: '#22252a' },
+    sage: { primary: '#c5ded6', accent: '#354240' },
     sobrio: { primary: '#EAEAE6', accent: '#222222' },
     estrella: { primary: '#4D4D4B', accent: '#F8F7F4', textColor: '#5A5A58' }
   },
@@ -520,6 +541,50 @@ function scalePreview() {
    ACTUALIZACIÓN DE LA PREVISUALIZACIÓN
    Renderiza el HTML de la plantilla activa con el estado actual del usuario.
    ========================================================================== */
+const VISUAL_PLACEHOLDERS = {
+  personal: {
+    name: 'Nombres',
+    lastName: 'Apellidos',
+    profession: 'Profesión / Especialidad',
+    profile: [
+      'Describe aquí tu perfil profesional en uno o dos párrafos breves. Destaca tus principales competencias, experiencia y lo que puedes aportar a la empresa.',
+      'Puedes añadir más párrafos de perfil o eliminarlos utilizando los botones de control de arriba.'
+    ],
+    additionalInfo: 'Disponible para incorporación inmediata y flexibilidad horaria en proyectos dinámicos.'
+  },
+  contact: {
+    location: 'Ciudad, País',
+    email: 'correo@ejemplo.com',
+    phone: '+34 600 000 000',
+    web: 'tuweb.com'
+  },
+  experience: {
+    title: 'Nombre de tu Puesto de Trabajo',
+    company: 'Nombre de la Empresa o Entidad',
+    period: 'Año Inicio - Año Fin (o Actual)',
+    bullets: [
+      'Detalla aquí un logro importante o una responsabilidad principal que tuviste.',
+      'Procura iniciar cada viñeta con un verbo de acción claro y conciso.',
+      'Puedes agregar tantas líneas de logros o tareas como necesites.'
+    ],
+    buttonText: 'Ver Proyecto'
+  },
+  education: {
+    title: 'Nombre de tu Grado o Formación Académica',
+    institution: 'Nombre de la Institución o Escuela',
+    period: 'Año Inicio - Año Fin',
+    description: 'Describe brevemente las materias de mayor importancia, proyectos realizados o competencias especiales desarrolladas durante tus estudios.',
+    buttonText: 'Ver Certificado'
+  },
+  skills: 'Habilidad',
+  languages: {
+    name: 'Idioma',
+    level: 'Nivel'
+  },
+  personality: 'Cualidad',
+  techSkills: 'Habilidad técnica'
+};
+
 async function updatePreview() {
   const previewContainer = document.querySelector('.cv-preview-container');
   if (!previewContainer) return;
@@ -536,18 +601,92 @@ async function updatePreview() {
       }
     }
 
+    // Inyectar placeholders visuales en la copia de renderizado si el estado está vacío
+    if (stateForRender.personal) {
+      const p = stateForRender.personal;
+      p.name = (p.name || '').trim() || VISUAL_PLACEHOLDERS.personal.name;
+      p.lastName = (p.lastName || '').trim() || VISUAL_PLACEHOLDERS.personal.lastName;
+      p.profession = (p.profession || '').trim() || VISUAL_PLACEHOLDERS.personal.profession;
+      p.additionalInfo = (p.additionalInfo || '').trim() || VISUAL_PLACEHOLDERS.personal.additionalInfo;
+
+      // Perfil
+      if (!p.profile || p.profile.length === 0 || (p.profile.length === 1 && !p.profile[0])) {
+        p.profile = VISUAL_PLACEHOLDERS.personal.profile;
+      }
+    }
+
+    if (stateForRender.contact) {
+      stateForRender.contact.forEach(c => {
+        if (!c.text || !c.text.trim()) {
+          c.text = VISUAL_PLACEHOLDERS.contact[c.type] || '';
+          if (c.type === 'email') c.href = `mailto:${c.text}`;
+          if (c.type === 'web') c.href = `https://${c.text}`;
+        }
+      });
+    }
+
+    if (stateForRender.experience) {
+      stateForRender.experience.forEach(exp => {
+        exp.title = (exp.title || '').trim() || VISUAL_PLACEHOLDERS.experience.title;
+        exp.company = (exp.company || '').trim() || VISUAL_PLACEHOLDERS.experience.company;
+        exp.period = (exp.period || '').trim() || VISUAL_PLACEHOLDERS.experience.period;
+        if (!exp.bullets || exp.bullets.length === 0 || (exp.bullets.length === 1 && !exp.bullets[0])) {
+          exp.bullets = VISUAL_PLACEHOLDERS.experience.bullets;
+        }
+        if (exp.button) {
+          exp.button.text = (exp.button.text || '').trim() || VISUAL_PLACEHOLDERS.experience.buttonText;
+        }
+      });
+    }
+
+    if (stateForRender.education) {
+      stateForRender.education.forEach(edu => {
+        edu.title = (edu.title || '').trim() || VISUAL_PLACEHOLDERS.education.title;
+        edu.institution = (edu.institution || '').trim() || VISUAL_PLACEHOLDERS.education.institution;
+        edu.period = (edu.period || '').trim() || VISUAL_PLACEHOLDERS.education.period;
+        edu.description = (edu.description || '').trim() || VISUAL_PLACEHOLDERS.education.description;
+        if (edu.button) {
+          edu.button.text = (edu.button.text || '').trim() || VISUAL_PLACEHOLDERS.education.buttonText;
+        }
+      });
+    }
+
     // Resolver nombres e ítems por defecto para visualización
     if (stateForRender.skills) {
-      stateForRender.skills = stateForRender.skills.map(s => ({
-        ...s,
-        name: resolveDefaultValue(s.name, 'name', 'skills')
-      }));
+      stateForRender.skills = stateForRender.skills.map((s, idx) => {
+        const name = (s.name || '').trim() || `${VISUAL_PLACEHOLDERS.skills} ${idx + 1}`;
+        return {
+          ...s,
+          name: resolveDefaultValue(name, 'name', 'skills')
+        };
+      });
     }
     if (stateForRender.techSkills) {
-      stateForRender.techSkills = stateForRender.techSkills.map(ts => ({
-        ...ts,
-        name: resolveDefaultValue(ts.name, 'name', 'techSkills')
-      }));
+      stateForRender.techSkills = stateForRender.techSkills.map((ts, idx) => {
+        const name = (ts.name || '').trim() || `${VISUAL_PLACEHOLDERS.techSkills} ${idx + 1}`;
+        return {
+          ...ts,
+          name: resolveDefaultValue(name, 'name', 'techSkills')
+        };
+      });
+    }
+    if (stateForRender.languages) {
+      stateForRender.languages = stateForRender.languages.map((l, idx) => {
+        const name = (l.name || '').trim() || `${VISUAL_PLACEHOLDERS.languages.name} ${idx + 1}`;
+        return {
+          ...l,
+          name: resolveDefaultValue(name, 'name', 'languages')
+        };
+      });
+    }
+    if (stateForRender.personality) {
+      stateForRender.personality = stateForRender.personality.map((p, idx) => {
+        const name = (p.name || '').trim() || `${VISUAL_PLACEHOLDERS.personality} ${idx + 1}`;
+        return {
+          ...p,
+          name: resolveDefaultValue(name, 'name', 'personality')
+        };
+      });
     }
     if (stateForRender.experience) {
       stateForRender.experience = stateForRender.experience.map(exp => ({
@@ -704,6 +843,11 @@ function migrateState(stateObj) {
     stateObj.personality = JSON.parse(JSON.stringify(defaultData.personality));
   }
 
+  // Asegurar inicialización de intereses
+  if (!stateObj.interests || stateObj.interests.length === 0) {
+    stateObj.interests = ['tech', 'reading', 'sports'];
+  }
+
   // Asegurar inicialización de habilidades técnicas estructuradas para Jones
   if (!stateObj.techSkills) {
     if (stateObj.personal && typeof stateObj.personal.sidebarSkills === 'string' && stateObj.personal.sidebarSkills.trim() !== '') {
@@ -726,7 +870,7 @@ function migrateState(stateObj) {
       if (edu.endDate === undefined) edu.endDate = '';
       if (edu.current === undefined) edu.current = false;
 
-      // Auto-parsear si están vacíos pero hay un period
+      // Auto-parsear si están vacíos pero existe un período
       if (!edu.startDate && !edu.endDate && !edu.current && edu.period) {
         const parsed = parsePeriodToDates(edu.period);
         edu.startDate = parsed.startDate;
@@ -746,7 +890,7 @@ function migrateState(stateObj) {
         exp.button = { text: 'Ver Proyecto', url: '' };
       }
 
-      // Auto-parsear si están vacíos pero hay un period
+      // Auto-parsear si están vacíos pero existe un período
       if (!exp.startDate && !exp.endDate && !exp.current && exp.period) {
         const parsed = parsePeriodToDates(exp.period);
         exp.startDate = parsed.startDate;
@@ -780,6 +924,51 @@ function getDefaultPhotoShape(templateId) {
   return 'circle';
 }
 
+function getActiveTemplateSupportedShapes() {
+  if (templatesConfig) {
+    const config = templatesConfig.find(t => t.id === (state ? state.activeTemplate : 'moderno'));
+    if (config && config.supportedPhotoShapes) {
+      return config.supportedPhotoShapes;
+    }
+  }
+  return ['circle', 'rounded', 'square']; // Valor por defecto si no se especifica
+}
+
+function renderShapeToggles() {
+  const shapeTogglesSide = document.querySelector('.avatar-shape-toggles-side');
+  if (!shapeTogglesSide) return;
+
+  const supported = getActiveTemplateSupportedShapes();
+  shapeTogglesSide.innerHTML = '';
+
+  const shapeDefinitions = {
+    circle: {
+      title: 'Circular',
+      svg: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2" fill="none" /></svg>`
+    },
+    rounded: {
+      title: 'Bordes Redondeados',
+      svg: `<svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="3" stroke="currentColor" stroke-width="2" fill="none" /></svg>`
+    },
+    square: {
+      title: 'Cuadrada',
+      svg: `<svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="0" stroke="currentColor" stroke-width="2" fill="none" /></svg>`
+    }
+  };
+
+  supported.forEach(shapeId => {
+    const def = shapeDefinitions[shapeId];
+    if (!def) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `shape-toggle-btn ${state.personal.photoShape === shapeId ? 'active' : ''}`;
+    btn.setAttribute('data-shape', shapeId);
+    btn.title = def.title;
+    btn.innerHTML = def.svg;
+    shapeTogglesSide.appendChild(btn);
+  });
+}
+
 function getActiveTemplateFeatures() {
   if (!templatesConfig || templatesConfig.length === 0) {
     return {
@@ -804,7 +993,8 @@ function getActiveTemplateFeatures() {
     languageLevels: feat.languageLevels !== undefined ? feat.languageLevels : true,
     personality: feat.personality !== undefined ? feat.personality : false,
     personalityLevels: feat.personalityLevels !== undefined ? feat.personalityLevels : false,
-    techSkills: feat.techSkills !== undefined ? feat.techSkills : false
+    techSkills: feat.techSkills !== undefined ? feat.techSkills : false,
+    additionalInfoText: feat.additionalInfoText !== undefined ? feat.additionalInfoText : false
   };
 }
 
@@ -901,7 +1091,7 @@ function getTemplateDefaultItems(key) {
     });
   }
 
-  // Legacy defaults compatibility list to clean up old localStorage pollution
+  // Lista de compatibilidad con valores heredados para limpiar datos antiguos de localStorage
   if (key === 'experience') {
     defaults.push({
       title: "Nombre de tu Segundo Puesto de Trabajo",
@@ -1049,19 +1239,29 @@ function syncStaticInputs() {
     }
   });
 
-  // Foto de perfil preview (sync preview image/svg visibility and shape)
+  // Vista previa de la foto de perfil (sincroniza la visibilidad y forma de la imagen/SVG de vista previa)
   const imgPreview = document.getElementById('avatar-preview-img');
   const svgPreview = document.querySelector('.avatar-preview .placeholder-svg');
   const previewBox = document.getElementById('avatar-preview-box');
+  const btnClearPhoto = document.getElementById('btn-clear-photo');
+
+  // Comprobar de forma dinámica si la plantilla activa permite borrar la foto de perfil
+  const activeTmplConfig = templatesConfig ? templatesConfig.find(t => t.id === state.activeTemplate) : null;
+  const allowClearPhoto = activeTmplConfig?.features?.allowClearPhoto || false;
+
   if (imgPreview && svgPreview) {
     if (state.personal.photo) {
       imgPreview.src = state.personal.photo;
       imgPreview.style.display = 'block';
       svgPreview.style.display = 'none';
+      if (btnClearPhoto) {
+        btnClearPhoto.style.display = allowClearPhoto ? 'inline-flex' : 'none';
+      }
     } else {
       imgPreview.src = '';
       imgPreview.style.display = 'none';
       svgPreview.style.display = 'block';
+      if (btnClearPhoto) btnClearPhoto.style.display = 'none';
     }
   }
   if (previewBox) {
@@ -1069,7 +1269,10 @@ function syncStaticInputs() {
     previewBox.classList.add(`shape-${state.personal.photoShape || 'circle'}`);
   }
 
-  // Sync photo shape buttons
+  // Renderizar las formas permitidas para la foto
+  renderShapeToggles();
+
+  // Sincroniza los botones de forma de la foto
   const shapeButtons = document.querySelectorAll('.shape-toggle-btn');
   shapeButtons.forEach(btn => {
     if (btn.getAttribute('data-shape') === (state.personal.photoShape || 'circle')) {
@@ -1079,7 +1282,7 @@ function syncStaticInputs() {
     }
   });
 
-  // Sync phone split inputs
+  // Sincroniza los campos divididos del número de teléfono
   const fullPhone = getDeepValue(state, 'contact.2.text') || '';
   const prefixSelect = document.getElementById('phone-prefix-select');
   const numberInput = document.getElementById('phone-number-input');
@@ -1089,7 +1292,7 @@ function syncStaticInputs() {
     const prefixes = Array.from(prefixSelect.options).map(opt => opt.value);
     prefixes.sort((a, b) => b.length - a.length);
 
-    let matchedPrefix = '+34'; // default
+    let matchedPrefix = '+34'; // por defecto
     let restNumber = fullPhone;
 
     for (const pref of prefixes) {
@@ -1115,13 +1318,14 @@ function syncStaticInputs() {
     triggerBtnText.textContent = `Plantilla: ${displayName}`;
   }
 
-  // Marcar la opción activa en el dropdown de plantillas
-  const options = document.querySelectorAll('.template-option');
-  options.forEach(opt => {
-    if (opt.getAttribute('data-value') === state.activeTemplate) {
-      opt.classList.add('active');
-    } else {
-      opt.classList.remove('active');
+  // Marcar la opción activa en el selector de plantillas modal
+  const cards = document.querySelectorAll('.template-card');
+  cards.forEach(card => {
+    const isAct = card.getAttribute('data-value') === state.activeTemplate;
+    card.classList.toggle('active', isAct);
+    const badge = card.querySelector('.template-badge');
+    if (badge) {
+      badge.textContent = isAct ? 'Activa' : 'Seleccionar';
     }
   });
 
@@ -1152,17 +1356,25 @@ function syncStaticInputs() {
       'sec-personality',
       'sec-languages',
       'sec-interests',
+      'sec-additional',
       'sec-design'
     ];
     const order = (activeTemplateConfig && activeTemplateConfig.tabOrder) || defaultOrder;
-    tabs.forEach(tab => {
-      const target = tab.getAttribute('data-target');
-      if (order.includes(target)) {
+    
+    // Primero, reordenar y mostrar los que están en la lista
+    order.forEach(target => {
+      const tab = tabs.find(t => t.getAttribute('data-target') === target);
+      if (tab) {
         tab.style.display = '';
         navTabs.appendChild(tab);
-      } else {
+      }
+    });
+
+    // Luego, ocultar los que no están en la lista y gestionar si el activo se ocultó
+    tabs.forEach(tab => {
+      const target = tab.getAttribute('data-target');
+      if (!order.includes(target)) {
         tab.style.display = 'none';
-        // Si la pestaña oculta estaba activa, redirigir a Datos Personales
         if (tab.classList.contains('active')) {
           const firstTab = tabs.find(t => t.getAttribute('data-target') === 'sec-personal');
           if (firstTab) firstTab.click();
@@ -1214,10 +1426,7 @@ function syncStaticInputs() {
     tabSkills.textContent = features.techSkills ? 'Competencias' : 'Habilidades';
   }
 
-  const interestsGrid = document.getElementById('interests-grid-container');
-  const rosaAdditionalInfo = document.getElementById('rosa-additional-info-container');
   const tabInterests = document.querySelector('.tab-btn[data-target="sec-interests"]');
-
   if (tabInterests) {
     const hasInterestsInOrder = activeTemplateConfig && activeTemplateConfig.tabOrder && activeTemplateConfig.tabOrder.includes('sec-interests');
     if (!hasInterestsInOrder) {
@@ -1229,15 +1438,21 @@ function syncStaticInputs() {
     } else {
       tabInterests.style.display = 'block';
       tabInterests.textContent = getSectionTitle('interests');
+    }
+  }
 
-      const showTextArea = features.additionalInfoText;
-      if (showTextArea) {
-        if (interestsGrid) interestsGrid.style.display = 'none';
-        if (rosaAdditionalInfo) rosaAdditionalInfo.style.display = 'block';
-      } else {
-        if (interestsGrid) interestsGrid.style.display = '';
-        if (rosaAdditionalInfo) rosaAdditionalInfo.style.display = 'none';
+  const tabAdditional = document.querySelector('.tab-btn[data-target="sec-additional"]');
+  if (tabAdditional) {
+    const hasAdditionalInOrder = activeTemplateConfig && activeTemplateConfig.tabOrder && activeTemplateConfig.tabOrder.includes('sec-additional');
+    if (!hasAdditionalInOrder) {
+      tabAdditional.style.display = 'none';
+      if (tabAdditional.classList.contains('active')) {
+        const firstTab = document.querySelector('.tab-btn[data-target="sec-personal"]');
+        if (firstTab) firstTab.click();
       }
+    } else {
+      tabAdditional.style.display = 'block';
+      tabAdditional.textContent = getSectionTitle('additional');
     }
   }
 
@@ -1333,7 +1548,7 @@ function syncColorPickers() {
     `;
     container.appendChild(itemDiv);
 
-    // Add input listener
+    // Añade el escuchador de eventos de entrada
     const input = itemDiv.querySelector('input');
     input.addEventListener('input', (e) => {
       state.colors[activeTmpl][token] = e.target.value;
@@ -1378,33 +1593,71 @@ function injectDynamicFontCSS(fontName) {
  *              Sigue el mismo patrón modular que `syncColorPickers()`.
  */
 function syncFontSelector() {
-  const select = document.getElementById('font-family-select');
-  if (!select) return;
+  const container = document.getElementById('custom-font-select-container');
+  const trigger = document.getElementById('custom-font-select-trigger');
+  const selectedValue = document.getElementById('custom-font-selected-value');
+  const optionsContainer = document.getElementById('custom-font-select-options');
+  
+  if (!container || !trigger || !selectedValue || !optionsContainer) return;
 
   const activeTmpl = state.activeTemplate;
-  const currentFont = state.fonts?.[activeTmpl] || defaultData.fonts[activeTmpl] || 'Inter';
+  const activeTmplConfig = templatesConfig.find(t => t.id === activeTmpl);
+  
+  // Obtener fuentes soportadas (por defecto todas si no se especifica en el JSON)
+  const supported = (activeTmplConfig && activeTmplConfig.supportedFonts) || SUPPORTED_FONTS;
 
-  // Poblar opciones solo si están vacías o han cambiado
-  select.innerHTML = '';
-  SUPPORTED_FONTS.forEach(font => {
-    const option = document.createElement('option');
-    option.value = font;
-    option.textContent = font;
-    option.style.fontFamily = `'${font}', sans-serif`;
-    if (font === currentFont) option.selected = true;
-    select.appendChild(option);
-  });
-
-  // Remover listeners previos clonando el nodo (evita duplicados en cada sync)
-  const newSelect = select.cloneNode(true);
-  select.parentNode.replaceChild(newSelect, select);
-
-  newSelect.addEventListener('change', (e) => {
+  let currentFont = state.fonts?.[activeTmpl] || defaultData.fonts[activeTmpl] || activeTmplConfig?.defaultFont || 'Inter';
+  if (!supported.includes(currentFont)) {
+    currentFont = supported[0] || 'Inter';
     if (!state.fonts) state.fonts = {};
-    state.fonts[state.activeTemplate] = e.target.value;
-    injectDynamicFontCSS(e.target.value);
-    updatePreview();
-    saveState();
+    state.fonts[activeTmpl] = currentFont;
+    injectDynamicFontCSS(currentFont);
+  }
+
+  // Sincronizar el valor actual en el botón
+  selectedValue.textContent = currentFont;
+  selectedValue.style.fontFamily = `'${currentFont}', sans-serif`;
+
+  // Poblar opciones
+  optionsContainer.innerHTML = '';
+  supported.forEach(font => {
+    const optionDiv = document.createElement('div');
+    optionDiv.className = `custom-select-option ${font === currentFont ? 'selected' : ''}`;
+    optionDiv.setAttribute('data-value', font);
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'custom-select-option-text';
+    nameSpan.textContent = font;
+    nameSpan.style.fontFamily = `'${font}', sans-serif`;
+
+    const previewSpan = document.createElement('span');
+    previewSpan.className = 'custom-select-option-preview';
+    previewSpan.textContent = 'AaBbCc';
+    previewSpan.style.fontFamily = `'${font}', sans-serif`;
+
+    optionDiv.appendChild(nameSpan);
+    optionDiv.appendChild(previewSpan);
+
+    optionDiv.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!state.fonts) state.fonts = {};
+      state.fonts[state.activeTemplate] = font;
+      
+      selectedValue.textContent = font;
+      selectedValue.style.fontFamily = `'${font}', sans-serif`;
+      
+      injectDynamicFontCSS(font);
+      updatePreview();
+      saveState();
+      container.classList.remove('active');
+      
+      // Actualizar clases de selección
+      optionsContainer.querySelectorAll('.custom-select-option').forEach(opt => {
+        opt.classList.toggle('selected', opt.getAttribute('data-value') === font);
+      });
+    });
+
+    optionsContainer.appendChild(optionDiv);
   });
 }
 
@@ -1581,7 +1834,7 @@ function renderSkillsForm() {
     const card = getClonedTemplate(templateId, index, { singular, percentage: percent });
     if (!card) return;
 
-    // Asignar nombre resolviendo defaults
+    // Asignar nombre resolviendo valores por defecto
     const nameInput = card.querySelector('input[data-field="name"]');
     if (nameInput) nameInput.value = resolveDefaultValue(skill.name || '', 'name', 'skills');
 
@@ -1765,21 +2018,28 @@ function renderAllForms() {
    teclado, zoom, impresión y edición inline de títulos de sección).
    ========================================================================== */
 function setupEventListeners() {
-  // 1. Selector de Plantillas Visual (Dropdown con Miniaturas)
+  // 1. Selector de Plantillas Visual (Modal con Miniaturas en Grid)
   const triggerBtn = document.getElementById('btn-template-select-trigger');
-  const dropdownMenu = document.getElementById('template-dropdown-menu');
+  const closeBtn = document.getElementById('btn-close-template-modal');
+  const templateModal = document.getElementById('template-modal');
 
-  if (triggerBtn && dropdownMenu) {
+  if (triggerBtn) {
     triggerBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      dropdownMenu.classList.toggle('active');
+      openTemplateModal();
     });
+  }
 
-    // Cerrar el menú si se hace clic fuera de su contenedor
-    document.addEventListener('click', (e) => {
-      const container = document.querySelector('.template-selector-container');
-      if (container && !container.contains(e.target)) {
-        dropdownMenu.classList.remove('active');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      closeTemplateModal();
+    });
+  }
+
+  if (templateModal) {
+    templateModal.addEventListener('click', (e) => {
+      if (e.target === templateModal) {
+        closeTemplateModal();
       }
     });
   }
@@ -2037,7 +2297,7 @@ function setupEventListeners() {
         } else if (val <= 75) {
           state.languages[idx].level = 'Avanzado';
         } else {
-          state.languages[idx].level = 'Nativo / C2';
+          state.languages[idx].level = 'Nativo';
         }
 
         // Sincronizar el input de texto de nivel
@@ -2162,7 +2422,7 @@ function setupEventListeners() {
         state.techSkills.push({ name: '' });
         renderTechSkillsForm();
       } else if (action === 'add-language') {
-        state.languages.push({ name: '', level: 'Básico', percentage: 25 });
+        state.languages.push({ name: '', level: 'Nativo', percentage: 100 });
         renderLanguagesForm();
       }
 
@@ -2198,10 +2458,54 @@ function setupEventListeners() {
             imgPreview.style.display = 'block';
             svgPreview.style.display = 'none';
           }
+          const btnClearPhoto = document.getElementById('btn-clear-photo');
+          if (btnClearPhoto) {
+            const activeTmplConfig = templatesConfig ? templatesConfig.find(t => t.id === state.activeTemplate) : null;
+            const allowClearPhoto = activeTmplConfig?.features?.allowClearPhoto || false;
+            btnClearPhoto.style.display = allowClearPhoto ? 'inline-flex' : 'none';
+          }
           updatePreview();
           saveState();
         };
         reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // 11.2. Control de Borrado de Foto de Perfil
+  const btnClearPhoto = document.getElementById('btn-clear-photo');
+  if (btnClearPhoto) {
+    btnClearPhoto.addEventListener('click', () => {
+      state.personal.photo = '';
+      if (photoInput) {
+        photoInput.value = ''; // Resetear el selector de archivos
+      }
+      const imgPreview = document.getElementById('avatar-preview-img');
+      const svgPreview = document.querySelector('.avatar-preview .placeholder-svg');
+      if (imgPreview && svgPreview) {
+        imgPreview.src = '';
+        imgPreview.style.display = 'none';
+        svgPreview.style.display = 'block';
+      }
+      btnClearPhoto.style.display = 'none';
+      updatePreview();
+      saveState();
+    });
+  }
+
+  // 11.3. Selector de tipografías personalizado (custom dropdown)
+  const fontSelectTrigger = document.getElementById('custom-font-select-trigger');
+  const fontSelectContainer = document.getElementById('custom-font-select-container');
+  if (fontSelectTrigger && fontSelectContainer) {
+    fontSelectTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fontSelectContainer.classList.toggle('active');
+    });
+    
+    // Cerrar al hacer clic fuera
+    document.addEventListener('click', (e) => {
+      if (!fontSelectContainer.contains(e.target)) {
+        fontSelectContainer.classList.remove('active');
       }
     });
   }
@@ -2253,7 +2557,10 @@ function setupEventListeners() {
     prefixSelect.addEventListener('change', updatePhoneState);
   }
   if (numberInput) {
-    numberInput.addEventListener('input', updatePhoneState);
+    numberInput.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/[^0-9]/g, '');
+      updatePhoneState();
+    });
   }
 
   const addressInput = document.getElementById('address-input');
@@ -2403,7 +2710,7 @@ function setupEventListeners() {
   const btnReset = document.getElementById('btn-reset');
   const btnExport = document.getElementById('btn-export-json');
   const btnImport = document.getElementById('btn-import-json');
-  const btnPrint = document.getElementById('btn-print-pdf');
+  const btnPrintOnly = document.getElementById('btn-print-only');
   const modalOverlay = document.getElementById('json-modal');
   const modalCloseButtons = document.querySelectorAll('.modal-close');
   const modalSubmit = document.getElementById('btn-modal-import-submit');
@@ -2546,9 +2853,24 @@ function setupEventListeners() {
     });
   }
 
-  if (btnPrint) {
-    btnPrint.addEventListener('click', () => {
+  if (btnPrintOnly) {
+    btnPrintOnly.addEventListener('click', () => {
+      // Guardar el título original de la página
+      const originalTitle = document.title;
+      
+      // Crear un nombre de archivo limpio basado en el nombre del CV para que el navegador lo sugiera automáticamente al guardar como PDF
+      const firstName = (state.personal.name || '').trim();
+      const lastName = (state.personal.lastName || '').trim();
+      const cleanName = `cv-${firstName} ${lastName}`.trim().toLowerCase().replace(/\s+/g, '-');
+      document.title = cleanName || 'cv-personal';
+
+      // Lanzar el asistente de impresión nativo de alta calidad vectorial
       window.print();
+      
+      // Restaurar el título original de la pestaña después de un pequeño intervalo
+      setTimeout(() => {
+        document.title = originalTitle;
+      }, 1000);
     });
   }
 

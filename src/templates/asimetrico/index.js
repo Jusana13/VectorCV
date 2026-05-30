@@ -1,9 +1,21 @@
+/**
+ * @file index.js
+ * @description Plantilla de diseño "Asimétrico" para la generación de currículums.
+ * Presenta una estructura moderna con distribución asimétrica de la información,
+ * destacando la foto y los títulos de las secciones.
+ */
+
 import { renderStars, escapeHTML, silhouetteSVG, CONTACT_ICONS, INTEREST_ICONS } from '../helpers.js';
 
+/**
+ * Genera el HTML para la plantilla de currículum "Asimétrico".
+ * @param {Object} data - Datos del currículum del usuario.
+ * @returns {string} Fragmento HTML listo para renderizar.
+ */
 export function render(data) {
   const colors = data.colors?.asimetrico || { primary: '#111316', accent: '#c9a227' };
   
-  // Split name for visual styling (thin/bold contrast)
+  // Divide el nombre para el estilo visual (contraste entre fino y negrita)
   const nameParts = (data.personal.name || '').trim().split(' ');
   const firstName = nameParts[0] || '';
   const restName = nameParts.slice(1).join(' ');
@@ -12,13 +24,17 @@ export function render(data) {
   const nameLightHTML = `<p class="name-light">${escapeHTML((firstName + ' ' + restName).trim().toUpperCase())}</p>`;
   const nameBoldHTML = `<p class="name-bold">${escapeHTML(lastName.toUpperCase())}</p>`;
 
-  // Photo Box
+  // Bloque de la foto de perfil
   const photoShape = data.personal.photoShape || 'square';
-  const photoHTML = data.personal.photo
-    ? `<div class="photo shape-${photoShape}"><img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(data.personal.name || '')}"></div>`
-    : `<div class="photo shape-${photoShape} placeholder">${silhouetteSVG}</div>`;
+  let photoHTML = '';
+  const showPlaceholder = data.features?.photoPlaceholder !== false;
+  if (data.personal.photo) {
+    photoHTML = `<div class="photo shape-${photoShape}"><img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(data.personal.name || '')}"></div>`;
+  } else if (showPlaceholder) {
+    photoHTML = `<div class="photo shape-${photoShape} placeholder">${silhouetteSVG}</div>`;
+  }
 
-  // Contact Info
+  // Información de contacto
   const contactHTML = (data.contact || [])
     .map(c => {
       const icon = CONTACT_ICONS[c.type] || '';
@@ -38,15 +54,15 @@ export function render(data) {
     })
     .join('');
 
-  // Column Left
-  // Profile (About Me)
+  // Columna izquierda
+  // Perfil profesional (Sobre mí)
   const profileHTML = (data.personal.profile || []).length > 0 ? `
     <div class="block">
       <h2 class="section-title">${escapeHTML(data.sectionTitles?.profile || 'Perfil Profesional')}</h2>
       ${(data.personal.profile || []).map(p => `<p class="profile-text">${escapeHTML(p)}</p>`).join('')}
     </div>` : '';
 
-  // Education
+  // Formación académica (Educación)
   const educationHTML = (data.education || []).length > 0 ? `
     <div class="block">
       <h2 class="section-title">${escapeHTML(data.sectionTitles?.education || 'Formación Académica')}</h2>
@@ -65,7 +81,7 @@ export function render(data) {
       }).join('')}
     </div>` : '';
 
-  // Skills
+  // Habilidades
   const skillsHTML = (data.skills || []).length > 0 ? `
     <div class="block">
       <h2 class="section-title">${escapeHTML(data.sectionTitles?.skills || 'Habilidades')}</h2>
@@ -78,8 +94,8 @@ export function render(data) {
       </div>
     </div>` : '';
 
-  // Column Right
-  // Experience
+  // Columna derecha
+  // Experiencia laboral
   const experienceHTML = (data.experience || []).length > 0 ? `
     <div class="block" style="margin-bottom:0;">
       <h2 class="section-title">${escapeHTML(data.sectionTitles?.experience || 'Experiencia Laboral')}</h2>
@@ -104,7 +120,7 @@ export function render(data) {
       }).join('')}
     </div>` : '';
 
-  // Languages
+  // Idiomas
   const languagesHTML = (data.languages || []).length > 0 ? `
     <div class="block">
       <h2 class="section-title">${escapeHTML(data.sectionTitles?.languages || 'Idiomas')}</h2>
@@ -122,7 +138,7 @@ export function render(data) {
       </div>
     </div>` : '';
 
-  // Personality
+  // Personalidad
   const personalityHTML = (data.personality || []).length > 0 ? `
     <div class="block">
       <h2 class="section-title">${escapeHTML(data.sectionTitles?.personality || 'Personalidad')}</h2>
@@ -134,7 +150,7 @@ export function render(data) {
       </div>
     </div>` : '';
 
-  // Interests
+  // Intereses
   const interestsHTML = (data.interests || []).length > 0 ? `
     <div class="block">
       <h2 class="section-title">${escapeHTML(data.sectionTitles?.interests || 'Intereses')}</h2>

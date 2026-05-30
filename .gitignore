@@ -28,3 +28,6 @@ dotnet-server/
 
 # Reference assets
 cvs soon/
+
+# CLI Agents / IDE logs
+.antigravitycli/

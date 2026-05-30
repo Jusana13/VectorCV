@@ -8,6 +8,11 @@ import { CONTACT_ICONS, INTEREST_ICONS } from '../js/icon-library.js';
 
 /* --- Escape de HTML (prevención de XSS en campos de usuario) --- */
 
+/**
+ * Escapa caracteres especiales de HTML para prevenir ataques de scripting entre sitios (XSS).
+ * @param {string} str - La cadena de texto original.
+ * @returns {string} La cadena de texto escapada con entidades HTML.
+ */
 export function escapeHTML(str) {
   if (!str) return '';
   return str
@@ -24,6 +29,11 @@ export const silhouetteSVG = `<svg viewBox="0 0 24 24" fill="none" xmlns="http:/
 
 /* --- Renderizado de Estrellas de Nivel (★☆) --- */
 
+/**
+ * Genera el marcado HTML para representar el nivel mediante estrellas rellenas y vacías.
+ * @param {number} level - El nivel alcanzado (de 1 a 5).
+ * @returns {string} Cadena HTML con la representación visual de estrellas.
+ */
 export function renderStars(level) {
   const max = 5;
   const filled = '★'.repeat(level);

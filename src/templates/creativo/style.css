@@ -1,7 +1,7 @@
 /* ==========================================================================
-   PLANTILLA CREATIVO
-   Layout de dos columnas con flex, fondo SVG decorativo con curvas doradas,
-   sidebar izquierda con foto y contacto, contenido principal a la derecha.
+   PLANTILLA: CREATIVO
+   Estilos CSS de la plantilla "Creativo". Presenta un diseño de dos
+   columnas usando flexbox, con un fondo SVG decorativo de curvas doradas.
    ========================================================================== */
 
 .cv-page.creativo {
@@ -49,7 +49,7 @@
     width: 76mm;
     height: 100%;
     padding: 15mm 20px 20px 25px;
-    /* Spans down to align items safely under the golden top-left wave */
+    /* Se extiende hacia abajo para alinear elementos de forma segura bajo la onda dorada superior izquierda */
     display: flex;
     flex-direction: column;
     gap: 25px;
@@ -236,7 +236,7 @@
     flex: 1;
     height: 100%;
     padding: 25mm 30px 20px 20px;
-    /* Pushed top padding to align with the golden header curve */
+    /* Desplazamiento del padding superior para alinearse con la curva dorada del encabezado */
     display: flex;
     flex-direction: column;
     gap: 20px;

@@ -1,14 +1,7 @@
 /* ==========================================================================
-   PLANTILLA SOBRIO
-   Diseño limpio y profesional con layout de dos columnas centrales,
-   franja inferior de tres columnas, y líneas divisorias precisas.
-   ========================================================================== */
-
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
-
-/* ==========================================================================
-   PÁGINA BASE Y RESET
-   Dimensiones A4, fondo neutro y layout flex columna
+   PLANTILLA: SOBRIO
+   Estilos CSS de la plantilla "Sobrio". Presenta una estructura simétrica
+   y limpia de dos columnas y un bloque inferior a tres columnas.
    ========================================================================== */
 
 .cv-page.sobrio {

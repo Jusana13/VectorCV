@@ -1,5 +1,18 @@
+/**
+ * @file index.js
+ * @description Plantilla de diseño "Profesional" para la generación de currículums.
+ * Presenta una estructura clásica con una barra lateral izquierda decorativa, un
+ * encabezado de tono azul oscuro (navy) y una distribución a dos columnas (contenido
+ * principal a la izquierda y barra lateral gris claro a la derecha).
+ */
+
 import { renderStars, escapeHTML, silhouetteSVG, CONTACT_ICONS, INTEREST_ICONS } from '../helpers.js';
 
+/**
+ * Genera el HTML para la plantilla de currículum "Profesional".
+ * @param {Object} data - Datos del currículum del usuario.
+ * @returns {string} Fragmento HTML listo para renderizar.
+ */
 export function render(data) {
   const colors = data.colors?.profesional || { primary: '#1b2a4a', accent: '#e8a838', sidebarBg: '#f4f6f8' };
   
@@ -110,9 +123,13 @@ export function render(data) {
     })
     .join('');
 
-  const photoHTML = data.personal.photo
-    ? `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}"><img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(data.personal.name || '')}"></div>`
-    : `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}">${silhouetteSVG}</div>`;
+  let photoHTML = '';
+  const showPlaceholder = data.features?.photoPlaceholder !== false;
+  if (data.personal.photo) {
+    photoHTML = `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}"><img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(data.personal.name || '')}"></div>`;
+  } else if (showPlaceholder) {
+    photoHTML = `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}">${silhouetteSVG}</div>`;
+  }
 
   return `
     <article class="cv-page profesional" style="--navy: ${colors.primary}; --gold: ${colors.accent}; --side: ${colors.sidebarBg};">
@@ -126,7 +143,7 @@ export function render(data) {
 
       <div class="main-layout">
         <main class="main-content">
-          <!-- PROFILE -->
+          <!-- Perfil profesional -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.profile || 'Perfil Profesional')}</h2>
@@ -134,7 +151,7 @@ export function render(data) {
             ${profileHTML}
           </section>
 
-          <!-- EDUCATION -->
+          <!-- Formación académica -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.education || 'Formación Académica')}</h2>
@@ -142,7 +159,7 @@ export function render(data) {
             ${educationHTML}
           </section>
 
-          <!-- EXPERIENCE -->
+          <!-- Experiencia laboral -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.experience || 'Experiencia Laboral')}</h2>
@@ -152,7 +169,7 @@ export function render(data) {
         </main>
 
         <aside class="sidebar">
-          <!-- CONTACT -->
+          <!-- Contacto -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.contact || 'Contacto')}</h2>
@@ -162,7 +179,7 @@ export function render(data) {
             </div>
           </section>
 
-          <!-- SKILLS -->
+          <!-- Habilidades -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.skills || 'Habilidades')}</h2>
@@ -172,7 +189,7 @@ export function render(data) {
             </div>
           </section>
 
-          <!-- LANGUAGES -->
+          <!-- Idiomas -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.languages || 'Idiomas')}</h2>
@@ -182,7 +199,7 @@ export function render(data) {
             </div>
           </section>
 
-          <!-- INTERESTS -->
+          <!-- Intereses -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.interests || 'Intereses')}</h2>

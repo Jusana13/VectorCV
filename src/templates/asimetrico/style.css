@@ -1,10 +1,8 @@
 /* ==========================================================================
-   PLANTILLA ASIMÉTRICO
-   Diseño con posicionamiento absoluto, banda oscura superior, foto grande
-   superpuesta y dos columnas de contenido.
+   PLANTILLA: ASIMÉTRICO
+   Estilos CSS de la plantilla "Asimétrico". Presenta un diseño de dos
+   columnas asimétricas, foto destacada y una banda decorativa superior.
    ========================================================================== */
-
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
 
 /* ==========================================================================
    PÁGINA BASE Y RESET

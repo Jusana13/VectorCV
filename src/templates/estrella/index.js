@@ -1,5 +1,17 @@
+/**
+ * @file index.js
+ * @description Plantilla de diseño "Estrella" para la generación de currículums.
+ * Presenta una distribución clásica y elegante de dos columnas divididas por
+ * líneas ornamentales con estrellas y cruces decorativas.
+ */
+
 import { escapeHTML, silhouetteSVG } from '../helpers.js';
 
+/**
+ * Genera el HTML para la plantilla de currículum "Estrella".
+ * @param {Object} data - Datos del currículum del usuario.
+ * @returns {string} Fragmento HTML listo para renderizar.
+ */
 export function render(data) {
   const colors = data.colors?.estrella || { primary: '#4D4D4B', accent: '#F8F7F4', textColor: '#5A5A58' };
   
@@ -7,9 +19,20 @@ export function render(data) {
   const fullName = `${data.personal.name || ''} ${data.personal.lastName || ''}`.trim();
 
   // Foto de Perfil dinámica
-  const photoHTML = data.personal.photo
-    ? `<img class="profile-pic" src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(fullName)}">`
-    : `<div class="profile-pic-placeholder">${silhouetteSVG}</div>`;
+  let photoHTML = '';
+  const showPlaceholder = data.features?.photoPlaceholder !== false;
+
+  if (data.personal.photo) {
+    photoHTML = `
+      <div class="profile-pic-container shape-${data.personal.photoShape || 'circle'}">
+        <img class="profile-pic" src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(fullName)}">
+      </div>`;
+  } else if (showPlaceholder) {
+    photoHTML = `
+      <div class="profile-pic-container shape-${data.personal.photoShape || 'circle'}">
+        <div class="profile-pic-placeholder">${silhouetteSVG}</div>
+      </div>`;
+  }
 
   // Resumen / Párrafos de Perfil
   const profileHTML = (data.personal.profile || [])
@@ -44,9 +67,11 @@ export function render(data) {
   const educationHTML = (data.education || [])
     .map(edu => `
       <div class="education-item item">
-        <h4 class="edu-degree item-title">${escapeHTML(edu.title).toUpperCase()}</h4>
+        <div class="edu-role-row">
+          <h4 class="edu-degree item-title">${escapeHTML(edu.title).toUpperCase()}</h4>
+          <span class="edu-date item-date">${escapeHTML(edu.period)}</span>
+        </div>
         <p class="edu-institution item-subtitle">${escapeHTML(edu.institution)}</p>
-        <span class="edu-date item-date">${escapeHTML(edu.period)}</span>
         <p class="edu-desc item-desc" style="margin-top: 5px;">${escapeHTML(edu.description)}</p>
       </div>
     `)
@@ -58,8 +83,25 @@ export function render(data) {
       ${educationHTML}
     </div>` : '';
 
-  // Línea divisoria de columna izquierda si existen ambas secciones
-  const leftColDivider = ((data.skills || []).length > 0 && (data.education || []).length > 0)
+  // Personalidad
+  const personalityHTML = (data.personality || [])
+    .map(p => `<li>${escapeHTML(p.name)}</li>`)
+    .join('');
+
+  const personalityBlockHTML = (data.personality || []).length > 0 ? `
+    <div class="section-block">
+      <h3 class="section-title">${escapeHTML(data.sectionTitles?.personality || 'PERSONALIDAD')}</h3>
+      <ul class="skills-list">
+        ${personalityHTML}
+      </ul>
+    </div>` : '';
+
+  // Líneas divisorias de columnas
+  const leftColDivider = ((data.skills || []).length > 0 && (data.personality || []).length > 0)
+    ? `<div class="col-divider-line"></div>`
+    : '';
+
+  const rightColDivider = ((data.experience || []).length > 0 && (data.education || []).length > 0)
     ? `<div class="col-divider-line"></div>`
     : '';
 
@@ -126,9 +168,7 @@ export function render(data) {
           </div>
 
           <!-- Contenedor Foto de Perfil -->
-          <div class="profile-pic-container">
-            ${photoHTML}
-          </div>
+          ${photoHTML}
 
           <!-- Decoración Derecha (Línea + Estrella) -->
           <div class="line-decor right-decor">
@@ -151,11 +191,11 @@ export function render(data) {
       <!-- CUERPO PRINCIPAL / BODY -->
       <main class="cv-body">
         
-        <!-- Columna Izquierda: Habilidades y Formación -->
+        <!-- Columna Izquierda: Habilidades y Personalidad -->
         <section class="body-col left-col">
           ${skillsBlockHTML}
           ${leftColDivider}
-          ${educationBlockHTML}
+          ${personalityBlockHTML}
         </section>
 
         <!-- Divisor Vertical con Estrellas Decorativas -->
@@ -186,9 +226,11 @@ export function render(data) {
           </div>
         </div>
 
-        <!-- Columna Derecha: Experiencia Laboral -->
+        <!-- Columna Derecha: Experiencia Laboral y Formación -->
         <section class="body-col right-col">
           ${experienceBlockHTML}
+          ${rightColDivider}
+          ${educationBlockHTML}
         </section>
 
       </main>

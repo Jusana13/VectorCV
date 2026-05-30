@@ -1,7 +1,7 @@
 /* ==========================================================================
-   PLANTILLA MINIMALISTA
-   Layout limpio sin sidebar oscura, disposición vertical con flex,
-   grid de dos columnas para contenido, tipografía Inter y decoración mínima.
+   PLANTILLA: MINIMALISTA
+   Estilos CSS de la plantilla "Minimalista". Presenta un diseño limpio,
+   disposición vertical y cuadrícula de dos columnas sin barra lateral oscura.
    ========================================================================== */
 
 .cv-page.minimalista {

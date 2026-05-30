@@ -1,8 +1,8 @@
 /* ==========================================================================
-   PLANTILLA SAGE
-   Diseño simétrico con banda central, foto de perfil centrada, columnas
-   de contacto flanqueantes, tres columnas de contenido y sección de
-   experiencia a ancho completo.
+   PLANTILLA: SAGE
+   Estilos CSS de la plantilla "Sage". Presenta un diseño simétrico con
+   banda superior, foto de perfil centrada, tres columnas de contenido y
+   sección de experiencia a ancho completo.
    ========================================================================== */
 
 /* ==========================================================================
@@ -15,15 +15,15 @@
     width: 210mm;
     height: 297mm;
     overflow: hidden;
-    --sage-bg: var(--primary, #b5d3cd);
-    --sage-ink: var(--accent, #22252a);
+    --sage-bg: var(--primary, #c5ded6);
+    --sage-ink: var(--accent, #354240);
     --sage-muted: #6b6b6b;
-    --sage-paper: color-mix(in srgb, var(--primary, #b5d3cd) 10%, #ffffff);
-    --sage-accent-light: color-mix(in srgb, var(--primary, #b5d3cd) 20%, #ffffff);
-    --sage-progress-bg: color-mix(in srgb, var(--primary, #b5d3cd) 35%, #ffffff);
+    --sage-paper: color-mix(in srgb, var(--primary, #c5ded6) 10%, #ffffff);
+    --sage-accent-light: color-mix(in srgb, var(--primary, #c5ded6) 20%, #ffffff);
+    --sage-progress-bg: color-mix(in srgb, var(--primary, #c5ded6) 35%, #ffffff);
     --sage-pill-bg: linear-gradient(to bottom, #3a3a3a, #262626);
     --sage-pill-border: #181818;
-    --sage-line: var(--accent, #22252a);
+    --sage-line: var(--accent, #354240);
 
     background-color: var(--sage-paper);
     color: var(--sage-ink);

@@ -1,5 +1,17 @@
+/**
+ * @file index.js
+ * @description Plantilla de diseño "Minimalista" para la generación de currículums.
+ * Destaca por su sobriedad, el uso limpio de espacios en blanco y una estructura
+ * clara a dos columnas (columna principal de contenido y barra lateral de datos adicionales).
+ */
+
 import { renderStars, escapeHTML, silhouetteSVG, CONTACT_ICONS, INTEREST_ICONS } from '../helpers.js';
 
+/**
+ * Genera el HTML para la plantilla de currículum "Minimalista".
+ * @param {Object} data - Datos del currículum del usuario.
+ * @returns {string} Fragmento HTML listo para renderizar.
+ */
 export function render(data) {
   const colors = data.colors?.minimalista || { primary: '#111111', accent: '#666666' };
   
@@ -98,9 +110,13 @@ export function render(data) {
     })
     .join('');
 
-  const photoHTML = data.personal.photo
-    ? `<div class="photo-wrap shape-${data.personal.photoShape || 'rounded'}"><img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(data.personal.name || '')}"></div>`
-    : `<div class="photo-wrap shape-${data.personal.photoShape || 'rounded'}">${silhouetteSVG}</div>`;
+  let photoHTML = '';
+  const showPlaceholder = data.features?.photoPlaceholder !== false;
+  if (data.personal.photo) {
+    photoHTML = `<div class="photo-wrap shape-${data.personal.photoShape || 'rounded'}"><img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(data.personal.name || '')}"></div>`;
+  } else if (showPlaceholder) {
+    photoHTML = `<div class="photo-wrap shape-${data.personal.photoShape || 'rounded'}">${silhouetteSVG}</div>`;
+  }
 
   return `
     <article class="cv-page minimalista" style="--primary: ${colors.primary}; --text-muted: ${colors.accent};">
@@ -114,7 +130,7 @@ export function render(data) {
 
       <div class="content-layout">
         <div class="main-column">
-          <!-- PROFILE -->
+          <!-- Perfil profesional -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.profile || 'Perfil Profesional')}</h2>
@@ -122,7 +138,7 @@ export function render(data) {
             ${profileHTML}
           </section>
 
-          <!-- EXPERIENCE -->
+          <!-- Experiencia laboral -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.experience || 'Experiencia Laboral')}</h2>
@@ -130,7 +146,7 @@ export function render(data) {
             ${experienceHTML}
           </section>
 
-          <!-- EDUCATION -->
+          <!-- Formación académica -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.education || 'Formación Académica')}</h2>
@@ -140,7 +156,7 @@ export function render(data) {
         </div>
 
         <div class="side-column">
-          <!-- CONTACT -->
+          <!-- Contacto -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.contact || 'Contacto')}</h2>
@@ -150,7 +166,7 @@ export function render(data) {
             </div>
           </section>
 
-          <!-- SKILLS -->
+          <!-- Habilidades -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.skills || 'Habilidades')}</h2>
@@ -160,7 +176,7 @@ export function render(data) {
             </div>
           </section>
 
-          <!-- LANGUAGES -->
+          <!-- Idiomas -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.languages || 'Idiomas')}</h2>
@@ -170,7 +186,7 @@ export function render(data) {
             </div>
           </section>
 
-          <!-- INTERESTS -->
+          <!-- Intereses -->
           <section class="section">
             <div class="section-title">
               <h2>${escapeHTML(data.sectionTitles?.interests || 'Intereses')}</h2>

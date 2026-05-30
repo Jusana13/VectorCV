@@ -1,12 +1,24 @@
+/**
+ * @file index.js
+ * @description Plantilla de diseño "Creativo" para la generación de currículums.
+ * Presenta una estructura dinámica de dos columnas con un fondo decorativo en SVG,
+ * barra lateral izquierda y sección de contenido principal a la derecha.
+ */
+
 import { escapeHTML, silhouetteSVG, CONTACT_ICONS } from '../helpers.js';
 
+/**
+ * Genera el HTML para la plantilla de currículum "Creativo".
+ * @param {Object} data - Datos del currículum del usuario.
+ * @returns {string} Fragmento HTML listo para renderizar.
+ */
 export function render(data) {
   const colors = data.colors?.creativo || { primary: '#222222', accent: '#f4b844', bgLight: '#fdf8ec' };
   
-  // Format Name: "JORDANA JONES" (all caps)
+  // Formato del nombre completo en mayúsculas
   const fullName = `${data.personal.name || ''} ${data.personal.lastName || ''}`.toUpperCase();
   
-  // Sidebar "Habilidades Técnicas" (from data.techSkills array)
+  // Barra lateral: "Habilidades Técnicas" (desde data.techSkills)
   const techSkillsHTML = (data.techSkills || [])
     .map(ts => `
       <div class="bullet-item">
@@ -15,7 +27,7 @@ export function render(data) {
       </div>`)
     .join('');
 
-  // Sidebar "Competencias / Skills" (from data.skills)
+  // Barra lateral: "Competencias" (desde data.skills)
   const skillsHTML = (data.skills || [])
     .map(s => `
       <div class="bullet-item">
@@ -24,7 +36,7 @@ export function render(data) {
       </div>`)
     .join('');
 
-  // Languages (Idiomas) in sidebar
+  // Barra lateral: "Idiomas"
   const languagesHTML = (data.languages || [])
     .map(lang => `
       <div class="bullet-item">
@@ -33,7 +45,7 @@ export function render(data) {
       </div>`)
     .join('');
 
-  // Contact list
+  // Lista de información de contacto
   const contactHTML = (data.contact || [])
     .map(c => {
       const icon = CONTACT_ICONS[c.type] || '';
@@ -53,12 +65,12 @@ export function render(data) {
     })
     .join('');
 
-  // Profile text paragraphs
+  // Párrafos del perfil profesional
   const profileHTML = (data.personal.profile || [])
     .map(p => `<p class="profile-text">${escapeHTML(p)}</p>`)
     .join('');
 
-  // Experience list (Work experience)
+  // Lista de experiencia laboral
   const experienceHTML = (data.experience || [])
     .map(exp => {
       const bulletsHTML = (exp.bullets || []).length > 0 ? `
@@ -86,7 +98,7 @@ export function render(data) {
     })
     .join('');
 
-  // Education list (Academic background)
+  // Lista de formación académica
   const educationHTML = (data.education || [])
     .map(edu => {
       const buttonHTML = edu.button?.url ? `
@@ -107,44 +119,48 @@ export function render(data) {
     })
     .join('');
 
-  const photoHTML = data.personal.photo
-    ? `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}"><img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(fullName)}"></div>`
-    : `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}">${silhouetteSVG}</div>`;
+  let photoHTML = '';
+  const showPlaceholder = data.features?.photoPlaceholder !== false;
+  if (data.personal.photo) {
+    photoHTML = `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}"><img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(fullName)}"></div>`;
+  } else if (showPlaceholder) {
+    photoHTML = `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}">${silhouetteSVG}</div>`;
+  }
 
   return `
     <article class="cv-page creativo" style="--primary: ${colors.primary}; --accent: ${colors.accent}; --bg-light: ${colors.bgLight};">
-      <!-- SVG Background Decoration -->
+      <!-- Decoración de fondo en SVG -->
       <div class="creativo-bg">
         <svg viewBox="0 0 210 297" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- White background -->
+          <!-- Fondo blanco -->
           <rect width="210" height="297" fill="#ffffff" />
           
-          <!-- Cream top background wave -->
+          <!-- Onda de fondo crema superior -->
           <path d="M 0 0 H 210 V 28 C 130 30, 70 60, 38 75 C 20 80, 10 70, 0 62 Z" fill="var(--bg-light)" />
           
-          <!-- Layered light gold/yellow top wave -->
+          <!-- Onda dorada clara superior intermedia -->
           <path d="M 0 0 H 210 V 16 C 130 18, 70 44, 38 55 C 20 60, 10 50, 0 42 Z" fill="var(--accent)" opacity="0.6" />
           
-          <!-- Main gold/yellow top wave (occupying photo space on left, above title on right) -->
+          <!-- Onda dorada principal superior (para foto a la izquierda, título a la derecha) -->
           <path d="M 0 0 H 210 V 22 C 130 24, 70 52, 38 65 C 20 70, 10 60, 0 52 Z" fill="var(--accent)" />
           
-          <!-- Bottom-right corner light-yellow accent curve -->
+          <!-- Curva de acento amarillo claro en la esquina inferior derecha -->
           <path d="M 210 297 H 175 C 190 280, 205 285, 210 297 Z" fill="var(--accent)" opacity="0.12" />
         </svg>
       </div>
       
       <aside class="sidebar">
-        <!-- Photo Container -->
+        <!-- Contenedor de la foto de perfil -->
         <div class="photo-container">
           ${photoHTML}
         </div>
         
-        <!-- Contact Info -->
+        <!-- Información de contacto -->
         <div class="contact-section">
           ${contactHTML}
         </div>
         
-        <!-- Habilidades Técnicas (sidebar) -->
+        <!-- Habilidades técnicas (barra lateral) -->
         <div class="sidebar-section">
           <h3>${escapeHTML(data.sectionTitles?.techSkills || 'Habilidades Técnicas')}</h3>
           <div class="bullet-list-container">
@@ -152,7 +168,7 @@ export function render(data) {
           </div>
         </div>
 
-        <!-- Idiomas (sidebar) -->
+        <!-- Idiomas (barra lateral) -->
         <div class="sidebar-section">
           <h3>${escapeHTML(data.sectionTitles?.languages || 'Idiomas')}</h3>
           <div class="bullet-list-container">
@@ -160,7 +176,7 @@ export function render(data) {
           </div>
         </div>
 
-        <!-- Competencias (sidebar) -->
+        <!-- Competencias (barra lateral) -->
         <div class="sidebar-section">
           <h3>${escapeHTML(data.sectionTitles?.skills || 'Competencias')}</h3>
           <div class="bullet-list-container">
@@ -175,13 +191,13 @@ export function render(data) {
           <h1>${escapeHTML(fullName)}</h1>
         </header>
 
-        <!-- About Me Section -->
+        <!-- Sección de perfil profesional -->
         <section class="section">
           <h2>${escapeHTML(data.sectionTitles?.profile || 'Perfil Profesional')}</h2>
           ${profileHTML}
         </section>
 
-        <!-- Experience Section -->
+        <!-- Sección de experiencia laboral -->
         <section class="section">
           <h2>${escapeHTML(data.sectionTitles?.experience || 'Experiencia Laboral')}</h2>
           <div class="items-container">
@@ -189,7 +205,7 @@ export function render(data) {
           </div>
         </section>
 
-        <!-- Education Section -->
+        <!-- Sección de formación académica -->
         <section class="section">
           <h2>${escapeHTML(data.sectionTitles?.education || 'Formación Académica')}</h2>
           <div class="items-container">

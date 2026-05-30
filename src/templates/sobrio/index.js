@@ -1,25 +1,39 @@
+/**
+ * @file index.js
+ * @description Plantilla de diseño "Sobrio" para la generación de currículums.
+ * Presenta una distribución formal, limpia y equilibrada: encabezado con nombre
+ * centrado entre finas líneas, foto de perfil discreta y una estructura principal
+ * a dos columnas (Perfil y Experiencia en la izquierda, Educación y Habilidades en la derecha)
+ * seguida de un bloque inferior a tres columnas para personalidad, intereses e idiomas.
+ */
+
 import { escapeHTML, silhouetteSVG, CONTACT_ICONS, INTEREST_ICONS } from '../helpers.js';
 
+/**
+ * Genera el HTML para la plantilla de currículum "Sobrio".
+ * @param {Object} data - Datos del currículum del usuario.
+ * @returns {string} Fragmento HTML listo para renderizar.
+ */
 export function render(data) {
   const colors = data.colors?.sobrio || { primary: '#EAEAE6', accent: '#222222' };
   
-  // Format Name
+  // Formato del nombre completo
   const fullname = `${data.personal.name || ''} ${data.personal.lastName || ''}`.trim();
   const nameHTML = fullname ? `<h1 class="fullname">${escapeHTML(fullname)}</h1>` : '';
 
-  // Profession / Job Title
+  // Profesión o Cargo
   const professionHTML = data.personal.profession 
     ? `<p class="profession-subtitle">${escapeHTML(data.personal.profession)}</p>` 
     : '';
 
-  // Profile Photo: centered below name & profession if uploaded
+  // Foto de perfil: centrada debajo del nombre y profesión si se ha subido
   const photoHTML = data.personal.photo
     ? `<div class="photo shape-${data.personal.photoShape || 'circle'}">
          <img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(data.personal.name || '')}">
        </div>`
     : '';
 
-  // Contact list row
+  // Fila con la lista de información de contacto
   const contactItems = data.contact || [];
   const contactHTML = contactItems
     .map(c => {
@@ -40,7 +54,7 @@ export function render(data) {
     })
     .join('');
 
-  // Column 1: Profile Summary & Experience
+  // Columna 1: Resumen de perfil y experiencia laboral
   const profileHTML = (data.personal.profile || [])
     .map(p => `<p class="profile-text">${escapeHTML(p)}</p>`)
     .join('');
@@ -61,7 +75,7 @@ export function render(data) {
     })
     .join('');
 
-  // Column 2: Education & Skills
+  // Columna 2: Formación académica y habilidades
   const educationHTML = (data.education || [])
     .map(edu => {
       return `
@@ -78,7 +92,7 @@ export function render(data) {
     .map(s => `<li>${escapeHTML(s.name)}</li>`)
     .join('');
 
-  // Bottom Left: Personality & Interests side-by-side
+  // Parte inferior: Personalidad e intereses lado a lado
   const personalityHTML = (data.personality || [])
     .map(p => `<li>${escapeHTML(p.name)}</li>`)
     .join('');
@@ -91,14 +105,14 @@ export function render(data) {
     })
     .join('');
 
-  // Bottom Right: Languages
+  // Parte inferior derecha: Idiomas
   const languagesHTML = (data.languages || [])
     .map(lang => `<li>${escapeHTML(lang.name)} ${lang.level ? `(${escapeHTML(lang.level)})` : ''}</li>`)
     .join('');
 
   return `
     <article class="cv-page sobrio" style="--bg-primary: ${colors.primary}; --accent-color: ${colors.accent};">
-      <!-- HEADER -->
+      <!-- Encabezado -->
       <header class="header">
         <div class="header-name-container">
           <span class="header-line"></span>
@@ -108,18 +122,18 @@ export function render(data) {
         ${professionHTML}
         
         ${photoHTML}
-
+ 
         <div class="contact-row">
           ${contactHTML}
         </div>
       </header>
 
-      <!-- MIDDLE CONTENT LAYOUT (Two columns) -->
+      <!-- Distribución de contenido central (Dos columnas) -->
       <div class="middle-layout">
-        <!-- Absolute vertical divider line -->
+        <!-- Línea divisoria vertical absoluta -->
         <div class="vertical-line"></div>
         
-        <!-- Left Column: Profile & Experience -->
+        <!-- Columna izquierda: Perfil y experiencia laboral -->
         <div class="col-left">
           <section class="section profile-section">
             <h2 class="section-title">${escapeHTML(data.sectionTitles?.profile || 'PROFILE SUMMARY')}</h2>
@@ -127,9 +141,9 @@ export function render(data) {
               ${profileHTML}
             </div>
           </section>
-
+ 
           <hr class="section-divider">
-
+ 
           <section class="section experience-section">
             <h2 class="section-title">${escapeHTML(data.sectionTitles?.experience || 'EXPERIENCE')}</h2>
             <div class="experience-list">
@@ -138,7 +152,7 @@ export function render(data) {
           </section>
         </div>
 
-        <!-- Right Column: Education & Skills -->
+        <!-- Columna derecha: Formación académica y habilidades -->
         <div class="col-right">
           <section class="section education-section">
             <h2 class="section-title">${escapeHTML(data.sectionTitles?.education || 'EDUCATION')}</h2>
@@ -146,9 +160,9 @@ export function render(data) {
               ${educationHTML}
             </div>
           </section>
-
+ 
           <hr class="section-divider right-col-divider">
-
+ 
           <section class="section skills-section">
             <h2 class="section-title">${escapeHTML(data.sectionTitles?.skills || 'SKILLS')}</h2>
             <ul class="bullets-list">
@@ -158,9 +172,9 @@ export function render(data) {
         </div>
       </div>
 
-      <!-- BOTTOM LAYOUT (Personality, Interests, Languages) -->
+      <!-- Distribución de la parte inferior (Personalidad, Intereses, Idiomas) -->
       <div class="bottom-layout">
-        <!-- Absolute vertical lines -->
+        <!-- Líneas verticales absolutas -->
         <div class="vertical-line line-1"></div>
         <div class="vertical-line line-2"></div>
         

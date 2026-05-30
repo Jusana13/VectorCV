@@ -1,9 +1,22 @@
+/**
+ * @file index.js
+ * @description Plantilla de diseño "Moderno" para la generación de currículums.
+ * Presenta una estructura de dos columnas con un encabezado oscuro de ancho completo,
+ * una columna principal a la izquierda para la información de trayectoria y una
+ * barra lateral derecha oscura para datos complementarios e idiomas en círculos de progreso.
+ */
+
 import { renderStars, escapeHTML, silhouetteSVG, CONTACT_ICONS, INTEREST_ICONS } from '../helpers.js';
 
+/**
+ * Genera el HTML para la plantilla de currículum "Moderno".
+ * @param {Object} data - Datos del currículum del usuario.
+ * @returns {string} Fragmento HTML listo para renderizar.
+ */
 export function render(data) {
   const colors = data.colors?.moderno || { primary: '#2C2D30', accent: '#C9A227', bgLight: '#F3EFE6' };
   
-  // Format Name: split first word or show bold/accent color
+  // Formato del nombre: separa la primera palabra del resto para aplicar el estilo visual (destacado en negrita/color)
   const nameParts = (data.personal.name || '').trim().split(' ');
   const firstName = nameParts[0] || '';
   const restName = nameParts.slice(1).join(' ');
@@ -16,12 +29,12 @@ export function render(data) {
     nameHTML = `<span>${escapeHTML(lastName)}</span>`;
   }
 
-  // Profile text paragraphs
+  // Párrafos del perfil profesional
   const profileHTML = (data.personal.profile || [])
     .map(p => `<div class="profile-text">${escapeHTML(p)}</div>`)
     .join('');
 
-  // Contact list
+  // Lista de información de contacto
   const contactHTML = (data.contact || [])
     .map(c => {
       const icon = CONTACT_ICONS[c.type] || '';
@@ -41,7 +54,7 @@ export function render(data) {
     })
     .join('');
 
-  // Education list (with optional cert button)
+  // Lista de formación académica (con botón opcional de certificado)
   const educationHTML = (data.education || [])
     .map(edu => {
       const buttonHTML = edu.button?.url ? `
@@ -61,7 +74,7 @@ export function render(data) {
     })
     .join('');
 
-  // Experience list
+  // Lista de experiencia laboral
   const experienceHTML = (data.experience || [])
     .map(exp => {
       const bulletsHTML = (exp.bullets || []).length > 0 ? `
@@ -85,7 +98,7 @@ export function render(data) {
     })
     .join('');
 
-  // Skills
+  // Habilidades
   const skillsHTML = (data.skills || [])
     .map(s => `
       <div class="skill-item">
@@ -94,11 +107,11 @@ export function render(data) {
       </div>`)
     .join('');
 
-  // Languages (with SVG circle progress)
+  // Idiomas (con progreso en círculo SVG)
   const languagesHTML = (data.languages || [])
     .map(lang => {
       const percent = parseInt(lang.percentage) || 50;
-      // SVG Circle stroke-dasharray is 125.6 (based on r=20 for smooth animation)
+      // El valor stroke-dasharray del círculo SVG es 125.6 (basado en r=20 para una transición fluida)
       const strokeDasharray = 125.6;
       const offset = strokeDasharray - (percent / 100) * strokeDasharray;
       return `
@@ -112,7 +125,7 @@ export function render(data) {
     })
     .join('');
 
-  // Interests/Hobbies
+  // Intereses y hobbies
   const interestsHTML = (data.interests || [])
     .map(key => {
       const item = INTEREST_ICONS[key];
@@ -124,9 +137,13 @@ export function render(data) {
     })
     .join('');
 
-  const photoHTML = data.personal.photo
-    ? `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}"><img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(data.personal.name || '')}"></div>`
-    : `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}">${silhouetteSVG}</div>`;
+  let photoHTML = '';
+  const showPlaceholder = data.features?.photoPlaceholder !== false;
+  if (data.personal.photo) {
+    photoHTML = `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}"><img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(data.personal.name || '')}"></div>`;
+  } else if (showPlaceholder) {
+    photoHTML = `<div class="photo-wrap shape-${data.personal.photoShape || 'circle'}">${silhouetteSVG}</div>`;
+  }
 
   return `
     <article class="cv-page moderno" style="--primary: ${colors.primary}; --accent: ${colors.accent}; --bg-light: ${colors.bgLight};">
@@ -139,7 +156,7 @@ export function render(data) {
       </header>
 
       <main class="main-content">
-        <!-- PROFILE -->
+        <!-- Perfil profesional -->
         <section class="section">
           <div class="section-title">
             <h2>${escapeHTML(data.sectionTitles?.profile || 'Perfil Profesional')}</h2>
@@ -147,7 +164,7 @@ export function render(data) {
           ${profileHTML}
         </section>
 
-        <!-- EDUCATION -->
+        <!-- Formación académica -->
         <section class="section">
           <div class="section-title">
             <h2>${escapeHTML(data.sectionTitles?.education || 'Formación Académica')}</h2>
@@ -155,7 +172,7 @@ export function render(data) {
           ${educationHTML}
         </section>
 
-        <!-- EXPERIENCE -->
+        <!-- Experiencia laboral -->
         <section class="section">
           <div class="section-title">
             <h2>${escapeHTML(data.sectionTitles?.experience || 'Experiencia Laboral')}</h2>
@@ -165,7 +182,7 @@ export function render(data) {
       </main>
 
       <aside class="sidebar">
-        <!-- CONTACT -->
+        <!-- Contacto -->
         <section class="section">
           <div class="section-title">
             <h2>${escapeHTML(data.sectionTitles?.contact || 'Contacto')}</h2>
@@ -175,7 +192,7 @@ export function render(data) {
           </div>
         </section>
 
-        <!-- SKILLS -->
+        <!-- Habilidades -->
         <section class="section">
           <div class="section-title">
             <h2>${escapeHTML(data.sectionTitles?.skills || 'Habilidades')}</h2>
@@ -185,7 +202,7 @@ export function render(data) {
           </div>
         </section>
 
-        <!-- LANGUAGES -->
+        <!-- Idiomas -->
         <section class="section">
           <div class="section-title">
             <h2>${escapeHTML(data.sectionTitles?.languages || 'Idiomas')}</h2>
@@ -195,7 +212,7 @@ export function render(data) {
           </div>
         </section>
 
-        <!-- INTERESTS -->
+        <!-- Intereses -->
         <section class="section">
           <div class="section-title">
             <h2>${escapeHTML(data.sectionTitles?.interests || 'Intereses')}</h2>

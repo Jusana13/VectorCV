@@ -1,7 +1,7 @@
 /* ==========================================================================
-   PLANTILLA MODERNO
-   Layout de dos columnas con grid, header oscuro de ancho completo,
-   sidebar oscura a la derecha y contenido principal blanco a la izquierda.
+   PLANTILLA: MODERNO
+   Estilos CSS de la plantilla "Moderno". Presenta una estructura de dos
+   columnas (contenido y barra lateral derecha) con encabezado superior oscuro.
    ========================================================================== */
 
 .cv-page.moderno {
@@ -126,11 +126,6 @@
     border-radius: 4px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    transition: opacity 0.2s;
-
-    &:hover {
-      opacity: 0.9;
-    }
   }
 
   /* ==========================================================================

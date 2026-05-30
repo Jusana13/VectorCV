@@ -1,21 +1,46 @@
+/**
+ * @file index.js
+ * @description Plantilla de diseño "Sage" para la generación de currículums.
+ * Presenta un diseño simétrico con una banda superior que aloja la foto de perfil
+ * centrada flanqueada por datos de contacto, seguido de un bloque introductorio de
+ * perfil, una distribución de tres columnas intermedias (Formación, Cualidades y
+ * Habilidades/Idiomas) y una sección inferior de experiencia laboral a ancho completo.
+ */
+
 import { renderStars, escapeHTML, silhouetteSVG, CONTACT_ICONS, INTEREST_ICONS } from '../helpers.js';
 
+/**
+ * Genera el HTML para la plantilla de currículum "Sage".
+ * @param {Object} data - Datos del currículum del usuario.
+ * @returns {string} Fragmento HTML listo para renderizar.
+ */
 export function render(data) {
-  const colors = data.colors?.sage || { primary: '#b5d3cd', accent: '#22252a' };
+  const colors = data.colors?.sage || { primary: '#c5ded6', accent: '#354240' };
   
-  // Split name for visual styling
+  // Divide el nombre para dar estilo visual contrastado
   const nameParts = (data.personal.name || '').trim().split(' ');
   const firstName = nameParts[0] || '';
   const restName = nameParts.slice(1).join(' ');
   const lastName = data.personal.lastName || '';
   
-  // Profile Photo (Circular by default, with concentric borders)
+  // Foto de perfil (Circular por defecto, con bordes concéntricos en CSS)
   const photoShape = data.personal.photoShape || 'circle';
-  const photoHTML = data.personal.photo
-    ? `<img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(data.personal.name || '')}">`
-    : silhouetteSVG;
+  let photoWrapperHTML = '';
+  const showPlaceholder = data.features?.photoPlaceholder !== false;
 
-  // Split contact items: first two go on the left, the rest on the right
+  if (data.personal.photo) {
+    photoWrapperHTML = `
+      <div class="profile-pic shape-${photoShape}">
+        <img src="${escapeHTML(data.personal.photo)}" alt="Foto de ${escapeHTML(data.personal.name || '')}">
+      </div>`;
+  } else if (showPlaceholder) {
+    photoWrapperHTML = `
+      <div class="profile-pic shape-${photoShape}">
+        ${silhouetteSVG}
+      </div>`;
+  }
+
+  // Divide la información de contacto: los dos primeros elementos van a la izquierda, el resto a la derecha
   const contactItems = data.contact || [];
   const midPoint = 2;
   const leftContacts = contactItems.slice(0, midPoint);
@@ -47,7 +72,7 @@ export function render(data) {
     })
     .join('');
 
-  // Column 1: Education
+  // Columna 1: Formación académica (Educación)
   const educationHTML = (data.education || [])
     .map(edu => {
       const buttonHTML = edu.button?.url ? `
@@ -65,7 +90,7 @@ export function render(data) {
     })
     .join('');
 
-  // Column 2: Expertise (Personality) & Interests
+  // Columna 2: Cualidades de personalidad e intereses
   const personalityHTML = (data.personality || [])
     .map(p => `<li>${escapeHTML(p.name).toUpperCase()}</li>`)
     .join('');
@@ -99,7 +124,7 @@ export function render(data) {
     ${interestsHTML}
   `;
 
-  // Column 3: Skills & Languages
+  // Columna 3: Habilidades e Idiomas
   const skillsHTML = (data.skills || [])
     .map(s => {
       const percent = s.percentage !== undefined ? s.percentage : (s.level ? s.level * 20 : 60);
@@ -130,7 +155,7 @@ export function render(data) {
     ${languagesHTML}
   `;
 
-  // Bottom Section: Work Experience
+  // Sección inferior: Experiencia laboral
   const experienceHTML = (data.experience || [])
     .map(exp => {
       const bulletsHTML = (exp.bullets || []).length > 0 ? `
@@ -167,7 +192,7 @@ export function render(data) {
     })
     .join('');
 
-  // Main profile block
+  // Bloque del perfil profesional principal
   const profileHTML = (data.personal.profile || [])
     .map(p => `<p class="profile-desc profile-text">${escapeHTML(p)}</p>`)
     .join('');
@@ -186,9 +211,7 @@ export function render(data) {
           ${leftContactHTML}
         </div>
 
-        <div class="profile-pic shape-${photoShape}">
-          ${photoHTML}
-        </div>
+        ${photoWrapperHTML}
 
         <div class="contact-col right">
           ${rightContactHTML}
@@ -208,7 +231,7 @@ export function render(data) {
         ${profileHTML}
       </section>
 
-      <!-- 3 Columns Header -->
+      <!-- Cabecera de las 3 columnas -->
       <div class="three-pills-container">
         <div class="three-pills-line"></div>
         <div class="three-pills-row">
@@ -224,7 +247,7 @@ export function render(data) {
         </div>
       </div>
 
-      <!-- 3 Columns Content -->
+      <!-- Contenido de las 3 columnas -->
       <section class="three-columns">
         <div class="col">
           ${educationHTML}
@@ -237,7 +260,7 @@ export function render(data) {
         </div>
       </section>
 
-      <!-- Work Experience Section -->
+      <!-- Sección de Experiencia Laboral -->
       <section class="experience-section">
         <div class="pill-wrapper">
           <div class="pill-line"></div>
