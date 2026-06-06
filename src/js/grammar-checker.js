@@ -4,15 +4,10 @@
    Desarrollado de forma modular para no alterar el core de app.js.
    ========================================================================== */
 
-import {
-  state,
-  updatePreview,
-  renderAllForms,
-  saveState,
-  getSingularForSection,
-  getDeepValue,
-  setDeepValue
-} from './app.js';
+import { state, saveState, getDeepValue, setDeepValue } from './state.js';
+import { updatePreview } from './cv-renderer.js';
+import { renderAllForms } from './form-builder.js';
+import { getSingularForSection } from './utils.js';
 
 // Almacenamiento local para los errores encontrados y los textos originales analizados
 let currentGrammarMatches = {};

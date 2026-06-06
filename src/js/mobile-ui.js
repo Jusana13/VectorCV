@@ -3,7 +3,7 @@
    Diseñado para aislar el comportamiento móvil sin contaminar el flujo de app.js
    ========================================================================== */
 
-import { updatePreview } from './app.js';
+import { updatePreview } from './cv-renderer.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const workspace = document.querySelector('.workspace');
