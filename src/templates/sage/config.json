@@ -1,0 +1,34 @@
+﻿{
+    "id":  "sage",
+    "name":  "Sage",
+    "thumbnail":  "./src/templates/sage/thumbnail.svg",
+    "defaultPhotoShape":  "circle",
+    "defaultFont":  "Montserrat",
+    "features":  {
+                     "buttons":  true,
+                     "skillLevels":  true,
+                     "skillPercentage":  true,
+                     "languageLevels":  true,
+                     "personality":  true,
+                     "personalityLevels":  false,
+                     "techSkills":  false
+                 },
+    "tabOrder":  [
+                     "sec-personal",
+                     "sec-contact",
+                     "sec-education",
+                     "sec-personality",
+                     "sec-interests",
+                     "sec-skills",
+                     "sec-languages",
+                     "sec-experience",
+                     "sec-design"
+                 ],
+    "colors":  {
+                   "primary":  "Fondo de Cabecera (Sage)",
+                   "accent":  "LÃ­neas y Texto Principal"
+               },
+    "defaultDataOverrides":  {
+                                 "experience":  2
+                             }
+}

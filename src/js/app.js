@@ -288,6 +288,23 @@ function parsePeriodToDates(periodText) {
 const templateCache = {};
 let templatesConfig = [];
 
+async function loadTemplatesConfig() {
+  if (templatesConfig && templatesConfig.length > 0) return templatesConfig;
+  try {
+    const response = await fetch('./src/templates/templates-manifest.json');
+    const templateIds = await response.json();
+    const configPromises = templateIds.map(async (id) => {
+      const res = await fetch(`./src/templates/${id}/config.json`);
+      return res.json();
+    });
+    templatesConfig = await Promise.all(configPromises);
+    return templatesConfig;
+  } catch (err) {
+    console.error("Error al cargar la configuración distribuida de plantillas:", err);
+    return [];
+  }
+}
+
 async function loadTemplate(templateId) {
   if (templateCache[templateId]) {
     return templateCache[templateId];
@@ -354,10 +371,7 @@ async function initTemplateSelector() {
   const gridContainer = document.getElementById('template-modal-grid');
   if (!gridContainer) return;
   try {
-    if (!templatesConfig || templatesConfig.length === 0) {
-      const response = await fetch('./src/templates/templates-config.json');
-      templatesConfig = await response.json();
-    }
+    await loadTemplatesConfig();
     gridContainer.innerHTML = '';
 
     for (const tmpl of templatesConfig) {
@@ -3029,12 +3043,7 @@ function setupEventListeners() {
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', async () => {
   // Precargar configuración de plantillas antes de cargar el estado
-  try {
-    const response = await fetch('./src/templates/templates-config.json');
-    templatesConfig = await response.json();
-  } catch (err) {
-    console.error("Error al precargar la configuración de plantillas en inicio:", err);
-  }
+  await loadTemplatesConfig();
 
   loadState();
   await initTemplateSelector();

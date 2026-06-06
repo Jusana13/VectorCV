@@ -1,0 +1,29 @@
+﻿{
+    "id":  "estrella",
+    "name":  "Estrella",
+    "thumbnail":  "./src/templates/estrella/thumbnail.svg",
+    "defaultPhotoShape":  "circle",
+    "defaultFont":  "Montserrat",
+    "features":  {
+                     "buttons":  false,
+                     "skillLevels":  false,
+                     "languageLevels":  false,
+                     "personality":  true,
+                     "personalityLevels":  false,
+                     "techSkills":  false
+                 },
+    "tabOrder":  [
+                     "sec-personal",
+                     "sec-contact",
+                     "sec-skills",
+                     "sec-personality",
+                     "sec-education",
+                     "sec-experience",
+                     "sec-design"
+                 ],
+    "colors":  {
+                   "primary":  "LÃ­neas y Detalles (Estrella)",
+                   "accent":  "Fondo del Papel",
+                   "textColor":  "Texto del CV"
+               }
+}

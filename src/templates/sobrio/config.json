@@ -1,0 +1,35 @@
+﻿{
+    "id":  "sobrio",
+    "name":  "Sobrio",
+    "thumbnail":  "./src/templates/sobrio/thumbnail.svg",
+    "defaultPhotoShape":  "circle",
+    "defaultFont":  "Montserrat",
+    "features":  {
+                     "buttons":  false,
+                     "skillLevels":  false,
+                     "languageLevels":  false,
+                     "personality":  true,
+                     "personalityLevels":  false,
+                     "techSkills":  false,
+                     "photoPlaceholder":  false,
+                     "allowClearPhoto":  true
+                 },
+    "tabOrder":  [
+                     "sec-personal",
+                     "sec-contact",
+                     "sec-education",
+                     "sec-experience",
+                     "sec-skills",
+                     "sec-personality",
+                     "sec-interests",
+                     "sec-languages",
+                     "sec-design"
+                 ],
+    "colors":  {
+                   "primary":  "Fondo Principal",
+                   "accent":  "Color de Texto"
+               },
+    "defaultDataOverrides":  {
+                                 "education":  2
+                             }
+}

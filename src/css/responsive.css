@@ -1,0 +1,398 @@
+/* ==========================================================================
+   FlowCV - Creador de CV Dinámico (Estilos Responsivos para Móviles y Tablets)
+   ========================================================================== */
+
+/* 1. Ocultar la navegación móvil por defecto en escritorio */
+.mobile-nav-bar {
+  display: none;
+}
+
+/* Ocultar el ícono de Auto-Ajustar en pantallas de escritorio para conservar el diseño original */
+@media (min-width: 1024px) {
+  #app-container .zoom-controls-floating .btn-zoom-action .btn-icon {
+    display: none;
+  }
+}
+
+/* 2. Reglas responsivas para pantallas móviles y tablets (Solo aplicadas en visualización)
+   Al usar '@media screen', garantizamos que al imprimir ('print') no se aplique 
+   ningún padding, flex vertical o margen de móvil que desbarate el formato A4 de impresión. */
+@media screen and (max-width: 1023px) {
+  
+  /* Ajuste de contenedores principales */
+  body {
+    overflow: hidden; /* Evita scrolls dobles en el body */
+    height: 100vh !important;
+    height: 100dvh !important; /* Adaptar el body al alto dinámico del navegador móvil */
+  }
+
+  #app-container {
+    height: 100vh;
+    height: 100dvh; /* Altura dinámica del viewport en móviles para evitar esconder la barra inferior */
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0; /* Eliminado padding fijo, barra inferior en flujo normal */
+    box-sizing: border-box;
+  }
+
+  /* Barra Superior Compacta */
+  #app-container header.top-bar {
+    height: 56px;
+    padding: 0 12px;
+    gap: 8px;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  #app-container header.top-bar .brand {
+    gap: 6px;
+  }
+
+  #app-container header.top-bar .brand .logo-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* QUITAR EL TÍTULO EN MÓVIL: Dejar solo el ícono para dar espacio */
+  #app-container header.top-bar .brand h1 {
+    display: none;
+  }
+
+  /* Controles de la cabecera en móvil */
+  #app-container header.top-bar .controls-top {
+    gap: 6px;
+    margin-left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 4px 0;
+    scrollbar-width: none;
+  }
+
+  #app-container header.top-bar .controls-top::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Botones compactos (Iconos solamente) */
+  #app-container header.top-bar .controls-top .btn {
+    padding: 8px;
+    height: 36px;
+    min-width: 36px;
+    justify-content: center;
+    gap: 0;
+  }
+
+  #app-container header.top-bar .controls-top .btn span {
+    display: none; /* Oculta etiquetas de texto */
+  }
+
+  #app-container header.top-bar .controls-top .btn .btn-icon {
+    margin: 0;
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Trigger del selector de plantillas compacto */
+  #app-container #btn-template-select-trigger {
+    padding: 8px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  #app-container #btn-template-select-trigger span {
+    display: none;
+  }
+
+  #app-container #btn-template-select-trigger .dropdown-chevron-svg {
+    display: none;
+  }
+
+  #app-container #btn-print-only {
+    background: var(--db-accent);
+    color: black;
+  }
+
+  /* Centrado absoluto de todos los diálogos modales en móviles */
+  body .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 12px;
+    box-sizing: border-box;
+  }
+
+  /* Optimización de tamaño de los modales en móvil */
+  #app-container #template-modal .modal-content, 
+  #app-container #grammar-modal .modal-content,
+  body .modal-overlay .modal-card {
+    width: 100%;
+    max-width: 480px;
+    max-height: 80vh;
+    margin: auto; /* Fuerza centrado */
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Encabezados y contenidos de modales compactos */
+  body .modal-overlay .modal-header {
+    padding: 16px 20px;
+  }
+
+  body .modal-overlay .modal-body {
+    padding: 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Grid del selector de plantillas en móviles (2 columnas compactas) */
+  #app-container .template-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  #app-container .template-card {
+    padding: 10px;
+  }
+
+  #app-container .template-card .template-card-preview {
+    width: 110px;
+    height: 155px;
+  }
+  
+  #app-container .template-card .template-card-info {
+    margin-top: 8px;
+    font-size: 11px;
+  }
+
+  /* Workspace con Flexbox dinámico para asegurar el scroll correcto en móviles */
+  #app-container .workspace {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 0; /* Evita desbordamiento vertical y permite que los hijos resuelvan height: 100% correctamente */
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Comportamiento según el panel seleccionado */
+  #app-container .workspace.show-editor aside.editor-panel {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  #app-container .workspace.show-editor .preview-panel-outer {
+    display: none;
+  }
+
+  #app-container .workspace.show-preview aside.editor-panel {
+    display: none;
+  }
+
+  #app-container .workspace.show-preview .preview-panel-outer {
+    display: block;
+    height: 100%;
+    width: 100%;
+    overflow: hidden; /* Ocultamos el scroll nativo en móvil para usar Pan&Zoom absoluto */
+  }
+
+  /* Panel de Formularios (Editor) */
+  #app-container aside.editor-panel {
+    border-right: none;
+  }
+  
+  /* Tabs horizontales deslizables */
+  #app-container aside.editor-panel nav.editor-tabs {
+    height: 44px;
+    background: rgba(10, 11, 14, 0.85);
+    flex-shrink: 0;
+    scrollbar-width: none;
+    display: flex;
+    overflow-x: auto;
+  }
+
+  #app-container aside.editor-panel nav.editor-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  #app-container aside.editor-panel nav.editor-tabs .tab-btn {
+    padding: 0 16px;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    border-bottom: 3px solid transparent;
+    border-right: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  #app-container aside.editor-panel nav.editor-tabs .tab-btn.active {
+    border-bottom-color: var(--db-accent);
+  }
+
+  /* FORMULARIOS: Scroll vertical inercial totalmente desbloqueado */
+  #app-container aside.editor-panel .editor-content {
+    height: calc(100% - 44px);
+    flex-grow: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Desplazamiento táctil suave */
+    padding: 16px;
+    padding-bottom: 80px; /* Colchón de cortesía inferior */
+    gap: 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  #app-container aside.editor-panel .editor-content fieldset {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  #app-container aside.editor-panel .editor-content .photo-layout-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  #app-container aside.editor-panel .editor-content .photo-layout-row .avatar-shape-toggles-side {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  #app-container aside.editor-panel .editor-footer {
+    display: none;
+  }
+
+  /* Panel de Vista Previa del CV */
+  #app-container .preview-panel-outer {
+    padding: 0;
+  }
+
+  #app-container .preview-panel-outer main#preview-panel {
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: auto !important; /* Activar scroll nativo para móviles */
+    -webkit-overflow-scrolling: touch !important; /* Desplazamiento inercial premium en iOS */
+    background: #14171c;
+    position: relative;
+    padding: 16px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  #app-container .preview-panel-outer main#preview-panel .cv-preview-wrapper {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    margin: auto !important; /* Centra el CV cuando es pequeño y lo alinea al inicio cuando desborda, sin bloquear scroll */
+    flex-shrink: 0 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    will-change: transform !important;
+    transition: none !important; /* Evita saltos y retrasos durante el escalado en pellizcos */
+  }
+
+  /* OCULTAR TOTALMENTE LA BARRA DE ZOOM FLOTANTE EN MÓVIL */
+  #app-container .zoom-controls-floating {
+    display: none !important;
+  }
+
+  /* Barra de Navegación Inferior para Móvil (Posicionada naturalmente en flujo) */
+  body .mobile-nav-bar {
+    display: flex;
+    position: relative;
+    flex-shrink: 0; /* Asegurar que no se encoja ante el workspace */
+    height: 60px;
+    background: #0d0f13;
+    border-top: 1px solid var(--db-border);
+    z-index: 998;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  body .mobile-nav-bar .mobile-nav-btn {
+    flex: 1;
+    height: 100%;
+    background: transparent;
+    border: none;
+    color: var(--db-text-muted);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  body .mobile-nav-bar .mobile-nav-btn .mobile-nav-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.2s ease;
+  }
+
+  body .mobile-nav-bar .mobile-nav-btn:hover {
+    color: white;
+  }
+
+  body .mobile-nav-bar .mobile-nav-btn.active {
+    color: var(--db-accent);
+  }
+  
+  body .mobile-nav-bar .mobile-nav-btn.active .mobile-nav-icon {
+    transform: scale(1.1);
+  }
+}
+
+/* ==========================================================================
+   3. ESTILOS DE IMPRESIÓN (BLINDAJE DE EXPORTACIÓN A PDF)
+   Forzamos la ocultación de los controles interactivos de interfaz.
+   Aquí sí se justifica el uso de '!important' según la Regla 17 del guardián
+   para asegurar que las directivas del sistema de impresión no se ignoren.
+   ========================================================================== */
+@media print {
+  /* Ocultar siempre la barra de navegación inferior móvil al imprimir/guardar */
+  .mobile-nav-bar,
+  #mobile-nav-bar {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Ocultar la barra de zoom flotante */
+  .zoom-controls-floating,
+  #zoom-controls-floating {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}

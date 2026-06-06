@@ -1,0 +1,29 @@
+﻿{
+    "id":  "minimalista",
+    "name":  "Minimalista",
+    "thumbnail":  "./src/templates/minimalista/thumbnail.svg",
+    "defaultPhotoShape":  "square",
+    "defaultFont":  "Inter",
+    "features":  {
+                     "buttons":  true,
+                     "skillLevels":  true,
+                     "languageLevels":  false,
+                     "personality":  false,
+                     "personalityLevels":  false,
+                     "techSkills":  false
+                 },
+    "tabOrder":  [
+                     "sec-personal",
+                     "sec-contact",
+                     "sec-experience",
+                     "sec-education",
+                     "sec-skills",
+                     "sec-languages",
+                     "sec-interests",
+                     "sec-design"
+                 ],
+    "colors":  {
+                   "primary":  "Color Principal",
+                   "accent":  "Color de Acento"
+               }
+}

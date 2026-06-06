@@ -1,0 +1,40 @@
+﻿{
+    "id":  "creativo",
+    "name":  "Creativo",
+    "thumbnail":  "./src/templates/creativo/thumbnail.svg",
+    "defaultPhotoShape":  "circle",
+    "defaultFont":  "Plus Jakarta Sans",
+    "supportedFonts":  [
+                           "Plus Jakarta Sans",
+                           "Inter"
+                       ],
+    "features":  {
+                     "buttons":  true,
+                     "skillLevels":  false,
+                     "languageLevels":  false,
+                     "personality":  false,
+                     "personalityLevels":  false,
+                     "techSkills":  true
+                 },
+    "tabOrder":  [
+                     "sec-personal",
+                     "sec-contact",
+                     "sec-experience",
+                     "sec-education",
+                     "sec-tech-skills",
+                     "sec-languages",
+                     "sec-skills",
+                     "sec-design"
+                 ],
+    "colors":  {
+                   "primary":  "Color Principal",
+                   "accent":  "Color de Acento",
+                   "bgLight":  "Fondo Claro"
+               },
+    "sectionAliases":  {
+                           "skills":  "Competencias"
+                       },
+    "singularAliases":  {
+                            "skills":  "Competencia"
+                        }
+}

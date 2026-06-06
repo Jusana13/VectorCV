@@ -1,0 +1,30 @@
+﻿{
+    "id":  "profesional",
+    "name":  "Profesional",
+    "thumbnail":  "./src/templates/profesional/thumbnail.svg",
+    "defaultPhotoShape":  "rounded",
+    "defaultFont":  "Open Sans",
+    "features":  {
+                     "buttons":  true,
+                     "skillLevels":  true,
+                     "languageLevels":  true,
+                     "personality":  false,
+                     "personalityLevels":  false,
+                     "techSkills":  false
+                 },
+    "tabOrder":  [
+                     "sec-personal",
+                     "sec-education",
+                     "sec-experience",
+                     "sec-contact",
+                     "sec-skills",
+                     "sec-languages",
+                     "sec-interests",
+                     "sec-design"
+                 ],
+    "colors":  {
+                   "primary":  "Color Principal",
+                   "accent":  "Color de Acento",
+                   "sidebarBg":  "Fondo de Barra Lateral"
+               }
+}

@@ -1,0 +1,271 @@
+diff --git a/src/css/styles.css b/src/css/styles.css
+index cfe9423..8716f7f 100644
+--- a/src/css/styles.css
++++ b/src/css/styles.css
+@@ -604,22 +604,55 @@ body {
+           letter-spacing: 0.5px;
+ 
+           &[contenteditable="true"] {
+-            cursor: text;
++            cursor: pointer;
+             border-radius: 4px;
+             border: 1px dashed transparent;
+             transition: all 0.2s ease;
+             outline: none;
+-            padding: 2px 8px;
++            padding: 2.5px 8px;
++            display: inline-flex;
++            align-items: center;
++            gap: 8px;
++
++            &::after {
++              content: "";
++              display: inline-block;
++              width: 18px;
++              height: 18px;
++              background-color: rgba(255, 255, 255, 0.06);
++              border: 1px solid var(--db-border);
++              border-radius: 4px;
++              background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c9a227'><path d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/></svg>");
++              background-size: 10px;
++              background-repeat: no-repeat;
++              background-position: center;
++              opacity: 0.7;
++              transition: all 0.2s ease;
++              pointer-events: none;
++            }
+ 
+             &:hover {
+-              border-color: rgba(201, 162, 39, 0.4);
+               background-color: rgba(255, 255, 255, 0.02);
++
++              &::after {
++                opacity: 1;
++                background-color: rgba(201, 162, 39, 0.12);
++                border-color: var(--db-accent);
++                transform: scale(1.08);
++              }
+             }
+ 
+             &:focus {
++              cursor: text;
+               border-color: var(--db-accent);
+-              background-color: rgba(255, 255, 255, 0.04);
++              background-color: rgba(201, 162, 39, 0.05);
+               box-shadow: 0 0 0 2px var(--db-accent-glow);
++
++              &::after {
++                opacity: 0.3;
++                background-color: rgba(255, 255, 255, 0.03);
++                border-color: var(--db-border);
++              }
+             }
+           }
+         }
+@@ -2635,4 +2668,205 @@ main#preview-panel .cv-preview-wrapper {
+   transform-origin: center center;
+   transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+     transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
++}
++
++/* ==========================================================================
++   CORRECTOR ORTOGR?FICO MODAL
++   ========================================================================== */
++#grammar-modal .modal-content {
++  background: rgba(18, 22, 28, 0.96);
++  border: 1px solid rgba(255, 255, 255, 0.08);
++  border-radius: 16px;
++  width: 90%;
++  max-width: 800px;
++  max-height: 85vh;
++  display: flex;
++  flex-direction: column;
++  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
++  opacity: 0;
++  transform: scale(0.95) translateY(15px);
++  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
++    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
++  overflow: hidden;
++}
++
++#grammar-modal.active .modal-content {
++  opacity: 1;
++  transform: scale(1) translateY(0);
++}
++
++.grammar-result-card {
++  background: rgba(255, 255, 255, 0.02);
++  border: 1px solid var(--db-border);
++  border-radius: 8px;
++  padding: 16px;
++  margin-bottom: 20px;
++  display: flex;
++  flex-direction: column;
++  gap: 12px;
++}
++
++.grammar-result-header {
++  font-size: 13px;
++  font-weight: 600;
++  color: var(--db-accent);
++  display: flex;
++  justify-content: space-between;
++  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
++  padding-bottom: 8px;
++}
++
++.grammar-result-text {
++  font-size: 14px;
++  color: #e2e8f0;
++  line-height: 1.6;
++  background: rgba(0, 0, 0, 0.2);
++  padding: 12px;
++  border-radius: 6px;
++  border-left: 3px solid var(--db-accent);
++}
++
++.grammar-highlight-error {
++  background: rgba(239, 68, 68, 0.2);
++  border-bottom: 2px dashed #ef4444;
++  color: #fca5a5;
++  padding: 0 2px;
++  border-radius: 2px;
++}
++
++.grammar-error-list {
++  display: flex;
++  flex-direction: column;
++  gap: 12px;
++  margin-top: 8px;
++}
++
++.grammar-error-item {
++  background: rgba(255, 255, 255, 0.01);
++  border: 1px solid rgba(255, 255, 255, 0.04);
++  border-radius: 6px;
++  padding: 12px;
++  display: flex;
++  flex-direction: column;
++  gap: 8px;
++  transition: all 0.2s ease;
++}
++
++.grammar-error-item.resolved {
++  opacity: 0.5;
++  border-color: rgba(16, 185, 129, 0.3);
++  background: rgba(16, 185, 129, 0.02);
++  pointer-events: none;
++}
++
++.grammar-error-meta {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++}
++
++.grammar-error-found {
++  font-size: 12px;
++  font-weight: 600;
++  color: #fca5a5;
++  text-decoration: line-through;
++  background: rgba(239, 68, 68, 0.1);
++  padding: 2px 6px;
++  border-radius: 4px;
++}
++
++.grammar-error-desc {
++  font-size: 12px;
++  color: var(--db-text-muted);
++}
++
++.grammar-error-suggestions {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 6px;
++  align-items: center;
++}
++
++.grammar-error-suggestions span {
++  font-size: 12px;
++  color: var(--db-text-muted);
++}
++
++.btn-suggestion {
++  background: rgba(201, 162, 39, 0.1);
++  border: 1px solid rgba(201, 162, 39, 0.3);
++  color: var(--db-accent);
++  padding: 4px 10px;
++  border-radius: 4px;
++  font-size: 12px;
++  font-weight: 500;
++  cursor: pointer;
++  transition: all 0.2s ease;
++}
++
++.btn-suggestion:hover {
++  background: var(--db-accent);
++  color: #0c0d0f;
++  border-color: var(--db-accent);
++  transform: translateY(-1px);
++}
++
++.grammar-empty-state {
++  text-align: center;
++  padding: 48px 24px;
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  gap: 16px;
++}
++
++.grammar-empty-icon {
++  width: 48px;
++  height: 48px;
++  color: var(--db-btn-success);
++}
++
++.grammar-empty-state h3 {
++  font-size: 18px;
++  color: #f8fafc;
++  margin: 0;
++}
++
++.grammar-empty-state p {
++  font-size: 14px;
++  color: var(--db-text-muted);
++  max-width: 400px;
++  margin: 0;
++}
++
++.modal-footer {
++  padding: 20px 32px;
++  border-top: 1px solid rgba(255, 255, 255, 0.06);
++  display: flex;
++  justify-content: flex-end;
++  gap: 12px;
++  background: rgba(23, 28, 36, 0.3);
++}
++
++/* Spinner de carga */
++.grammar-loader {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  justify-content: center;
++  padding: 48px 0;
++  gap: 16px;
++}
++
++.grammar-spinner {
++  width: 32px;
++  height: 32px;
++  border: 3px solid rgba(201, 162, 39, 0.1);
++  border-top-color: var(--db-accent);
++  border-radius: 50%;
++  animation: grammar-spin 0.8s linear infinite;
++}
++
++@keyframes grammar-spin {
++  to { transform: rotate(360deg); }
+ }
+\ No newline at end of file
