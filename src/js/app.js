@@ -32,13 +32,6 @@ function getSectionTitle(sectionKey) {
   return title;
 }
 
-/**
- * Obtiene el singular de una sección adaptado por la plantilla activa en base a aliases de configuración.
- * @param {string} sectionKey - Clave identificadora de la sección (ej. 'skills', 'languages').
- * @returns {string} La forma singular adaptada para la plantilla activa.
- * @description Intenta leer un alias singular específico en templates-config.json. Como fallback,
- *              aplica el algoritmo de singularización dinámica sobre el título de la sección.
- */
 function getSingularForSection(sectionKey) {
   if (templatesConfig) {
     const activeTemplateConfig = templatesConfig.find(t => t.id === state.activeTemplate);
@@ -46,8 +39,22 @@ function getSingularForSection(sectionKey) {
       return activeTemplateConfig.singularAliases[sectionKey];
     }
   }
-  const title = getSectionTitle(sectionKey);
-  return getSingularFromPlural(title);
+  
+  // Usar el título original/base de la sección de la plantilla o el por defecto,
+  // ignorando los cambios de texto personalizados que el usuario haya hecho en el estado,
+  // para mantener consistentes las etiquetas del panel del editor (ej. "Añadir Habilidad").
+  let baseTitle = '';
+  if (templatesConfig) {
+    const activeTemplateConfig = templatesConfig.find(t => t.id === state.activeTemplate);
+    if (activeTemplateConfig?.sectionAliases?.[sectionKey]) {
+      baseTitle = activeTemplateConfig.sectionAliases[sectionKey];
+    }
+  }
+  if (!baseTitle) {
+    baseTitle = defaultData.sectionTitles[sectionKey] || '';
+  }
+  
+  return getSingularFromPlural(baseTitle);
 }
 
 /**
@@ -1381,31 +1388,52 @@ function syncStaticInputs() {
     editorPanel.classList.toggle('hide-skill-levels', !features.skillLevels);
   }
 
-  // Reordenar los botones de las pestañas (tabs) según la configuración de la plantilla activa
+  // Reordenar, renombrar y alternar la visibilidad de los botones de las pestañas (tabs) según la configuración
   const activeTemplateConfig = templatesConfig.find(t => t.id === state.activeTemplate);
+  const defaultOrder = [
+    'sec-personal',
+    'sec-contact',
+    'sec-education',
+    'sec-experience',
+    'sec-tech-skills',
+    'sec-skills',
+    'sec-personality',
+    'sec-languages',
+    'sec-interests',
+    'sec-additional',
+    'sec-design'
+  ];
+  const order = (activeTemplateConfig && activeTemplateConfig.tabOrder) || defaultOrder;
   const navTabs = document.querySelector('.editor-tabs');
+
   if (navTabs) {
     const tabs = Array.from(navTabs.querySelectorAll('.tab-btn'));
-    const defaultOrder = [
-      'sec-personal',
-      'sec-contact',
-      'sec-education',
-      'sec-experience',
-      'sec-tech-skills',
-      'sec-skills',
-      'sec-personality',
-      'sec-languages',
-      'sec-interests',
-      'sec-additional',
-      'sec-design'
-    ];
-    const order = (activeTemplateConfig && activeTemplateConfig.tabOrder) || defaultOrder;
-    
-    // Primero, reordenar y mostrar los que están en la lista
+
+    // Primero, reordenar y mostrar los que están en la lista, renombrándolos dinámicamente
     order.forEach(target => {
       const tab = tabs.find(t => t.getAttribute('data-target') === target);
       if (tab) {
-        tab.style.display = '';
+        tab.style.display = 'block';
+
+        // Mapear el target (ej. 'sec-skills') a la sección correspondiente (ej. 'skills')
+        const sectionKey = target.replace('sec-', '');
+
+        // Obtener el título de la sección de forma dinámica (con soporte para alias)
+        let tabTitle = '';
+        if (sectionKey === 'personal') {
+          tabTitle = 'Información Personal';
+        } else if (sectionKey === 'design') {
+          tabTitle = 'Diseño';
+        } else if (sectionKey === 'tech-skills') {
+          tabTitle = getSectionTitle('techSkills');
+        } else {
+          tabTitle = getSectionTitle(sectionKey);
+        }
+
+        if (tabTitle) {
+          tab.textContent = tabTitle;
+        }
+
         navTabs.appendChild(tab);
       }
     });
@@ -1423,78 +1451,12 @@ function syncStaticInputs() {
     });
   }
 
-
-
-  const tabPersonality = document.getElementById('tab-personality');
-  if (tabPersonality) {
-    if (features.personality) {
-      tabPersonality.style.display = 'block';
-      renderPersonalityForm();
-    } else {
-      tabPersonality.style.display = 'none';
-      if (tabPersonality.classList.contains('active')) {
-        const firstTab = document.querySelector('.tab-btn[data-target="sec-personal"]');
-        if (firstTab) firstTab.click();
-      }
-    }
-  }
-
-  // Forzar re-renderizado de formularios con campos condicionales al cambiar de plantilla
-  renderSkillsForm();
-  renderLanguagesForm();
-  renderInterestsForm();
-
-  // Sincronizar botones de tabs según la plantilla
-  const tabTechSkills = document.getElementById('tab-tech-skills');
-  const tabSkills = document.getElementById('tab-skills');
-
-  if (tabTechSkills) {
-    if (features.techSkills) {
-      tabTechSkills.style.display = 'block';
-      tabTechSkills.textContent = 'Habilidades';
-      renderTechSkillsForm();
-    } else {
-      tabTechSkills.style.display = 'none';
-      if (tabTechSkills.classList.contains('active')) {
-        const firstTab = document.querySelector('.tab-btn[data-target="sec-personal"]');
-        if (firstTab) firstTab.click();
-      }
-    }
-  }
-
-  if (tabSkills) {
-    tabSkills.textContent = features.techSkills ? 'Competencias' : 'Habilidades';
-  }
-
-  const tabInterests = document.querySelector('.tab-btn[data-target="sec-interests"]');
-  if (tabInterests) {
-    const hasInterestsInOrder = activeTemplateConfig && activeTemplateConfig.tabOrder && activeTemplateConfig.tabOrder.includes('sec-interests');
-    if (!hasInterestsInOrder) {
-      tabInterests.style.display = 'none';
-      if (tabInterests.classList.contains('active')) {
-        const firstTab = document.querySelector('.tab-btn[data-target="sec-personal"]');
-        if (firstTab) firstTab.click();
-      }
-    } else {
-      tabInterests.style.display = 'block';
-      tabInterests.textContent = getSectionTitle('interests');
-    }
-  }
-
-  const tabAdditional = document.querySelector('.tab-btn[data-target="sec-additional"]');
-  if (tabAdditional) {
-    const hasAdditionalInOrder = activeTemplateConfig && activeTemplateConfig.tabOrder && activeTemplateConfig.tabOrder.includes('sec-additional');
-    if (!hasAdditionalInOrder) {
-      tabAdditional.style.display = 'none';
-      if (tabAdditional.classList.contains('active')) {
-        const firstTab = document.querySelector('.tab-btn[data-target="sec-personal"]');
-        if (firstTab) firstTab.click();
-      }
-    } else {
-      tabAdditional.style.display = 'block';
-      tabAdditional.textContent = getSectionTitle('additional');
-    }
-  }
+  // Renderizar condicionalmente los formularios de las secciones activas en esta plantilla
+  if (order.includes('sec-skills')) renderSkillsForm();
+  if (order.includes('sec-languages')) renderLanguagesForm();
+  if (order.includes('sec-interests')) renderInterestsForm();
+  if (order.includes('sec-personality')) renderPersonalityForm();
+  if (order.includes('sec-tech-skills')) renderTechSkillsForm();
 
   // Sincronizar leyendas editables (evitando reescribir si está enfocada por el usuario)
   const editableLegends = document.querySelectorAll('legend[contenteditable="true"]');
@@ -1518,6 +1480,30 @@ function syncStaticInputs() {
 }
 
 /* --- Sincronización de Etiquetas de Sección (tarjetas repeater y botones) --- */
+/**
+ * Genera una etiqueta descriptiva en base a la acción y el singular de la sección,
+ * determinando el artículo en español de forma dinámica.
+ * @param {string} prefix - Prefijo de la etiqueta (ej. 'Nombre', 'Nivel', 'Dominio').
+ * @param {string} singular - Término singular de la sección (ej. 'Idioma', 'Habilidad').
+ * @returns {string} La etiqueta descriptiva formateada.
+ */
+function getDescriptiveLabel(prefix, singular) {
+  const lowerSingular = (singular || '').trim().toLowerCase();
+  if (!lowerSingular) return prefix;
+  // Determinar artículo en español
+  let article = 'de';
+  if (lowerSingular === 'idioma') {
+    article = 'del';
+  } else if (lowerSingular === 'habilidad' || lowerSingular === 'cualidad' || lowerSingular === 'competencia' || lowerSingular === 'habilidad técnica' || lowerSingular === 'habilidad tecnica') {
+    article = 'de la';
+  } else {
+    const isFeminine = lowerSingular.endsWith('a') || lowerSingular.endsWith('d');
+    article = isFeminine ? 'de la' : 'del';
+  }
+  return `${prefix} ${article} ${lowerSingular}`;
+}
+
+/* --- Sincronización de Etiquetas de Sección (tarjetas repeater y botones) --- */
 function updateSectionLabels(sectionKey) {
   const titleText = getSectionTitle(sectionKey);
   const singular = getSingularForSection(sectionKey);
@@ -1536,6 +1522,12 @@ function updateSectionLabels(sectionKey) {
   } else if (sectionKey === 'languages') {
     containerId = 'languages-list-container';
     addAction = 'add-language';
+  } else if (sectionKey === 'personality') {
+    containerId = 'personality-list-container';
+    addAction = 'add-personality';
+  } else if (sectionKey === 'techSkills') {
+    containerId = 'tech-skills-list-container';
+    addAction = 'add-tech-skill';
   }
 
   if (containerId) {
@@ -1548,12 +1540,32 @@ function updateSectionLabels(sectionKey) {
           titleSpan.textContent = `${singular} #${index + 1}`;
         }
 
-        // Re-etiquetar el label principal del campo en Habilidades o Idiomas
-        if (sectionKey === 'skills' || sectionKey === 'languages') {
-          const labelField = card.querySelector('.form-group label');
-          if (labelField && !labelField.textContent.includes('Nivel') && !labelField.textContent.includes('Dominio')) {
-            labelField.textContent = singular;
-          }
+        // Re-etiquetar dinámicamente los labels del formulario para que sean descriptivos
+        if (['skills', 'languages', 'personality', 'techSkills'].includes(sectionKey)) {
+          const formGroups = card.querySelectorAll('.form-group');
+          formGroups.forEach(group => {
+            const label = group.querySelector('label');
+            if (!label) return;
+
+            const input = group.querySelector('input, select, textarea');
+            if (input) {
+              const field = input.getAttribute('data-field');
+              if (field === 'name') {
+                label.textContent = getDescriptiveLabel('Nombre', singular);
+              } else if (field === 'level') {
+                label.textContent = input.tagName === 'SELECT' ? 'Nivel (1 - 5)' : 'Nivel Texto';
+              }
+            }
+
+            // Si es un control deslizante de rango
+            const rangeInput = group.querySelector('input[type="range"]');
+            if (rangeInput) {
+              const strong = label.querySelector('.percent-label');
+              const pct = strong ? strong.textContent : '';
+              const prefix = sectionKey === 'languages' ? 'Dominio' : 'Nivel';
+              label.innerHTML = `${prefix}: <strong class="percent-label">${pct}</strong>`;
+            }
+          });
         }
       });
     }
@@ -1736,8 +1748,7 @@ function renderExperienceForm() {
   if (!container) return;
   container.innerHTML = '';
 
-  const titleText = (state.sectionTitles && state.sectionTitles.experience) || defaultData.sectionTitles.experience;
-  const singular = getSingularFromPlural(titleText);
+  const singular = getSingularForSection('experience');
 
   const addBtnSpan = document.querySelector('[data-action="add-experience"] span');
   if (addBtnSpan) {
@@ -1795,8 +1806,7 @@ function renderEducationForm() {
   if (!container) return;
   container.innerHTML = '';
 
-  const titleText = (state.sectionTitles && state.sectionTitles.education) || defaultData.sectionTitles.education;
-  const singular = getSingularFromPlural(titleText);
+  const singular = getSingularForSection('education');
 
   const addBtnSpan = document.querySelector('[data-action="add-education"] span');
   if (addBtnSpan) {
@@ -1912,6 +1922,7 @@ function renderSkillsForm() {
 
     container.appendChild(card);
   });
+  updateSectionLabels('skills');
 }
 
 /* --- Personalidad / Cualidades --- */
@@ -1953,6 +1964,7 @@ function renderPersonalityForm() {
 
     container.appendChild(card);
   });
+  updateSectionLabels('personality');
 }
 
 /* --- Habilidades Técnicas (sidebar Creativo) --- */
@@ -1977,6 +1989,7 @@ function renderTechSkillsForm() {
 
     container.appendChild(card);
   });
+  updateSectionLabels('techSkills');
 }
 
 /* --- Idiomas --- */
@@ -1985,8 +1998,7 @@ function renderLanguagesForm() {
   if (!container) return;
   container.innerHTML = '';
 
-  const titleText = (state.sectionTitles && state.sectionTitles.languages) || defaultData.sectionTitles.languages;
-  const singular = getSingularFromPlural(titleText);
+  const singular = getSingularForSection('languages');
 
   const addBtnSpan = document.querySelector('[data-action="add-language"] span');
   if (addBtnSpan) {
@@ -2017,6 +2029,7 @@ function renderLanguagesForm() {
 
     container.appendChild(card);
   });
+  updateSectionLabels('languages');
 }
 
 /* --- Intereses y Hobbies --- */
