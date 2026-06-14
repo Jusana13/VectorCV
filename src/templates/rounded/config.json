@@ -29,8 +29,50 @@
         "primary": "Color Principal (Azul)",
         "accent": "Tarjeta de Experiencia / Acento",
         "cardLight": "Tarjeta de Formación",
-        "cardDark": "Tarjeta de Habilidades"
+        "cardDark": "Otras Tarjetas"
     },
+    "skins": [
+        {
+            "id": "default",
+            "name": "Por Defecto (Azul)",
+            "colors": {
+                "primary": "#2A398A",
+                "accent": "#D1F2B6",
+                "cardLight": "#485CB8",
+                "cardDark": "#37489A"
+            }
+        },
+        {
+            "id": "dark-elegant",
+            "name": "Oscuro Elegante",
+            "colors": {
+                "primary": "#121824",
+                "accent": "#D4AF37",
+                "cardLight": "#1E2533",
+                "cardDark": "#273142"
+            }
+        },
+        {
+            "id": "emerald-forest",
+            "name": "Esmeralda",
+            "colors": {
+                "primary": "#064E3B",
+                "accent": "#A7F3D0",
+                "cardLight": "#047857",
+                "cardDark": "#065F46"
+            }
+        },
+        {
+            "id": "terracotta",
+            "name": "Terracota",
+            "colors": {
+                "primary": "#7C2D12",
+                "accent": "#FFEDD5",
+                "cardLight": "#B45309",
+                "cardDark": "#9A3412"
+            }
+        }
+    ],
     "defaultDataOverrides": {
         "experience": 2
     },

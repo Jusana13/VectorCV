@@ -846,6 +846,22 @@ function setupEventListeners() {
     });
   }
 
+  // 12.5. Restaurar Tipografía Predeterminada de la Plantilla
+  const btnResetFont = document.getElementById('btn-reset-font');
+  if (btnResetFont) {
+    btnResetFont.addEventListener('click', () => {
+      const activeTmpl = state.activeTemplate;
+      const activeTmplConfig = templatesConfig ? templatesConfig.find(t => t.id === activeTmpl) : null;
+      const defaultFont = defaultData.fonts[activeTmpl] || activeTmplConfig?.defaultFont || 'Inter';
+      if (!state.fonts) state.fonts = {};
+      state.fonts[activeTmpl] = defaultFont;
+      injectDynamicFontCSS(defaultFont);
+      syncFontSelector();
+      updatePreview();
+      saveState();
+    });
+  }
+
   // 13. Modales y Persistencia (Restablecer, Importar y Exportar JSON)
   const btnReset = document.getElementById('btn-reset');
   const btnExport = document.getElementById('btn-export-json');

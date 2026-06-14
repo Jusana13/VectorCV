@@ -410,23 +410,49 @@
 
           <!-- SECCIÓN: Diseño -->
           <section id="sec-design" class="form-section">
+            <!-- Paleta de Colores -->
             <fieldset class="form-fieldset">
-              <legend>Personalización del Tema</legend>
+              <legend>Paleta de Colores</legend>
               <p class="db-info-text">
-                Ajusta la paleta de colores de la plantilla activa para adaptarla a tu identidad visual corporativa.
+                Elige un estilo predefinido para tu currículum o ajusta los colores de forma detallada.
               </p>
-              <div class="color-picker-grid">
-                <div class="color-picker-item">
-                  <input type="color" id="color-primary" value="#2C2D30">
-                  <span>Color Principal</span>
+              <!-- Contenedor dinámico de Skins como sub-fieldset -->
+              <fieldset id="skin-selector-wrapper" class="nested-fieldset skin-selector-wrapper">
+                <legend>Skins</legend>
+                <div class="skins-grid" id="skins-grid">
+                  <!-- Se carga dinámicamente -->
                 </div>
-                <div class="color-picker-item">
-                  <input type="color" id="color-accent" value="#C9A227">
-                  <span>Color de Acento</span>
+              </fieldset>
+
+              <!-- Personalización Manual de Colores -->
+              <fieldset class="nested-fieldset">
+                <legend>Ajustes Detallados</legend>
+                <div class="color-picker-grid">
+                  <div class="color-picker-item">
+                    <input type="color" id="color-primary" value="#2C2D30">
+                    <span>Color Principal</span>
+                  </div>
+                  <div class="color-picker-item">
+                    <input type="color" id="color-accent" value="#C9A227">
+                    <span>Color de Acento</span>
+                  </div>
                 </div>
-              </div>
+                <div class="modal-footer-row">
+                  <button type="button" id="btn-reset-colors" class="btn btn-secondary btn-secondary-custom">
+                    Restablecer Colores por Defecto
+                  </button>
+                </div>
+              </fieldset>
+            </fieldset>
+
+            <!-- Tipografía del CV -->
+            <fieldset class="form-fieldset">
+              <legend>Tipografía del CV</legend>
+              <p class="db-info-text">
+                Elige la fuente de texto principal que mejor se adapte al estilo y tono de tu currículum.
+              </p>
               <div class="font-selector-container">
-                <span class="font-selector-label">Tipografía del CV</span>
+                <span class="font-selector-label">Tipografía</span>
                 <div class="custom-select-container" id="custom-font-select-container">
                   <button type="button" class="custom-select-trigger" id="custom-font-select-trigger">
                     <span id="custom-font-selected-value">Inter</span>
@@ -440,8 +466,8 @@
                 </div>
               </div>
               <div class="modal-footer-row">
-                <button type="button" id="btn-reset-colors" class="btn btn-secondary btn-secondary-custom">
-                  Restablecer Colores por Defecto
+                <button type="button" id="btn-reset-font" class="btn btn-secondary btn-secondary-custom">
+                  Restablecer Fuente por Defecto
                 </button>
               </div>
             </fieldset>

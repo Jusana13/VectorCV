@@ -559,6 +559,74 @@ export function syncColorPickers() {
   }
   const currentColors = state.colors[activeTmpl];
 
+  // --- RENDERIZADO DE SKINS ---
+  const skinWrapper = document.getElementById('skin-selector-wrapper');
+  const skinsGrid = document.getElementById('skins-grid');
+  if (skinWrapper && skinsGrid) {
+    if (activeTemplateConfig?.skins && activeTemplateConfig.skins.length > 0) {
+      skinWrapper.style.display = 'flex';
+      skinsGrid.innerHTML = '';
+      
+      activeTemplateConfig.skins.forEach(skin => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'skin-btn';
+        
+        // Determinar si esta skin es la activa basándose en la coincidencia exacta de colores
+        let isMatch = true;
+        Object.entries(skin.colors).forEach(([k, v]) => {
+          if (currentColors[k]?.toLowerCase() !== v.toLowerCase()) {
+            isMatch = false;
+          }
+        });
+        
+        if (isMatch) {
+          btn.classList.add('active');
+        }
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'skin-btn-name';
+        nameSpan.textContent = skin.name;
+        btn.appendChild(nameSpan);
+        
+        const dotsContainer = document.createElement('div');
+        dotsContainer.className = 'skin-preview-dots';
+        
+        const previewKeys = ['primary', 'accent', 'cardLight'];
+        previewKeys.forEach(k => {
+          if (skin.colors[k]) {
+            const dot = document.createElement('span');
+            dot.className = 'skin-preview-dot';
+            dot.style.backgroundColor = skin.colors[k];
+            dotsContainer.appendChild(dot);
+          }
+        });
+        btn.appendChild(dotsContainer);
+        
+        btn.addEventListener('click', () => {
+          state.colors[activeTmpl] = JSON.parse(JSON.stringify(skin.colors));
+          
+          if (skin.font) {
+            if (!state.fonts) state.fonts = {};
+            state.fonts[activeTmpl] = skin.font;
+            injectDynamicFontCSS(skin.font);
+            syncFontSelector();
+          }
+          
+          syncColorPickers();
+          updatePreview();
+          updateThumbnailColors();
+          saveState();
+        });
+        
+        skinsGrid.appendChild(btn);
+      });
+    } else {
+      skinWrapper.style.display = 'none';
+    }
+  }
+  // --- FIN RENDERIZADO DE SKINS ---
+
   container.innerHTML = '';
 
   Object.entries(colorsDef).forEach(([token, label]) => {
@@ -590,8 +658,10 @@ export function updateThumbnailColors() {
     const cardDiv = document.querySelector(`.template-card[data-value="${tmpl.id}"]`);
     if (cardDiv) {
       const colors = state.colors[tmpl.id] || {};
-      if (colors.primary) cardDiv.style.setProperty('--preview-primary', colors.primary);
-      if (colors.accent) cardDiv.style.setProperty('--preview-accent', colors.accent);
+      Object.entries(colors).forEach(([k, v]) => {
+        cardDiv.style.setProperty(`--preview-${k}`, v);
+      });
+      // Fallback for older bgLight mapped to --preview-rose
       if (colors.bgLight) cardDiv.style.setProperty('--preview-rose', colors.bgLight);
     }
   });
@@ -624,23 +694,47 @@ export function syncFontSelector() {
   selectedValue.textContent = currentFont;
   selectedValue.style.fontFamily = `'${currentFont}', sans-serif`;
 
+  const defaultFont = defaultData.fonts[activeTmpl] || activeTmplConfig?.defaultFont || 'Inter';
+
   optionsContainer.innerHTML = '';
   supported.forEach(font => {
     const optionDiv = document.createElement('div');
     optionDiv.className = `custom-select-option ${font === currentFont ? 'selected' : ''}`;
     optionDiv.setAttribute('data-value', font);
 
+    const nameWrapper = document.createElement('div');
+    nameWrapper.style.display = 'flex';
+    nameWrapper.style.alignItems = 'center';
+    nameWrapper.style.gap = '8px';
+
     const nameSpan = document.createElement('span');
     nameSpan.className = 'custom-select-option-text';
     nameSpan.textContent = font;
     nameSpan.style.fontFamily = `'${font}', sans-serif`;
+    nameWrapper.appendChild(nameSpan);
+
+    if (font === defaultFont) {
+      const badge = document.createElement('span');
+      badge.style.fontSize = '9px';
+      badge.style.color = 'var(--db-accent, #ebd078)';
+      badge.style.border = '1px solid var(--db-accent, #ebd078)';
+      badge.style.padding = '1px 5px';
+      badge.style.borderRadius = '4px';
+      badge.style.fontFamily = 'var(--db-font-family, sans-serif)';
+      badge.style.fontWeight = '500';
+      badge.style.textTransform = 'uppercase';
+      badge.style.letterSpacing = '0.5px';
+      badge.style.opacity = '0.8';
+      badge.textContent = 'defecto';
+      nameWrapper.appendChild(badge);
+    }
 
     const previewSpan = document.createElement('span');
     previewSpan.className = 'custom-select-option-preview';
     previewSpan.textContent = 'AaBbCc';
     previewSpan.style.fontFamily = `'${font}', sans-serif`;
 
-    optionDiv.appendChild(nameSpan);
+    optionDiv.appendChild(nameWrapper);
     optionDiv.appendChild(previewSpan);
 
     optionDiv.addEventListener('click', (e) => {
