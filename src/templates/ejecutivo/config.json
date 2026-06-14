@@ -1,0 +1,54 @@
+{
+    "id": "ejecutivo",
+    "name": "Ejecutivo",
+    "thumbnail": "./src/templates/ejecutivo/thumbnail.svg",
+    "defaultPhotoShape": "circle",
+    "supportedPhotoShapes": [
+        "circle",
+        "rounded",
+        "square"
+    ],
+    "defaultFont": "Open Sans",
+    "features": {
+        "buttons": true,
+        "skillLevels": true,
+        "skillPercentage": true,
+        "languageLevels": true,
+        "personality": true,
+        "personalityLevels": false,
+        "techSkills": false
+    },
+    "defaultDataOverrides": {
+        "experience": 2,
+        "education": 1,
+        "personality": 3
+    },
+    "tabOrder": [
+        "sec-personal",
+        "sec-contact",
+        "sec-personality",
+        "sec-languages",
+        "sec-experience",
+        "sec-education",
+        "sec-skills",
+        "sec-design"
+    ],
+    "colors": {
+        "primary": "Color Principal y Cabecera",
+        "accent": "Detalles, Listas y Progreso",
+        "sidebarBg": "Fondo de Barra Lateral"
+    },
+    "sectionAliases": {
+        "personality": "Información",
+        "skills": "Herramientas"
+    },
+    "singularAliases": {
+        "personality": "Dato de interés",
+        "skills": "Herramienta"
+    },
+    "resourceLayouts": {
+        "skills": "progress-linear",
+        "languages": "text-list-inline-between",
+        "personality": "bullets-list-li"
+    }
+}

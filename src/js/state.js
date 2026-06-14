@@ -157,7 +157,9 @@ export const defaultData = {
     estrella: { primary: '#4D4D4B', accent: '#F8F7F4', textColor: '#5A5A58' },
     split: { primary: '#1a1b1e', accent: '#e5dfd3', bgLight: '#ffffff' },
     vertice: { primary: '#fde484', accent: '#f5f6f8' },
-    frame: { primary: '#000000', accent: '#666666', bgLight: '#ffffff' }
+    frame: { primary: '#000000', accent: '#666666', bgLight: '#ffffff' },
+    ejecutivo: { primary: '#1b2c47', accent: '#1b2c47', sidebarBg: '#e5e8ec' },
+    rounded: { primary: '#2A398A', accent: '#D1F2B6', cardLight: '#485CB8', cardDark: '#37489A' }
   },
   fonts: {
     moderno: 'Plus Jakarta Sans',
@@ -171,7 +173,9 @@ export const defaultData = {
     estrella: 'Montserrat',
     split: 'Montserrat',
     vertice: 'Inter',
-    frame: 'Montserrat'
+    frame: 'Montserrat',
+    ejecutivo: 'Open Sans',
+    rounded: 'Montserrat'
   }
 };
 

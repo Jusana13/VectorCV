@@ -4,11 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "vite": "^5.2.11"
+    "start": "dotnet run --project dotnet-server",
+    "dev": "dotnet watch --project dotnet-server run"
   }
 }

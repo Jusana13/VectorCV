@@ -118,6 +118,7 @@
           </svg>
           <span>Corregir Ortografía</span>
         </button>
+
         <button id="btn-print-only" class="btn btn-primary"
           title="Imprimir o Guardar currículum como PDF vectorial de alta calidad">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
@@ -137,7 +138,6 @@
 
         <nav class="editor-tabs">
           <button class="tab-btn active" data-target="sec-personal">Personal</button>
-          <button class="tab-btn" data-target="sec-profile">Perfil</button>
           <button class="tab-btn" data-target="sec-contact">Contacto</button>
           <button class="tab-btn" data-target="sec-education">Estudios</button>
           <button class="tab-btn" data-target="sec-experience">Experiencia</button>
@@ -182,27 +182,23 @@
                           d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
                           fill="#94a3b8" />
                       </svg>
-                      <img id="avatar-preview-img" src="" alt="" style="display: none;">
+                      <img id="avatar-preview-img" src="" alt="">
                       <div class="avatar-overlay">
                         <svg viewBox="0 0 24 24" class="overlay-icon">
                           <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z" fill="currentColor" />
                         </svg>
                       </div>
                     </div>
-                    <input type="file" id="photo-upload-input" accept="image/*" style="display: none;">
+                    <input type="file" id="photo-upload-input" accept="image/*">
                   </div>
                   <div class="avatar-shape-toggles-side"></div>
                 </div>
-                <button type="button" class="btn-clear-link" id="btn-clear-photo"
-                  style="display: none; margin-top: 8px; width: 100%; justify-content: center;">
+                <button type="button" class="btn-clear-link" id="btn-clear-photo">
                   Borrar foto
                 </button>
               </div>
             </fieldset>
-          </section>
 
-          <!-- SECCIÓN: Perfil Profesional -->
-          <section id="sec-profile" class="form-section">
             <fieldset class="form-fieldset">
               <legend contenteditable="true" data-section-title="profile" title="Haz clic para renombrar esta sección">
                 Perfil Profesional</legend>
@@ -468,7 +464,7 @@
       <!-- Contenedor del Previsualizador con Zoom Fijo -->
       <div class="preview-panel-outer">
         <!-- Banner de advertencia de desbordamiento de página -->
-        <div id="overflow-warning" class="overflow-warning-banner" style="display: none;">
+        <div id="overflow-warning" class="overflow-warning-banner">
           <div class="overflow-warning-content">
             <svg class="warning-icon-svg" viewBox="0 0 24 24">
               <path
@@ -493,26 +489,25 @@
           </div>
         </main>
 
-        <!-- Barra de Control de Zoom Flotante -->
-        <div class="zoom-controls-floating">
-          <button id="btn-zoom-fit" class="btn-zoom-action active" title="Ajustar automáticamente a la pantalla">
+        <!-- Barra de Control de Zoom Flotante (Píldora Vertical) -->
+        <div class="zoom-controls-floating vertical-pill">
+          <button id="btn-zoom-in" class="btn-zoom-btn" title="Aumentar zoom">
             <svg class="btn-icon" viewBox="0 0 24 24">
-              <path d="M15 3h6v6h-2V5h-4V3zM9 3H3v6h2V5h4V3zm10 16v-4h2v6h-6v-2h4zM9 21H3v-6h2v4h4v2z"
-                fill="currentColor" />
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
             </svg>
-            <span>Auto-Ajustar</span>
           </button>
-          <span class="zoom-divider">|</span>
+          <span id="zoom-val-label">100%</span>
+          <input type="range" id="zoom-range" min="30" max="150" value="100" step="5" orient="vertical" title="Deslizador de zoom manual">
           <button id="btn-zoom-out" class="btn-zoom-btn" title="Reducir zoom">
             <svg class="btn-icon" viewBox="0 0 24 24">
               <path d="M19 13H5v-2h14v2z" />
             </svg>
           </button>
-          <input type="range" id="zoom-range" min="30" max="150" value="100" step="5" title="Deslizador de zoom manual">
-          <span id="zoom-val-label">100%</span>
-          <button id="btn-zoom-in" class="btn-zoom-btn" title="Aumentar zoom">
+          <span class="zoom-divider"></span>
+          <button id="btn-zoom-fit" class="btn-zoom-action active" title="Ajustar automáticamente a la pantalla">
             <svg class="btn-icon" viewBox="0 0 24 24">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+              <path d="M15 3h6v6h-2V5h-4V3zM9 3H3v6h2V5h4V3zm10 16v-4h2v6h-6v-2h4zM9 21H3v-6h2v4h4v2z"
+                fill="currentColor" />
             </svg>
           </button>
         </div>
@@ -950,19 +945,18 @@
       <div class="modal-header">
         <div class="modal-title-wrapper">
           <h2>Revisión Ortográfica y Gramatical</h2>
-          <span id="grammar-badge" class="template-badge"
-            style="background: rgba(239, 68, 68, 0.15); color: #f87171; display: none;">0 Errores</span>
+          <span id="grammar-badge" class="template-badge">0 Errores</span>
         </div>
         <button id="btn-close-grammar-modal" class="btn-close-modal" aria-label="Cerrar modal">&times;</button>
       </div>
       <div class="modal-body" id="grammar-modal-body">
-        <div id="grammar-loading" class="grammar-loading-state" style="display: none;">
+        <div id="grammar-loading" class="grammar-loading-state">
           <div class="grammar-loader-spinner"></div>
           <p>Analizando el texto de tu currículum...</p>
         </div>
-        <div id="grammar-empty" class="grammar-empty-state" style="display: none;">
+        <div id="grammar-empty" class="grammar-empty-state">
           <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" style="width: 64px; height: 64px; margin-bottom: 16px; display: inline-block;">
+            stroke-linejoin="round" class="grammar-empty-icon">
             <circle cx="12" cy="12" r="10"></circle>
             <path d="m9 12 2 2 4-4"></path>
           </svg>
@@ -973,11 +967,10 @@
           <!-- Las tarjetas de resultados irán aquí -->
         </div>
       </div>
-      <div class="modal-footer" id="grammar-modal-footer"
-        style="padding: 18px 32px; border-top: 1px solid rgba(255, 255, 255, 0.06); display: flex; justify-content: space-between; align-items: center; background: rgba(23, 28, 36, 0.5);">
-        <span class="db-info-text m-0" style="font-size: 11px;">Powered by LanguageTool API</span>
-        <div class="modal-footer-row m-0" style="gap: 12px; display: flex; align-items: center;">
-          <button id="btn-apply-all-grammar" class="btn btn-primary" style="display: none;">Aplicar todas las
+      <div class="modal-footer grammar-modal-footer-custom" id="grammar-modal-footer">
+        <span class="db-info-text m-0 grammar-powered-text">Powered by LanguageTool API</span>
+        <div class="modal-footer-row m-0 grammar-modal-footer-row">
+          <button id="btn-apply-all-grammar" class="btn btn-primary">Aplicar todas las
             sugerencias</button>
           <button id="btn-close-grammar-modal-foot" class="btn-secondary-custom">Cerrar</button>
         </div>

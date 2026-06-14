@@ -506,6 +506,13 @@ export function renderShapeToggles() {
   const supported = getActiveTemplateSupportedShapes();
   shapeTogglesSide.innerHTML = '';
 
+  if (supported.length <= 1) {
+    shapeTogglesSide.style.display = 'none';
+    return;
+  } else {
+    shapeTogglesSide.style.display = '';
+  }
+
   const shapeDefinitions = {
     circle: {
       title: 'Circular',

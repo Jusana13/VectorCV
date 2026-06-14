@@ -1,0 +1,50 @@
+{
+    "id": "rounded",
+    "name": "Rounded",
+    "thumbnail": "./src/templates/rounded/thumbnail.svg",
+    "defaultPhotoShape": "rounded",
+    "supportedPhotoShapes": [
+        "rounded"
+    ],
+    "features": {
+        "buttons": false,
+        "skillLevels": false,
+        "skillPercentage": false,
+        "languageLevels": true,
+        "personality": true,
+        "personalityLevels": false,
+        "techSkills": false
+    },
+    "tabOrder": [
+        "sec-personal",
+        "sec-contact",
+        "sec-education",
+        "sec-experience",
+        "sec-skills",
+        "sec-personality",
+        "sec-languages",
+        "sec-design"
+    ],
+    "colors": {
+        "primary": "Color Principal (Azul)",
+        "accent": "Tarjeta de Experiencia / Acento",
+        "cardLight": "Tarjeta de Formación",
+        "cardDark": "Tarjeta de Habilidades"
+    },
+    "defaultDataOverrides": {
+        "experience": 2
+    },
+    "resourceLayouts": {
+        "skills": "bullets-list-li",
+        "personality": "bullets-list-li",
+        "languages": "progress-linear"
+    },
+    "sectionAliases": {
+        "skills": "Conocimientos",
+        "personality": "Habilidades"
+    },
+    "singularAliases": {
+        "skills": "Conocimiento",
+        "personality": "Habilidad"
+    }
+}

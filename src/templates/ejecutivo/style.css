@@ -1,0 +1,501 @@
+/* ==========================================================================
+   PLANTILLA: EJECUTIVO (A4 - 794px x 1123px)
+   Estilos CSS para la plantilla "Ejecutivo". Diseñada y estructurada de forma
+   autocontenida, utilizando variables y CSS Nesting nativo.
+   ========================================================================== */
+
+.cv-page.ejecutivo {
+  position: relative;
+  width: 794px;
+  height: 1123px;
+  background-color: #ffffff;
+  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* --- Encabezado Superior (Oscuro) --- */
+  .header {
+    background-color: var(--primary, #1b2c47);
+    height: 185px;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+
+    .header-left {
+      width: 35%;
+      height: 100%;
+    }
+
+    .header-right {
+      width: 65%;
+      padding-left: 45px;
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      padding: 0 45px;
+      margin-top: 45px;
+
+      h1 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 34px;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0;
+        line-height: 1.1;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .profession {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        color: #ffffff;
+        letter-spacing: 3px;
+        margin-top: 8px;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  /* --- Cuerpo Principal del CV --- */
+  .cv-body {
+    display: flex;
+    flex: 1;
+    width: 100%;
+  }
+
+  /* --- Barra Lateral (Columna Izquierda) --- */
+  .sidebar {
+    width: 35%;
+    background-color: var(--sidebar-bg, #e5e8ec);
+    padding: 0 25px 30px 25px;
+    display: flex;
+    flex-direction: column;
+    border-top: 20px solid #ffffff;
+
+    /* Foto de perfil solapada con el header */
+    .photo-wrap {
+      margin-top: -130px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: center;
+      position: relative;
+      z-index: 5;
+    }
+
+    .photo-placeholder {
+      width: 210px;
+      height: 210px;
+      background-color: #ffffff;
+      border: 15px solid #ffffff;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.shape-circle {
+        border-radius: 50%;
+        img, svg {
+          border-radius: 50%;
+        }
+      }
+      &.shape-rounded {
+        border-radius: 12%;
+        img, svg {
+          border-radius: 12%;
+        }
+      }
+      &.shape-square {
+        border-radius: 0;
+        img, svg {
+          border-radius: 0;
+        }
+      }
+
+      img, svg {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .section {
+      margin-bottom: 30px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    /* Título de sección en la barra lateral con fondo blanco */
+    .section-title {
+      background-color: #ffffff;
+      padding: 8px 12px;
+      margin-bottom: 18px;
+      margin-right: -25px;
+      position: relative;
+
+      h2 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--primary, #1b2c47);
+        margin: 0;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+    }
+
+    /* Grid de Contacto */
+    .contact-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 0 5px;
+
+      .contact-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+
+        a {
+          color: inherit;
+          text-decoration: none;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .contact-icon {
+        width: 15px;
+        height: 15px;
+        flex-shrink: 0;
+        margin-top: 1px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+          width: 100%;
+          height: 100%;
+          fill: var(--primary, #1b2c47);
+        }
+      }
+
+      .contact-text {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 11px;
+        color: var(--primary, #1b2c47);
+        line-height: 1.45;
+        font-weight: 600;
+      }
+
+      .font-break {
+        word-break: break-all;
+      }
+    }
+
+    /* Lista de Información */
+    .info-list {
+      list-style-type: none;
+      padding-left: 5px;
+      margin: 0;
+
+      li {
+        position: relative;
+        padding-left: 18px;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 11px;
+        color: var(--primary, #1b2c47);
+        margin-bottom: 8px;
+        font-weight: 600;
+        line-height: 1.4;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        &::before {
+          content: "•";
+          position: absolute;
+          left: 0;
+          top: -1px;
+          color: var(--primary, #1b2c47);
+          font-size: 14px;
+        }
+      }
+    }
+
+    /* Listado de Idiomas */
+    .lang-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 0 5px;
+
+      .lang-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-bottom: 1px solid color-mix(in srgb, var(--primary, #1b2c47) 15%, transparent);
+        padding-bottom: 6px;
+
+        &:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        span {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 10.5px;
+          font-weight: 700;
+          color: var(--primary, #1b2c47);
+          letter-spacing: 0.5px;
+        }
+
+        .lang-level {
+          font-family: 'Open Sans', sans-serif;
+          font-size: 11px;
+          color: var(--primary, #1b2c47);
+          font-weight: 600;
+          text-align: right;
+        }
+      }
+    }
+  }
+
+  /* --- Contenido Principal (Columna Derecha) --- */
+  .main-content {
+    width: 65%;
+    background-color: #ffffff;
+    padding: 30px 40px;
+    display: flex;
+    flex-direction: column;
+
+    .section {
+      margin-bottom: 30px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    /* Título de sección con línea de acento inferior */
+    .section-title {
+      margin-bottom: 15px;
+
+      h2 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--primary, #1b2c47);
+        margin: 0;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        border-bottom: 2px solid var(--accent, #1b2c47);
+        padding-bottom: 6px;
+      }
+    }
+
+    /* Resumen / Perfil Profesional */
+    .profile-text {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #333333;
+      text-align: justify;
+      margin: 0 0 10px 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    /* Sección de Experiencia Laboral */
+    .experience-section {
+      .item {
+        position: relative;
+        padding-left: 20px;
+        margin-bottom: 22px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        &::before {
+          content: "•";
+          position: absolute;
+          left: 0;
+          top: -2px;
+          color: var(--accent, #1b2c47);
+          font-size: 18px;
+        }
+
+        .item-title {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 13px;
+          font-weight: 700;
+          color: var(--primary, #1b2c47);
+          letter-spacing: 0.5px;
+        }
+
+        .item-subtitle {
+          font-family: 'Open Sans', sans-serif;
+          font-size: 11px;
+          font-weight: 700;
+          font-style: italic;
+          color: var(--primary, #1b2c47);
+          margin-top: 3px;
+          margin-bottom: 6px;
+        }
+
+        .item-desc {
+          font-family: 'Open Sans', sans-serif;
+          font-size: 11px;
+          line-height: 1.55;
+          color: #555555;
+          text-align: justify;
+          margin: 0;
+          padding-left: 0;
+          list-style-type: none;
+
+          li {
+            position: relative;
+            padding-left: 12px;
+            margin-bottom: 4px;
+
+            &::before {
+              content: "-";
+              position: absolute;
+              left: 0;
+              top: 0;
+              color: #888888;
+            }
+          }
+        }
+      }
+    }
+
+    /* Sección de Educación */
+    .education-section {
+      .item {
+        margin-bottom: 20px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .item-title {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 13px;
+          font-weight: 700;
+          color: var(--primary, #1b2c47);
+          letter-spacing: 0.5px;
+        }
+
+        .item-subtitle {
+          font-family: 'Open Sans', sans-serif;
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--primary, #1b2c47);
+          margin-top: 3px;
+          margin-bottom: 4px;
+        }
+
+        .item-desc {
+          font-family: 'Open Sans', sans-serif;
+          font-size: 11px;
+          line-height: 1.5;
+          color: #555555;
+          margin: 0;
+        }
+      }
+    }
+
+    /* Sección de Habilidades / Herramientas */
+    .skills-section {
+      .skill-block {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        gap: 25px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .skill-info {
+          width: 45%;
+        }
+
+        .skill-name {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 11.5px;
+          font-weight: 700;
+          color: var(--primary, #1b2c47);
+          letter-spacing: 0.5px;
+        }
+
+        .progress-bg {
+          width: 55%;
+          height: 8px;
+          background-color: var(--sidebar-bg, #e5e8ec);
+          border-radius: 0;
+          overflow: hidden;
+        }
+
+        .progress-fill {
+          height: 100%;
+          background-color: var(--accent, #1b2c47);
+          border-radius: 0;
+        }
+      }
+    }
+
+    /* Botón de Enlace / Proyecto */
+    .cert-btn {
+      display: inline-block;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8.5px;
+      font-weight: 700;
+      color: var(--primary, #1b2c47);
+      text-decoration: none;
+      border: 1px solid var(--primary, #1b2c47);
+      padding: 3px 8px;
+      border-radius: 0;
+      margin-top: 6px;
+      background-color: transparent;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: var(--primary, #1b2c47);
+        color: #ffffff;
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   IMPRESIÓN
+   ========================================================================== */
+@media print {
+  .cv-page.ejecutivo {
+    box-shadow: none;
+    margin: 0;
+    width: 100% !important;
+    height: 100% !important;
+  }
+}

@@ -1,0 +1,451 @@
+.cv-page.rounded {
+  --white: #FFFFFF;
+  --text-gray: #666666;
+
+  display: flex;
+  flex-direction: column;
+  background-color: var(--white);
+  color: var(--text-gray);
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* --- CONTENIDO PRINCIPAL --- */
+  .main-content {
+    display: flex;
+    width: 100%;
+    flex: 1;
+  }
+
+  /* --- COLUMNA IZQUIERDA --- */
+  .left-col {
+    width: 40%;
+    position: relative;
+    background-color: var(--white);
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Contenedor de foto con curvas */
+  .header-blue-bg {
+    background-color: var(--primary);
+    border-bottom-right-radius: 120px;
+    width: 100%;
+    height: 350px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Estilo de la foto */
+  .photo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100% - 10px);
+    height: calc(100% - 20px);
+    background-size: cover;
+    background-position: center;
+    background-color: var(--white);
+
+    /* Formas dinámicas */
+    &.shape-rounded {
+      border-bottom-right-radius: 145px;
+    }
+
+    &.shape-circle {
+      border-radius: 50%;
+      top: 12px;
+      left: 12px;
+      width: calc(100% - 24px);
+      height: calc(100% - 24px);
+    }
+
+    &.shape-square {
+      border-radius: 0;
+    }
+  }
+
+  .left-text-content {
+    padding: 0 24px;
+    margin-top: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .name-bold {
+    color: var(--primary);
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 0.95;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .job-title-container {
+    margin-top: 8px;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+  }
+
+  .job-line {
+    height: 20px;
+    width: 3px;
+    background-color: var(--primary);
+    margin-right: 8px;
+  }
+
+  .job-text {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .section-title-left {
+    color: var(--primary);
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    margin-top: 18px;
+    text-transform: uppercase;
+  }
+
+  .about-text {
+    color: var(--primary);
+    font-size: 11px;
+    line-height: 1.5;
+    text-align: justify;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+  }
+
+  /* --- COLUMNA DERECHA --- */
+  .right-col {
+    flex: 1;
+    background-color: var(--primary);
+    position: relative;
+    padding: 30px 25px 15px 85px;
+    display: flex;
+    flex-direction: column;
+    margin-left: -2px;
+  }
+
+  .block {
+    border-radius: 15px;
+    padding: 12px 20px;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 2;
+
+    /* Línea de tiempo vertical dinámica entre bloques */
+    &:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: -41px;
+      top: 29px;
+      /* Centro vertical del primer icono */
+      bottom: -35px;
+      /* Se extiende por debajo hasta el siguiente bloque e icono */
+      width: 4px;
+      background-color: var(--white);
+      z-index: 1;
+    }
+  }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 800;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Iconos en la línea de tiempo */
+  .icon-wrapper {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    background-color: var(--primary);
+    border: 3px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    box-sizing: border-box;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--white);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 4px;
+      background-color: var(--accent);
+      z-index: -1;
+    }
+  }
+
+  /* Ajustes de posición de iconos */
+  .block>.icon-wrapper {
+    left: -56px;
+    top: 12px;
+
+    &::after {
+      right: -22px;
+      width: 22px;
+    }
+  }
+
+  /* Tarjeta Formación (Educación) */
+  .block-formacion {
+    background-color: var(--card-light);
+    color: var(--white);
+
+    .edu-item {
+      margin-bottom: 10px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    h4.institute {
+      margin: 0 0 2px 0;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    p.date {
+      margin: 0 0 4px 0;
+      font-size: 10px;
+      opacity: 0.9;
+    }
+
+    .edu-title {
+      font-weight: 600;
+    }
+
+    p.desc {
+      margin: 0;
+      font-size: 10px;
+      line-height: 1.4;
+      opacity: 0.85;
+    }
+  }
+
+  /* Tarjeta Experiencia Laboral */
+  .block-experiencia {
+    background-color: var(--accent);
+    color: var(--primary);
+
+    .exp-item {
+      margin-bottom: 12px;
+      font-size: 11px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .year {
+      font-weight: 800;
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+
+    .job {
+      font-weight: 700;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+
+    .company-row {
+      font-weight: 600;
+      font-size: 10px;
+      margin-bottom: 4px;
+      opacity: 0.9;
+    }
+
+    .exp-list {
+      margin: 0;
+      padding-left: 15px;
+      line-height: 1.4;
+      font-weight: 500;
+
+      li {
+        margin-bottom: 3px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .exp-desc {
+      margin: 0;
+      line-height: 1.4;
+      font-weight: 500;
+    }
+  }
+
+  /* Tarjeta Habilidades / Conocimientos */
+  .block-skills {
+    background-color: var(--card-dark);
+    color: var(--white);
+    padding-bottom: 12px;
+
+    .list-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    ul.custom-list {
+      list-style: none;
+      padding-left: 15px;
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.5;
+      text-align: left;
+      display: inline-block;
+
+      li {
+        position: relative;
+        padding-left: 12px;
+        margin-bottom: 2px;
+
+        &::before {
+          content: '•';
+          color: var(--white);
+          font-size: 14px;
+          position: absolute;
+          left: 0;
+          top: -2px;
+        }
+      }
+    }
+
+    /* Estilos dinámicos para barras de progreso (idiomas) */
+    .languages-container {
+      width: 100%;
+      padding: 0 10px;
+    }
+
+    .skill-block {
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .skill-info {
+      text-align: center;
+      margin-bottom: 4px;
+      font-weight: 600;
+      font-size: 11px;
+    }
+
+    .progress-bg {
+      width: 80%;
+      height: 8px;
+      background-color: var(--primary);
+      border-radius: 8px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: var(--accent);
+      border-radius: 8px;
+    }
+  }
+
+  /* --- FOOTER --- */
+  .footer-container {
+    width: 100%;
+    background-color: var(--primary);
+    padding: 10px 25px;
+    margin-top: auto;
+    position: relative;
+    top: -1px;
+    margin-bottom: -1px;
+  }
+
+  .footer-divider {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+
+    .line {
+      flex: 1;
+      height: 2px;
+      background-color: var(--white);
+    }
+
+    span {
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 800;
+      padding: 0 15px;
+      letter-spacing: 1px;
+    }
+  }
+
+  .contact-info {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 600;
+    gap: 6px;
+
+    a {
+      color: var(--white);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .contact-icon {
+    width: 22px;
+    height: 22px;
+    background-color: var(--white);
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+
+    svg {
+      width: 11px;
+      height: 11px;
+      fill: var(--primary);
+    }
+  }
+}
