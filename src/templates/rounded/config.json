@@ -34,7 +34,7 @@
     "skins": [
         {
             "id": "default",
-            "name": "Por Defecto (Azul)",
+            "name": "Azul (defecto)",
             "colors": {
                 "primary": "#2A398A",
                 "accent": "#D1F2B6",
@@ -43,8 +43,8 @@
             }
         },
         {
-            "id": "dark-elegant",
-            "name": "Oscuro Elegante",
+            "id": "dark",
+            "name": "Oscuro",
             "colors": {
                 "primary": "#121824",
                 "accent": "#D4AF37",
@@ -53,23 +53,23 @@
             }
         },
         {
-            "id": "emerald-forest",
-            "name": "Esmeralda",
+            "id": "teal-mint",
+            "name": "Menta",
             "colors": {
-                "primary": "#064E3B",
-                "accent": "#A7F3D0",
-                "cardLight": "#047857",
-                "cardDark": "#065F46"
+                "primary": "#112E3C",
+                "accent": "#A5F3FC",
+                "cardLight": "#1F526B",
+                "cardDark": "#173E52"
             }
         },
         {
-            "id": "terracotta",
-            "name": "Terracota",
+            "id": "burgundy",
+            "name": "Borgoña",
             "colors": {
-                "primary": "#7C2D12",
-                "accent": "#FFEDD5",
-                "cardLight": "#B45309",
-                "cardDark": "#9A3412"
+                "primary": "#4C121F",
+                "accent": "#FCE7F3",
+                "cardLight": "#782033",
+                "cardDark": "#621727"
             }
         }
     ],

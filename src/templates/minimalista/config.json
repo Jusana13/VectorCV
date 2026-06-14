@@ -23,9 +23,48 @@
         "sec-design"
     ],
     "colors": {
-        "primary": "Color Principal",
-        "accent": "Color de Acento"
+        "primary": "Tinta Principal (Textos)",
+        "accent": "Tinta de Detalle (Acento)",
+        "bg": "Color de Fondo (Papel)"
     },
+    "skins": [
+        {
+            "id": "default",
+            "name": "Monocromo Puro (Defecto)",
+            "colors": {
+                "primary": "#111111",
+                "accent": "#666666",
+                "bg": "#ffffff"
+            }
+        },
+        {
+            "id": "warm-ivory",
+            "name": "Papel Marfil (Cálido)",
+            "colors": {
+                "primary": "#2b2621",
+                "accent": "#8c7b6e",
+                "bg": "#fcfaf6"
+            }
+        },
+        {
+            "id": "cool-slate",
+            "name": "Gris Archivo (Frío)",
+            "colors": {
+                "primary": "#1f2937",
+                "accent": "#4b5563",
+                "bg": "#f4f6f8"
+            }
+        },
+        {
+            "id": "olive-press",
+            "name": "Oliva y Papiro",
+            "colors": {
+                "primary": "#2d3329",
+                "accent": "#606c5a",
+                "bg": "#faf9f5"
+            }
+        }
+    ],
     "resourceLayouts": {
         "skills": "rating-stars",
         "languages": "text-list-inline-between",

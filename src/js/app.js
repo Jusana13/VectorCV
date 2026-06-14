@@ -50,11 +50,14 @@ import {
   renderTechSkillsForm,
   renderLanguagesForm,
   renderInterestsForm,
+  renderDynamicContacts,
   syncStaticInputs,
   syncColorPickers,
   updateThumbnailColors,
   syncFontSelector,
-  updateSectionLabels
+  updateSectionLabels,
+  setExpandedExperienceIndex,
+  setExpandedEducationIndex
 } from './form-builder.js';
 
 // ==========================================================================
@@ -289,18 +292,75 @@ function setupEventListeners() {
         queuePreviewAndUpdate(); // Debounce en escritura
       } else if (e.target.classList.contains('exp-btn-input')) {
         const field = e.target.getAttribute('data-field');
-        if (!state.experience[idx].button) state.experience[idx].button = { text: 'Ver Proyecto', url: '' };
+        if (!state.experience[idx].button) {
+          state.experience[idx].button = { text: 'Ver Proyecto', url: '', enabled: true };
+        } else {
+          state.experience[idx].button.enabled = true;
+        }
         state.experience[idx].button[field] = e.target.value;
         queuePreviewAndUpdate(); // Debounce en escritura
       } else if (e.target.classList.contains('exp-bullets-input')) {
         state.experience[idx].bullets = e.target.value.split('\n').filter(line => line.trim() !== '');
+        queuePreviewAndUpdate(); // Debounce en escritura
+      } else if (e.target.classList.contains('exp-paragraph-input')) {
+        state.experience[idx].description = e.target.value;
         queuePreviewAndUpdate(); // Debounce en escritura
       } else if (e.target.classList.contains('exp-date-start') || e.target.classList.contains('exp-date-end')) {
         handleExpDateChange(e);
       }
     });
 
-    expContainer.addEventListener('change', handleExpDateChange);
+    expContainer.addEventListener('change', (e) => {
+      const idx = parseInt(e.target.getAttribute('data-index'));
+      if (isNaN(idx)) return;
+
+      if (e.target.classList.contains('exp-desc-type-select')) {
+        state.experience[idx].descriptionType = e.target.value;
+
+        // Cambiar visibilidad de los contenedores en el DOM inmediatamente
+        const card = e.target.closest('.repeater-card');
+        if (card) {
+          const bulletsGroup = card.querySelector('.exp-bullets-group');
+          const paragraphGroup = card.querySelector('.exp-paragraph-group');
+          const isBullets = e.target.value === 'bullets';
+          if (bulletsGroup) bulletsGroup.style.display = isBullets ? 'flex' : 'none';
+          if (paragraphGroup) paragraphGroup.style.display = isBullets ? 'none' : 'flex';
+        }
+
+        updatePreview();
+        saveState();
+      } else if (e.target.classList.contains('exp-optional-link-checkbox')) {
+        const checked = e.target.checked;
+        const card = e.target.closest('.repeater-card');
+        const linkFieldset = card ? card.querySelector('.exp-link-fieldset') : null;
+        if (linkFieldset) {
+          linkFieldset.style.display = checked ? 'block' : 'none';
+        }
+
+        if (checked) {
+          if (!state.experience[idx].button) {
+            state.experience[idx].button = { text: 'Ver Proyecto', url: '', enabled: true };
+          } else {
+            state.experience[idx].button.enabled = true;
+            state.experience[idx].button.url = state.experience[idx].button.url || '';
+            state.experience[idx].button.text = state.experience[idx].button.text || 'Ver Proyecto';
+          }
+          const urlInput = card ? card.querySelector('.exp-btn-input[data-field="url"]') : null;
+          if (urlInput) urlInput.value = state.experience[idx].button.url;
+          
+          const textInput = card ? card.querySelector('.exp-btn-input[data-field="text"]') : null;
+          if (textInput) textInput.value = state.experience[idx].button.text;
+        } else {
+          state.experience[idx].button = null;
+          const urlInput = card ? card.querySelector('.exp-btn-input[data-field="url"]') : null;
+          if (urlInput) urlInput.value = '';
+        }
+        updatePreview();
+        saveState();
+      } else {
+        handleExpDateChange(e);
+      }
+    });
   }
 
   // 6. Delegado de Entradas Dinámicas de Formación Académica - OPTIMIZADO
@@ -342,7 +402,11 @@ function setupEventListeners() {
         queuePreviewAndUpdate(); // Debounce
       } else if (e.target.classList.contains('edu-btn-input')) {
         const field = e.target.getAttribute('data-field');
-        if (!state.education[idx].button) state.education[idx].button = { text: '', url: '' };
+        if (!state.education[idx].button) {
+          state.education[idx].button = { text: 'Ver Certificado', url: '', enabled: true };
+        } else {
+          state.education[idx].button.enabled = true;
+        }
         state.education[idx].button[field] = e.target.value;
         queuePreviewAndUpdate(); // Debounce
       } else if (e.target.classList.contains('edu-date-start') || e.target.classList.contains('edu-date-end')) {
@@ -350,7 +414,42 @@ function setupEventListeners() {
       }
     });
 
-    eduContainer.addEventListener('change', handleEduDateChange);
+    eduContainer.addEventListener('change', (e) => {
+      const idx = parseInt(e.target.getAttribute('data-index'));
+      if (isNaN(idx)) return;
+
+      if (e.target.classList.contains('edu-optional-link-checkbox')) {
+        const checked = e.target.checked;
+        const card = e.target.closest('.repeater-card');
+        const linkFieldset = card ? card.querySelector('.edu-link-fieldset') : null;
+        if (linkFieldset) {
+          linkFieldset.style.display = checked ? 'block' : 'none';
+        }
+
+        if (checked) {
+          if (!state.education[idx].button) {
+            state.education[idx].button = { text: 'Ver Certificado', url: '', enabled: true };
+          } else {
+            state.education[idx].button.enabled = true;
+            state.education[idx].button.url = state.education[idx].button.url || '';
+            state.education[idx].button.text = state.education[idx].button.text || 'Ver Certificado';
+          }
+          const urlInput = card ? card.querySelector('.edu-btn-input[data-field="url"]') : null;
+          if (urlInput) urlInput.value = state.education[idx].button.url;
+          
+          const textInput = card ? card.querySelector('.edu-btn-input[data-field="text"]') : null;
+          if (textInput) textInput.value = state.education[idx].button.text;
+        } else {
+          state.education[idx].button = null;
+          const urlInput = card ? card.querySelector('.edu-btn-input[data-field="url"]') : null;
+          if (urlInput) urlInput.value = '';
+        }
+        updatePreview();
+        saveState();
+      } else {
+        handleEduDateChange(e);
+      }
+    });
   }
 
   // 7. Delegado de Entradas Dinámicas de Habilidades - OPTIMIZADO
@@ -486,6 +585,18 @@ function setupEventListeners() {
 
   // 10. Delegado de Botones Globales (Agregar, Eliminar y Limpiar Enlaces)
   document.addEventListener('click', (e) => {
+    const toggleVisibilityBtn = e.target.closest('.btn-toggle-visibility');
+    if (toggleVisibilityBtn) {
+      const sectionKey = toggleVisibilityBtn.getAttribute('data-section');
+      if (sectionKey && state.visibleSections) {
+        state.visibleSections[sectionKey] = !state.visibleSections[sectionKey];
+        toggleVisibilityBtn.classList.toggle('is-hidden', !state.visibleSections[sectionKey]);
+        updatePreview();
+        saveState();
+      }
+      return;
+    }
+
     const removeBtn = e.target.closest('.btn-remove');
     const addBtn = e.target.closest('.btn-add');
     const clearLinkBtn = e.target.closest('.btn-clear-link');
@@ -549,10 +660,12 @@ function setupEventListeners() {
         state.personal.profile.push('');
         renderProfileForm();
       } else if (action === 'add-experience') {
-        state.experience.push({ title: '', company: '', period: '', startDate: '', endDate: '', current: false, bullets: [] });
+        state.experience.push({ title: '', company: '', period: '', startDate: '', endDate: '', current: false, bullets: [], button: null });
+        setExpandedExperienceIndex(state.experience.length - 1);
         renderExperienceForm();
       } else if (action === 'add-education') {
-        state.education.push({ title: '', institution: '', period: '', startDate: '', endDate: '', current: false, description: '', button: { text: 'Ver Certificado', url: '' } });
+        state.education.push({ title: '', institution: '', period: '', startDate: '', endDate: '', current: false, description: '', button: null });
+        setExpandedEducationIndex(state.education.length - 1);
         renderEducationForm();
       } else if (action === 'add-skill') {
         state.skills.push({ name: '', level: 5 });
@@ -1108,6 +1221,25 @@ function setupEventListeners() {
       }
     });
   });
+
+  // 17. Agregar Canal de Contacto Adicional
+  const btnAddContact = document.getElementById('btn-add-contact');
+  const selectAddContactType = document.getElementById('select-add-contact-type');
+  if (btnAddContact && selectAddContactType) {
+    btnAddContact.addEventListener('click', () => {
+      const type = selectAddContactType.value;
+      if (!type) return;
+
+      const exists = state.contact.some(c => c.type === type);
+      if (!exists) {
+        state.contact.push({ type: type, text: '', href: '' });
+        renderDynamicContacts();
+        updatePreview();
+        saveState();
+      }
+      selectAddContactType.value = '';
+    });
+  }
 }
 
 // ==========================================================================

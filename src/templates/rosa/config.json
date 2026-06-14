@@ -26,7 +26,7 @@
     ],
     "colors": {
         "primary": "Color Principal",
-        "accent": "Color de Acento",
+        "accent": "Color Secundario",
         "bgLight": "Fondo Claro"
     },
     "resourceLayouts": {

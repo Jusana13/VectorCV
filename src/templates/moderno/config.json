@@ -14,9 +14,9 @@
     },
     "tabOrder": [
         "sec-personal",
+        "sec-contact",
         "sec-education",
         "sec-experience",
-        "sec-contact",
         "sec-skills",
         "sec-languages",
         "sec-interests",
@@ -24,9 +24,47 @@
     ],
     "colors": {
         "primary": "Color Principal",
-        "accent": "Color de Acento",
+        "accent": "Color Secundario",
         "bgLight": "Fondo Claro"
     },
+    "skins": [
+        {
+            "id": "default",
+            "name": "Clásico (defecto)",
+            "colors": {
+                "primary": "#2C2D30",
+                "accent": "#C9A227",
+                "bgLight": "#F3EFE6"
+            }
+        },
+        {
+            "id": "executive-blue",
+            "name": "Azul Ejecutivo",
+            "colors": {
+                "primary": "#1E293B",
+                "accent": "#0284C7",
+                "bgLight": "#F8FAFC"
+            }
+        },
+        {
+            "id": "forest-green",
+            "name": "Verde Bosque",
+            "colors": {
+                "primary": "#1A3326",
+                "accent": "#AE9768",
+                "bgLight": "#F4F6F4"
+            }
+        },
+        {
+            "id": "burgundy-linen",
+            "name": "Borgoña",
+            "colors": {
+                "primary": "#4A1D24",
+                "accent": "#C29F68",
+                "bgLight": "#FAF7F5"
+            }
+        }
+    ],
     "resourceLayouts": {
         "skills": "rating-stars",
         "languages": "progress-circular-dash"

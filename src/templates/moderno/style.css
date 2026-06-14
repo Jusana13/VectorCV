@@ -106,7 +106,7 @@
 
   .main-content {
     padding: 25px 30px;
-    background: #ffffff;
+    background: var(--bg-light, #ffffff);
     border-top-right-radius: 25px;
     position: relative;
     z-index: 5;

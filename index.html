@@ -14,8 +14,8 @@
   <meta name="description"
     content="Diseña, personaliza e imprime tu currículum profesional con ajuste perfecto a A4. Elige entre múltiples plantillas, ajusta colores y descarga tu PDF al instante.">
   <link rel="icon" type="image/svg+xml" href="./src/assets/logo.svg">
-  <link rel="stylesheet" href="./src/css/styles.css">
-  <link rel="stylesheet" href="./src/css/responsive.css">
+  <link rel="stylesheet" href="./src/css/styles.css?v=1.0.1">
+  <link rel="stylesheet" href="./src/css/responsive.css?v=1.0.1">
   <!-- html2pdf.js para descargas directas de PDF de alta calidad -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
@@ -217,6 +217,14 @@
           <!-- SECCIÓN: Contacto -->
           <section id="sec-contact" class="form-section">
             <fieldset class="form-fieldset">
+              <button type="button" class="btn-toggle-visibility" data-section="contact" title="Ocultar/Mostrar sección en el CV">
+                <svg viewBox="0 0 24 24" class="icon-eye-visible">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                <svg viewBox="0 0 24 24" class="icon-eye-hidden">
+                  <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92C21.27 15.11 22.27 13.62 23 12c-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.34-2.27l3.33 3.33C15.14 10.3 15 9.66 15 9c0-1.66-1.34-3-3-3c-.66 0-1.3.14-1.86.37z"/>
+                </svg>
+              </button>
               <legend contenteditable="true" data-section-title="contact" title="Haz clic para renombrar esta sección">
                 Contacto</legend>
               <div class="form-group">
@@ -269,10 +277,23 @@
                   <input type="hidden" id="phone-full-input" data-bind="contact.2.text">
                 </div>
               </div>
-              <div class="form-group">
-                <label>Página Web / Portafolio URL</label>
-                <input type="url" data-bind="contact.3.text" placeholder="Ej. miporfolio.github.io">
-                <input type="hidden" data-bind="contact.3.href">
+              <!-- Canales de Contacto Dinámicos/Adicionales -->
+              <div id="dynamic-contacts-container"></div>
+
+              <!-- Selector y Botón para agregar nuevos canales de contacto -->
+              <div class="form-group add-contact-group">
+                <label>Agregar Canal de Contacto</label>
+                <div class="add-contact-row">
+                  <select id="select-add-contact-type">
+                    <!-- Se llena dinámicamente -->
+                  </select>
+                  <button type="button" id="btn-add-contact" class="btn-add-contact-item">
+                    <svg class="btn-icon" viewBox="0 0 24 24">
+                      <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                    </svg>
+                    <span>Agregar</span>
+                  </button>
+                </div>
               </div>
             </fieldset>
           </section>
@@ -280,6 +301,14 @@
           <!-- SECCIÓN: Formación Académica -->
           <section id="sec-education" class="form-section">
             <fieldset class="form-fieldset">
+              <button type="button" class="btn-toggle-visibility" data-section="education" title="Ocultar/Mostrar sección en el CV">
+                <svg viewBox="0 0 24 24" class="icon-eye-visible">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                <svg viewBox="0 0 24 24" class="icon-eye-hidden">
+                  <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92C21.27 15.11 22.27 13.62 23 12c-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.34-2.27l3.33 3.33C15.14 10.3 15 9.66 15 9c0-1.66-1.34-3-3-3c-.66 0-1.3.14-1.86.37z"/>
+                </svg>
+              </button>
               <legend contenteditable="true" data-section-title="education"
                 title="Haz clic para renombrar esta sección">Formación Académica</legend>
               <div id="education-list-container" class="list-items-container">
@@ -297,6 +326,14 @@
           <!-- SECCIÓN: Experiencia Laboral -->
           <section id="sec-experience" class="form-section">
             <fieldset class="form-fieldset">
+              <button type="button" class="btn-toggle-visibility" data-section="experience" title="Ocultar/Mostrar sección en el CV">
+                <svg viewBox="0 0 24 24" class="icon-eye-visible">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                <svg viewBox="0 0 24 24" class="icon-eye-hidden">
+                  <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92C21.27 15.11 22.27 13.62 23 12c-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.34-2.27l3.33 3.33C15.14 10.3 15 9.66 15 9c0-1.66-1.34-3-3-3c-.66 0-1.3.14-1.86.37z"/>
+                </svg>
+              </button>
               <legend contenteditable="true" data-section-title="experience"
                 title="Haz clic para renombrar esta sección">Experiencia Laboral</legend>
               <div id="experience-list-container" class="list-items-container">
@@ -314,6 +351,14 @@
           <!-- SECCIÓN: Habilidades Técnicas -->
           <section id="sec-skills" class="form-section">
             <fieldset class="form-fieldset">
+              <button type="button" class="btn-toggle-visibility" data-section="skills" title="Ocultar/Mostrar sección en el CV">
+                <svg viewBox="0 0 24 24" class="icon-eye-visible">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                <svg viewBox="0 0 24 24" class="icon-eye-hidden">
+                  <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92C21.27 15.11 22.27 13.62 23 12c-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.34-2.27l3.33 3.33C15.14 10.3 15 9.66 15 9c0-1.66-1.34-3-3-3c-.66 0-1.3.14-1.86.37z"/>
+                </svg>
+              </button>
               <legend contenteditable="true" data-section-title="skills" title="Haz clic para renombrar esta sección">
                 Habilidades Técnicas</legend>
 
@@ -332,6 +377,14 @@
           <!-- SECCIÓN: Personalidad (Cualidades Rosa) -->
           <section id="sec-personality" class="form-section">
             <fieldset class="form-fieldset">
+              <button type="button" class="btn-toggle-visibility" data-section="personality" title="Ocultar/Mostrar sección en el CV">
+                <svg viewBox="0 0 24 24" class="icon-eye-visible">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                <svg viewBox="0 0 24 24" class="icon-eye-hidden">
+                  <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92C21.27 15.11 22.27 13.62 23 12c-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.34-2.27l3.33 3.33C15.14 10.3 15 9.66 15 9c0-1.66-1.34-3-3-3c-.66 0-1.3.14-1.86.37z"/>
+                </svg>
+              </button>
               <legend contenteditable="true" data-section-title="personality"
                 title="Haz clic para renombrar esta sección">Personalidad (Cualidades)</legend>
               <div id="personality-list-container" class="list-items-container">
@@ -349,6 +402,14 @@
           <!-- SECCIÓN: Habilidades Técnicas (Jones Sidebar) -->
           <section id="sec-tech-skills" class="form-section">
             <fieldset class="form-fieldset">
+              <button type="button" class="btn-toggle-visibility" data-section="techSkills" title="Ocultar/Mostrar sección en el CV">
+                <svg viewBox="0 0 24 24" class="icon-eye-visible">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                <svg viewBox="0 0 24 24" class="icon-eye-hidden">
+                  <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92C21.27 15.11 22.27 13.62 23 12c-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.34-2.27l3.33 3.33C15.14 10.3 15 9.66 15 9c0-1.66-1.34-3-3-3c-.66 0-1.3.14-1.86.37z"/>
+                </svg>
+              </button>
               <legend contenteditable="true" data-section-title="techSkills"
                 title="Haz clic para renombrar esta sección">Habilidades Técnicas</legend>
               <div id="tech-skills-list-container" class="list-items-container">
@@ -366,6 +427,14 @@
           <!-- SECCIÓN: Idiomas -->
           <section id="sec-languages" class="form-section">
             <fieldset class="form-fieldset">
+              <button type="button" class="btn-toggle-visibility" data-section="languages" title="Ocultar/Mostrar sección en el CV">
+                <svg viewBox="0 0 24 24" class="icon-eye-visible">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                <svg viewBox="0 0 24 24" class="icon-eye-hidden">
+                  <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92C21.27 15.11 22.27 13.62 23 12c-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.34-2.27l3.33 3.33C15.14 10.3 15 9.66 15 9c0-1.66-1.34-3-3-3c-.66 0-1.3.14-1.86.37z"/>
+                </svg>
+              </button>
               <legend contenteditable="true" data-section-title="languages"
                 title="Haz clic para renombrar esta sección">Idiomas</legend>
               <div id="languages-list-container" class="list-items-container">
@@ -383,6 +452,14 @@
           <!-- SECCIÓN: Intereses -->
           <section id="sec-interests" class="form-section">
             <fieldset class="form-fieldset">
+              <button type="button" class="btn-toggle-visibility" data-section="interests" title="Ocultar/Mostrar sección en el CV">
+                <svg viewBox="0 0 24 24" class="icon-eye-visible">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                <svg viewBox="0 0 24 24" class="icon-eye-hidden">
+                  <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92C21.27 15.11 22.27 13.62 23 12c-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.34-2.27l3.33 3.33C15.14 10.3 15 9.66 15 9c0-1.66-1.34-3-3-3c-.66 0-1.3.14-1.86.37z"/>
+                </svg>
+              </button>
               <legend contenteditable="true" data-section-title="interests"
                 title="Haz clic para renombrar esta sección">Intereses y Hobbies</legend>
               <div id="interests-grid-container" class="interests-grid-editor">
@@ -394,6 +471,14 @@
           <!-- SECCIÓN: Información Adicional -->
           <section id="sec-additional" class="form-section">
             <fieldset class="form-fieldset">
+              <button type="button" class="btn-toggle-visibility" data-section="additional" title="Ocultar/Mostrar sección en el CV">
+                <svg viewBox="0 0 24 24" class="icon-eye-visible">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                <svg viewBox="0 0 24 24" class="icon-eye-hidden">
+                  <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92C21.27 15.11 22.27 13.62 23 12c-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.34-2.27l3.33 3.33C15.14 10.3 15 9.66 15 9c0-1.66-1.34-3-3-3c-.66 0-1.3.14-1.86.37z"/>
+                </svg>
+              </button>
               <legend contenteditable="true" data-section-title="additional"
                 title="Haz clic para renombrar esta sección">Información Adicional</legend>
               <div class="repeater-card">
@@ -434,7 +519,7 @@
                   </div>
                   <div class="color-picker-item">
                     <input type="color" id="color-accent" value="#C9A227">
-                    <span>Color de Acento</span>
+                    <span>Color Secundario</span>
                   </div>
                 </div>
                 <div class="modal-footer-row">
@@ -654,127 +739,181 @@
 
   <!-- Plantilla: Experiencia Laboral -->
   <template id="template-experience-card">
-    <fieldset class="repeater-card">
+    <fieldset class="repeater-card collapsed">
       <div class="repeater-header">
-        <span class="repeater-title">{singular} #{index}</span>
+        <div class="repeater-header-left">
+          <svg class="collapse-arrow" viewBox="0 0 24 24">
+            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/>
+          </svg>
+          <span class="repeater-title">{singular} #{index}</span>
+        </div>
         <button type="button" class="btn-remove" data-action="remove-experience" data-index="{index-0}"
           title="Eliminar trabajo">
           {trashIcon}
         </button>
       </div>
-      <div class="form-group">
-        <label>Cargo / Título</label>
-        <input type="text" class="exp-input" data-field="title" data-index="{index-0}"
-          placeholder="Ej. Diseñador UX/UI o Puesto">
-      </div>
-      <div class="form-group">
-        <label>Empresa</label>
-        <input type="text" class="exp-input" data-field="company" data-index="{index-0}"
-          placeholder="Ej. Acme Corporation o Empresa">
-      </div>
-      <div class="form-group">
-        <label>Período / Fechas</label>
-        <div class="date-picker-helper-row">
-          <div class="date-inputs-row">
-            <div class="date-field">
-              <span>Desde</span>
-              <input type="date" class="exp-date-start" data-index="{index-0}">
-            </div>
-            <div class="date-field">
-              <span>Hasta</span>
-              <input type="date" class="exp-date-end" data-index="{index-0}">
-            </div>
+
+      <div class="repeater-body">
+        <!-- Rejilla de 2 columnas para Cargo y Empresa -->
+        <div class="grid-2-col">
+          <div class="form-group">
+            <label>Cargo / Título</label>
+            <input type="text" class="exp-input" data-field="title" data-index="{index-0}"
+              placeholder="Ej. Diseñador UX/UI o Puesto">
           </div>
-          <label class="presente-checkbox-label">
-            <input type="checkbox" class="exp-date-current" data-index="{index-0}">
-            <span>Trabajo actual</span>
+          <div class="form-group">
+            <label>Empresa</label>
+            <input type="text" class="exp-input" data-field="company" data-index="{index-0}"
+              placeholder="Ej. Acme Corporation o Empresa">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Período / Fechas</label>
+          <div class="date-picker-helper-row">
+            <div class="date-inputs-row">
+              <div class="date-field">
+                <span>Desde</span>
+                <input type="month" class="exp-date-start" data-index="{index-0}">
+              </div>
+              <div class="date-field">
+                <span>Hasta</span>
+                <input type="month" class="exp-date-end" data-index="{index-0}">
+              </div>
+            </div>
+            <label class="presente-checkbox-label">
+              <input type="checkbox" class="exp-date-current" data-index="{index-0}">
+              <span>Trabajo actual</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Tipo de Descripción</label>
+          <select class="exp-desc-type-select" data-index="{index-0}">
+            <option value="bullets">Lista de Viñetas (Logros)</option>
+            <option value="paragraph">Párrafo de Texto Libre</option>
+          </select>
+        </div>
+
+        <div class="form-group exp-bullets-group" data-index="{index-0}">
+          <label>Logros o Tareas (Uno por línea)</label>
+          <textarea class="exp-bullets-input" data-index="{index-0}"
+            placeholder="Ingresa cada logro en una línea distinta"></textarea>
+        </div>
+
+        <div class="form-group exp-paragraph-group" data-index="{index-0}" style="display: none;">
+          <label>Descripción / Párrafo</label>
+          <textarea class="exp-paragraph-input" data-index="{index-0}"
+            placeholder="Describe tus responsabilidades y logros principales en formato de párrafo libre..."></textarea>
+        </div>
+
+        <!-- Checkbox de enlace opcional -->
+        <div class="form-group optional-link-toggle-wrapper">
+          <label class="toggle-link-label">
+            <input type="checkbox" class="exp-optional-link-checkbox" data-index="{index-0}">
+            <span>🔗 Añadir enlace de proyecto o certificado</span>
           </label>
         </div>
-      </div>
-      <div class="form-group">
-        <label>Logros o Tareas (Uno por línea)</label>
-        <textarea class="exp-bullets-input" data-index="{index-0}"
-          placeholder="Ingresa cada logro en una línea distinta"></textarea>
-      </div>
 
-      <fieldset class="form-fieldset nested-fieldset">
-        <legend>Enlace Opcional (Certificado / Proyecto)</legend>
-        <div class="form-group">
-          <label>Texto del Botón</label>
-          <input type="text" class="exp-btn-input" data-field="text" data-index="{index-0}"
-            placeholder="Ej. Ver Proyecto">
-        </div>
-        <div class="form-group">
-          <label>URL del Enlace (Vacío para ocultar)</label>
-          <input type="url" class="exp-btn-input" data-field="url" data-index="{index-0}" placeholder="https://...">
-        </div>
-        <button type="button" class="btn-clear-link" data-action="clear-experience-link" data-index="{index-0}">
-          Borrar Enlace
-        </button>
-      </fieldset>
+        <fieldset class="form-fieldset nested-fieldset exp-link-fieldset" style="display: none;">
+          <legend>Enlace Opcional (Certificado / Proyecto)</legend>
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label>Texto del Botón</label>
+              <input type="text" class="exp-btn-input" data-field="text" data-index="{index-0}"
+                placeholder="Ej. Ver Proyecto">
+            </div>
+            <div class="form-group">
+              <label>URL del Enlace</label>
+              <input type="url" class="exp-btn-input" data-field="url" data-index="{index-0}" placeholder="https://...">
+            </div>
+          </div>
+        </fieldset>
+      </div>
     </fieldset>
   </template>
 
   <!-- Plantilla: Formación Académica -->
   <template id="template-education-card">
-    <fieldset class="repeater-card">
+    <fieldset class="repeater-card collapsed">
       <div class="repeater-header">
-        <span class="repeater-title">{singular} #{index}</span>
+        <div class="repeater-header-left">
+          <svg class="collapse-arrow" viewBox="0 0 24 24">
+            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/>
+          </svg>
+          <span class="repeater-title">{singular} #{index}</span>
+        </div>
         <button type="button" class="btn-remove" data-action="remove-education" data-index="{index-0}"
           title="Eliminar estudio">
           {trashIcon}
         </button>
       </div>
-      <div class="form-group">
-        <label>Titulación / Curso</label>
-        <input type="text" class="edu-input" data-field="title" data-index="{index-0}"
-          placeholder="Ej. Ingeniería de Software o Grado">
-      </div>
-      <div class="form-group">
-        <label>Institución / Escuela</label>
-        <input type="text" class="edu-input" data-field="institution" data-index="{index-0}"
-          placeholder="Ej. Universidad Politécnica o Escuela">
-      </div>
-      <div class="form-group">
-        <label>Período / Fechas</label>
-        <div class="date-picker-helper-row">
-          <div class="date-inputs-row">
-            <div class="date-field">
-              <span>Desde</span>
-              <input type="date" class="edu-date-start" data-index="{index-0}">
-            </div>
-            <div class="date-field">
-              <span>Hasta</span>
-              <input type="date" class="edu-date-end" data-index="{index-0}">
-            </div>
+
+      <div class="repeater-body">
+        <!-- Rejilla de 2 columnas para Titulación e Institución -->
+        <div class="grid-2-col">
+          <div class="form-group">
+            <label>Titulación / Curso</label>
+            <input type="text" class="edu-input" data-field="title" data-index="{index-0}"
+              placeholder="Ej. Ingeniería de Software o Grado">
           </div>
-          <label class="presente-checkbox-label">
-            <input type="checkbox" class="edu-date-current" data-index="{index-0}">
-            <span>Cursando actualmente</span>
+          <div class="form-group">
+            <label>Institución / Escuela</label>
+            <input type="text" class="edu-input" data-field="institution" data-index="{index-0}"
+              placeholder="Ej. Universidad Politécnica o Escuela">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Período / Fechas</label>
+          <div class="date-picker-helper-row">
+            <div class="date-inputs-row">
+              <div class="date-field">
+                <span>Desde</span>
+                <input type="month" class="edu-date-start" data-index="{index-0}">
+              </div>
+              <div class="date-field">
+                <span>Hasta</span>
+                <input type="month" class="edu-date-end" data-index="{index-0}">
+              </div>
+            </div>
+            <label class="presente-checkbox-label">
+              <input type="checkbox" class="edu-date-current" data-index="{index-0}">
+              <span>Cursando actualmente</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea class="edu-input" data-field="description" data-index="{index-0}"
+            placeholder="Ej. Especialización en desarrollo web, bases de datos y algoritmos avanzados..."></textarea>
+        </div>
+
+        <!-- Checkbox de enlace opcional -->
+        <div class="form-group optional-link-toggle-wrapper">
+          <label class="toggle-link-label">
+            <input type="checkbox" class="edu-optional-link-checkbox" data-index="{index-0}">
+            <span>🔗 Añadir enlace de certificado o portfolio</span>
           </label>
         </div>
-      </div>
-      <div class="form-group">
-        <label>Descripción</label>
-        <textarea class="edu-input" data-field="description" data-index="{index-0}"
-          placeholder="Ej. Especialización en desarrollo web, bases de datos y algoritmos avanzados..."></textarea>
-      </div>
 
-      <fieldset class="form-fieldset nested-fieldset">
-        <legend>Enlace Opcional (Certificado / Portfolio)</legend>
-        <div class="form-group">
-          <label>Texto del Botón</label>
-          <input type="text" class="edu-btn-input" data-field="text" data-index="{index-0}"
-            placeholder="Ej. Ver Certificado">
-        </div>
-        <div class="form-group">
-          <label>URL del Enlace (Vacío para ocultar)</label>
-          <input type="url" class="edu-btn-input" data-field="url" data-index="{index-0}" placeholder="https://...">
-        </div>
-        <button type="button" class="btn-clear-link" data-action="clear-education-link" data-index="{index-0}">
-          Borrar Enlace
-        </button>
-      </fieldset>
+        <fieldset class="form-fieldset nested-fieldset edu-link-fieldset" style="display: none;">
+          <legend>Enlace Opcional (Certificado / Portfolio)</legend>
+          <div class="grid-2-col">
+            <div class="form-group">
+              <label>Texto del Botón</label>
+              <input type="text" class="edu-btn-input" data-field="text" data-index="{index-0}"
+                placeholder="Ej. Ver Certificado">
+            </div>
+            <div class="form-group">
+              <label>URL del Enlace</label>
+              <input type="url" class="edu-btn-input" data-field="url" data-index="{index-0}" placeholder="https://...">
+            </div>
+          </div>
+        </fieldset>
+      </div>
     </fieldset>
   </template>
 

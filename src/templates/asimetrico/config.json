@@ -25,7 +25,7 @@
     ],
     "colors": {
         "primary": "Color Principal",
-        "accent": "Color de Acento"
+        "accent": "Color Secundario"
     },
     "resourceLayouts": {
         "skills": "rating-stars",

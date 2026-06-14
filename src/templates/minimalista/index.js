@@ -14,7 +14,7 @@ import { escapeHTML, silhouetteSVG, CONTACT_ICONS, INTEREST_ICONS, renderResourc
  * @returns {string} Fragmento HTML listo para renderizar.
  */
 export function render(data) {
-  const colors = data.colors?.minimalista || { primary: '#111111', accent: '#666666' };
+  const colors = data.colors?.minimalista || { primary: '#111111', accent: '#666666', bg: '#ffffff' };
   
   const nameHTML = `<h1>${escapeHTML(data.personal.name || '')} <span>${escapeHTML(data.personal.lastName || '')}</span></h1>`;
 
@@ -108,7 +108,7 @@ export function render(data) {
   }
 
   return `
-    <article class="cv-page minimalista" style="--primary: ${colors.primary}; --text-muted: ${colors.accent};">
+    <article class="cv-page minimalista" style="--primary: ${colors.primary}; --text-muted: ${colors.accent}; --bg: ${colors.bg || '#ffffff'};">
       <header class="header">
         <div class="header-name">
           ${nameHTML}

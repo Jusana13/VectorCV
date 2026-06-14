@@ -44,7 +44,21 @@ export const VISUAL_PLACEHOLDERS = {
     location: 'Ciudad, País',
     email: 'correo@ejemplo.com',
     phone: '+34 600 000 000',
-    web: 'tuweb.com'
+    web: 'tuweb.com',
+    linkedin: 'linkedin.com/in/usuario',
+    github: 'github.com/usuario',
+    facebook: 'facebook.com/usuario',
+    instagram: 'instagram.com/usuario',
+    x: 'x.com/usuario',
+    behance: 'behance.net/usuario',
+    dribbble: 'dribbble.com/usuario',
+    portfolio: 'portfolio.com/usuario',
+    youtube: 'youtube.com/@usuario',
+    whatsapp: 'wa.me/34600000000',
+    telegram: 't.me/usuario',
+    skype: 'skype:usuario',
+    medium: 'medium.com/@usuario',
+    stackoverflow: 'stackoverflow.com/users/usuario'
   },
   experience: {
     title: 'Nombre de tu Puesto de Trabajo',
@@ -55,6 +69,7 @@ export const VISUAL_PLACEHOLDERS = {
       'Procura iniciar cada viñeta con un verbo de acción claro y conciso.',
       'Puedes agregar tantas líneas de logros o tareas como necesites.'
     ],
+    description: 'Describe aquí tus responsabilidades y logros principales en este puesto de trabajo de manera concisa y clara. Destaca los proyectos clave y las tecnologías o herramientas que utilizaste.',
     buttonText: 'Ver Proyecto'
   },
   education: {
@@ -79,6 +94,17 @@ export const VISUAL_PLACEHOLDERS = {
  */
 export const defaultData = {
   activeTemplate: 'moderno',
+  visibleSections: {
+    contact: true,
+    education: true,
+    experience: true,
+    skills: true,
+    languages: true,
+    interests: true,
+    personality: true,
+    techSkills: true,
+    additional: true
+  },
   sectionTitles: {
     personalInfo: 'Información Personal',
     profile: 'Perfil Profesional',
@@ -115,8 +141,10 @@ export const defaultData = {
       startDate: '',
       endDate: '',
       current: false,
+      descriptionType: 'bullets',
+      description: '',
       bullets: [''],
-      button: { text: '', url: '' }
+      button: null
     }
   ],
   education: [
@@ -129,7 +157,7 @@ export const defaultData = {
       endDate: '',
       current: false,
       description: '',
-      button: { text: '', url: '' }
+      button: null
     }
   ],
   skills: [
@@ -148,7 +176,7 @@ export const defaultData = {
   colors: {
     moderno: { primary: '#2C2D30', accent: '#C9A227', bgLight: '#F3EFE6' },
     profesional: { primary: '#1b2a4a', accent: '#e8a838', sidebarBg: '#f4f6f8' },
-    minimalista: { primary: '#111111', accent: '#666666' },
+    minimalista: { primary: '#111111', accent: '#666666', bg: '#ffffff' },
     creativo: { primary: '#222222', accent: '#f4b844', bgLight: '#fdf8ec' },
     rosa: { primary: '#d63a3a', accent: '#ff8a80', bgLight: '#ff8a80' },
     asimetrico: { primary: '#111316', accent: '#a68d73' },
@@ -263,7 +291,7 @@ export async function loadTemplatesConfig() {
     if (!manifestRes.ok) throw new Error(`Manifest no disponible: ${manifestRes.status}`);
     const templateIds = await manifestRes.json();
     const configPromises = templateIds.map(async (id) => {
-      const configRes = await fetch(`./src/templates/${id}/config.json`);
+      const configRes = await fetch(`./src/templates/${id}/config.json?v=${Date.now()}`);
       if (!configRes.ok) throw new Error(`Config no disponible para ${id}: ${configRes.status}`);
       return configRes.json();
     });
@@ -289,7 +317,7 @@ export async function loadTemplate(templateId) {
 
     // Usamos fetch() en lugar del import ?raw de Vite para compatibilidad con
     // entornos sin bundler (GitHub Pages sirviendo fuentes directamente).
-    const cssRes = await fetch(`./src/templates/${templateId}/style.css`);
+    const cssRes = await fetch(`./src/templates/${templateId}/style.css?v=${Date.now()}`);
     const cssText = cssRes.ok ? await cssRes.text() : '';
 
     templateCache[templateId] = {
@@ -380,17 +408,42 @@ export function migrateState(stateObj) {
         edu.institution = edu.company;
         delete edu.company;
       }
-      if (!edu.button) {
-        edu.button = { text: 'Ver Certificado', url: '' };
+      if (edu.button) {
+        if (edu.button.enabled === undefined) {
+          if (edu.button.url && edu.button.url.trim()) {
+            edu.button.enabled = true;
+          } else {
+            edu.button = null;
+          }
+        }
+      } else {
+        edu.button = null;
       }
     });
   }
 
-  // Asegurar botón en experiencia laboral
+  // Asegurar botón en experiencia laboral y campos de descripción/párrafos
   if (stateObj.experience) {
     stateObj.experience.forEach(exp => {
-      if (!exp.button) {
-        exp.button = { text: 'Ver Proyecto', url: '' };
+      if (exp.button) {
+        if (exp.button.enabled === undefined) {
+          if (exp.button.url && exp.button.url.trim()) {
+            exp.button.enabled = true;
+          } else {
+            exp.button = null;
+          }
+        }
+      } else {
+        exp.button = null;
+      }
+      if (!exp.descriptionType) {
+        exp.descriptionType = 'bullets';
+      }
+      if (exp.description === undefined) {
+        exp.description = '';
+      }
+      if (!exp.bullets || !Array.isArray(exp.bullets)) {
+        exp.bullets = [''];
       }
     });
   }
@@ -398,14 +451,50 @@ export function migrateState(stateObj) {
   // Sanitizar listas vacías para evitar que la UI quede sin ningún campo inicial
   const listKeys = ['experience', 'education', 'skills', 'languages', 'techSkills', 'interests', 'personality'];
   listKeys.forEach(k => {
-    if (!stateObj[k] || !Array.isArray(stateObj[k]) || stateObj[k].length === 0) {
+    if (!stateObj[k] || !Array.isArray(stateObj[k])) {
       stateObj[k] = JSON.parse(JSON.stringify(defaultData[k]));
     }
   });
 
+  // Asegurar la existencia e integridad de visibleSections
+  if (!stateObj.visibleSections || typeof stateObj.visibleSections !== 'object') {
+    stateObj.visibleSections = {
+      contact: true,
+      education: true,
+      experience: true,
+      skills: true,
+      languages: true,
+      interests: true,
+      personality: true,
+      techSkills: true,
+      additional: true
+    };
+  } else {
+    const defaultKeys = ['contact', 'education', 'experience', 'skills', 'languages', 'interests', 'personality', 'techSkills', 'additional'];
+    defaultKeys.forEach(k => {
+      if (stateObj.visibleSections[k] === undefined) {
+        stateObj.visibleSections[k] = true;
+      }
+    });
+  }
+
   // Asegurar la existencia e integridad de la sección de contacto
   if (!stateObj.contact || !Array.isArray(stateObj.contact) || stateObj.contact.length === 0) {
     stateObj.contact = JSON.parse(JSON.stringify(defaultData.contact));
+  } else {
+    // Asegurar que las primeras 3 entradas sean obligatoriamente location, email y phone en ese orden
+    const requiredTypes = ['location', 'email', 'phone'];
+    requiredTypes.forEach((type, idx) => {
+      if (!stateObj.contact[idx] || stateObj.contact[idx].type !== type) {
+        const existingIdx = stateObj.contact.findIndex(c => c && c.type === type);
+        if (existingIdx !== -1) {
+          const item = stateObj.contact.splice(existingIdx, 1)[0];
+          stateObj.contact.splice(idx, 0, item);
+        } else {
+          stateObj.contact.splice(idx, 0, { type: type, text: '' });
+        }
+      }
+    });
   }
 
   // Asegurar la existencia e integridad de los colores
@@ -416,6 +505,13 @@ export function migrateState(stateObj) {
     Object.keys(defaultData.colors).forEach(tmplId => {
       if (!stateObj.colors[tmplId]) {
         stateObj.colors[tmplId] = JSON.parse(JSON.stringify(defaultData.colors[tmplId]));
+      } else {
+        // Rellenar claves de color faltantes desde los valores predeterminados
+        Object.keys(defaultData.colors[tmplId]).forEach(colorKey => {
+          if (stateObj.colors[tmplId][colorKey] === undefined) {
+            stateObj.colors[tmplId][colorKey] = defaultData.colors[tmplId][colorKey];
+          }
+        });
       }
     });
   }
@@ -455,7 +551,7 @@ export function applyTemplateDefaultOverrides(templateId, stateObj = state) {
     if (overrides && Array.isArray(overrides)) {
       if (!stateVal) {
         setCollectionState(stateObj, key, JSON.parse(JSON.stringify(overrides)));
-      } else if (stateVal.length < overrides.length) {
+      } else if (stateVal.length > 0 && stateVal.length < overrides.length) {
         const diff = overrides.length - stateVal.length;
         for (let i = 0; i < diff; i++) {
           const overrideIndex = overrides.length - diff + i;
@@ -543,7 +639,7 @@ function getTemplateDefaultItems(key) {
         "Describe una contribución relevante realizada en este puesto.",
         "Utiliza métricas siempre que sea posible (ej. aumenté ventas, reduje costes)."
       ],
-      button: { text: "Ver Proyecto", url: "https://ejemplo.com" }
+      button: { text: "Ver Proyecto", url: "" }
     });
   }
 
@@ -726,3 +822,89 @@ export function getActiveTemplateFeatures() {
     additionalInfoText: feat.additionalInfoText !== undefined ? feat.additionalInfoText : false
   };
 }
+
+/**
+ * Normaliza y resuelve el enlace de contacto a su formato href adecuado.
+ * @param {string} type - Tipo de contacto (web, linkedin, github, x, behance, etc.)
+ * @param {string} val - El valor introducido por el usuario.
+ * @returns {string} El enlace href completo.
+ */
+export function resolveContactHref(type, val) {
+  val = (val || '').trim();
+  if (!val) return '';
+
+  if (type === 'email') {
+    return val.startsWith('mailto:') ? val : `mailto:${val}`;
+  }
+  if (type === 'web' || type === 'portfolio') {
+    return (val.startsWith('http://') || val.startsWith('https://')) ? val : `https://${val}`;
+  }
+  if (type === 'linkedin') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.includes('linkedin.com'))
+      ? (val.startsWith('http') ? val : `https://${val}`)
+      : `https://linkedin.com/in/${val}`;
+  }
+  if (type === 'github') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.includes('github.com'))
+      ? (val.startsWith('http') ? val : `https://${val}`)
+      : `https://github.com/${val}`;
+  }
+  if (type === 'facebook') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.includes('facebook.com'))
+      ? (val.startsWith('http') ? val : `https://${val}`)
+      : `https://facebook.com/${val}`;
+  }
+  if (type === 'instagram') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.includes('instagram.com'))
+      ? (val.startsWith('http') ? val : `https://${val}`)
+      : `https://instagram.com/${val}`;
+  }
+  if (type === 'x') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.includes('x.com') || val.includes('twitter.com'))
+      ? (val.startsWith('http') ? val : `https://${val}`)
+      : `https://x.com/${val}`;
+  }
+  if (type === 'behance') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.includes('behance.net'))
+      ? (val.startsWith('http') ? val : `https://${val}`)
+      : `https://behance.net/${val}`;
+  }
+  if (type === 'dribbble') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.includes('dribbble.com'))
+      ? (val.startsWith('http') ? val : `https://${val}`)
+      : `https://dribbble.com/${val}`;
+  }
+  if (type === 'youtube') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.includes('youtube.com'))
+      ? (val.startsWith('http') ? val : `https://${val}`)
+      : `https://youtube.com/${val.startsWith('@') ? val : '@' + val}`;
+  }
+  if (type === 'whatsapp') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.startsWith('wa.me'))
+      ? (val.startsWith('http') ? val : `https://${val}`)
+      : `https://wa.me/${val.replace(/\s+/g, '')}`;
+  }
+  if (type === 'telegram') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.includes('t.me'))
+      ? (val.startsWith('http') ? val : `https://${val}`)
+      : `https://t.me/${val}`;
+  }
+  if (type === 'skype') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.startsWith('skype:'))
+      ? val
+      : `skype:${val}?chat`;
+  }
+  if (type === 'medium') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.includes('medium.com'))
+      ? (val.startsWith('http') ? val : `https://${val}`)
+      : `https://medium.com/${val.startsWith('@') ? val : '@' + val}`;
+  }
+  if (type === 'stackoverflow') {
+    return (val.startsWith('http://') || val.startsWith('https://') || val.includes('stackoverflow.com'))
+      ? (val.startsWith('http') ? val : `https://${val}`)
+      : `https://stackoverflow.com/users/${val}`;
+  }
+
+  return '';
+}
+

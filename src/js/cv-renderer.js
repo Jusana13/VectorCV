@@ -5,7 +5,7 @@
  * Optimiza la inyección de estilos (CSS) y tipografías en el DOM usando caché local.
  */
 
-import { state, loadTemplate, VISUAL_PLACEHOLDERS, templateCache, templatesConfig } from './state.js';
+import { state, loadTemplate, VISUAL_PLACEHOLDERS, templateCache, templatesConfig, resolveContactHref } from './state.js';
 import { getSectionTitle, resolveDefaultValue } from './utils.js';
 
 // ==========================================================================
@@ -257,9 +257,9 @@ function buildStateForRender() {
     stateForRender.contact.forEach(c => {
       if (!c.text || !c.text.trim()) {
         c.text = VISUAL_PLACEHOLDERS.contact[c.type] || '';
-        if (c.type === 'email') c.href = `mailto:${c.text}`;
-        if (c.type === 'web') c.href = `https://${c.text}`;
       }
+      const val = (c.text || '').trim();
+      c.href = resolveContactHref(c.type, val);
     });
   }
 
@@ -268,11 +268,25 @@ function buildStateForRender() {
       exp.title = (exp.title || '').trim() || VISUAL_PLACEHOLDERS.experience.title;
       exp.company = (exp.company || '').trim() || VISUAL_PLACEHOLDERS.experience.company;
       exp.period = (exp.period || '').trim() || VISUAL_PLACEHOLDERS.experience.period;
-      if (!exp.bullets || exp.bullets.length === 0 || (exp.bullets.length === 1 && !exp.bullets[0])) {
-        exp.bullets = VISUAL_PLACEHOLDERS.experience.bullets;
+      
+      const descType = exp.descriptionType || 'bullets';
+      if (descType === 'paragraph') {
+        exp.bullets = [];
+        exp.description = (exp.description || '').trim() || VISUAL_PLACEHOLDERS.experience.description;
+      } else {
+        exp.description = '';
+        if (!exp.bullets || exp.bullets.length === 0 || (exp.bullets.length === 1 && !exp.bullets[0])) {
+          exp.bullets = VISUAL_PLACEHOLDERS.experience.bullets;
+        }
       }
-      if (exp.button) {
+
+      if (exp.button && exp.button.enabled === true) {
         exp.button.text = (exp.button.text || '').trim() || VISUAL_PLACEHOLDERS.experience.buttonText;
+        if (!exp.button.url || !exp.button.url.trim()) {
+          exp.button.url = 'https://example.com';
+        }
+      } else {
+        exp.button = null;
       }
     });
   }
@@ -283,8 +297,13 @@ function buildStateForRender() {
       edu.institution = (edu.institution || '').trim() || VISUAL_PLACEHOLDERS.education.institution;
       edu.period = (edu.period || '').trim() || VISUAL_PLACEHOLDERS.education.period;
       edu.description = (edu.description || '').trim() || VISUAL_PLACEHOLDERS.education.description;
-      if (edu.button) {
+      if (edu.button && edu.button.enabled === true) {
         edu.button.text = (edu.button.text || '').trim() || VISUAL_PLACEHOLDERS.education.buttonText;
+        if (!edu.button.url || !edu.button.url.trim()) {
+          edu.button.url = 'https://example.com';
+        }
+      } else {
+        edu.button = null;
       }
     });
   }
@@ -381,6 +400,19 @@ export async function updatePreview() {
       }
     }
 
+    // Vaciar datos de secciones ocultas manualmente por el usuario (visibleSections)
+    if (stateForRender.visibleSections) {
+      const listSectionKeys = ['contact', 'education', 'experience', 'skills', 'languages', 'interests', 'personality', 'techSkills'];
+      listSectionKeys.forEach(key => {
+        if (stateForRender.visibleSections[key] === false) {
+          stateForRender[key] = [];
+        }
+      });
+      if (stateForRender.visibleSections.additional === false && stateForRender.personal) {
+        stateForRender.personal.additionalInfo = '';
+      }
+    }
+
     // Inyectar placeholders visuales en la copia de renderizado si el estado está vacío
     if (stateForRender.personal) {
       const p = stateForRender.personal;
@@ -398,9 +430,9 @@ export async function updatePreview() {
       stateForRender.contact.forEach(c => {
         if (!c.text || !c.text.trim()) {
           c.text = VISUAL_PLACEHOLDERS.contact[c.type] || '';
-          if (c.type === 'email') c.href = `mailto:${c.text}`;
-          if (c.type === 'web') c.href = `https://${c.text}`;
         }
+        const val = (c.text || '').trim();
+        c.href = resolveContactHref(c.type, val);
       });
     }
 
@@ -409,11 +441,25 @@ export async function updatePreview() {
         exp.title = (exp.title || '').trim() || VISUAL_PLACEHOLDERS.experience.title;
         exp.company = (exp.company || '').trim() || VISUAL_PLACEHOLDERS.experience.company;
         exp.period = (exp.period || '').trim() || VISUAL_PLACEHOLDERS.experience.period;
-        if (!exp.bullets || exp.bullets.length === 0 || (exp.bullets.length === 1 && !exp.bullets[0])) {
-          exp.bullets = VISUAL_PLACEHOLDERS.experience.bullets;
+        
+        const descType = exp.descriptionType || 'bullets';
+        if (descType === 'paragraph') {
+          exp.bullets = [];
+          exp.description = (exp.description || '').trim() || VISUAL_PLACEHOLDERS.experience.description;
+        } else {
+          exp.description = '';
+          if (!exp.bullets || exp.bullets.length === 0 || (exp.bullets.length === 1 && !exp.bullets[0])) {
+            exp.bullets = VISUAL_PLACEHOLDERS.experience.bullets;
+          }
         }
-        if (exp.button) {
+
+        if (exp.button && exp.button.enabled === true) {
           exp.button.text = (exp.button.text || '').trim() || VISUAL_PLACEHOLDERS.experience.buttonText;
+          if (!exp.button.url || !exp.button.url.trim()) {
+            exp.button.url = 'https://example.com';
+          }
+        } else {
+          exp.button = null;
         }
       });
     }
@@ -424,8 +470,13 @@ export async function updatePreview() {
         edu.institution = (edu.institution || '').trim() || VISUAL_PLACEHOLDERS.education.institution;
         edu.period = (edu.period || '').trim() || VISUAL_PLACEHOLDERS.education.period;
         edu.description = (edu.description || '').trim() || VISUAL_PLACEHOLDERS.education.description;
-        if (edu.button) {
+        if (edu.button && edu.button.enabled === true) {
           edu.button.text = (edu.button.text || '').trim() || VISUAL_PLACEHOLDERS.education.buttonText;
+          if (!edu.button.url || !edu.button.url.trim()) {
+            edu.button.url = 'https://example.com';
+          }
+        } else {
+          edu.button = null;
         }
       });
     }
@@ -487,6 +538,9 @@ export async function updatePreview() {
 
     const html = template.render(stateForRender);
     previewContainer.innerHTML = html;
+
+    // Ocultar secciones vacías en el CV renderizado
+    hideEmptySections(previewContainer);
   } else {
     showPreviewError(
       'No se pudo cargar la plantilla activa.',
@@ -517,4 +571,47 @@ export async function updatePreview() {
     }
   }
 }
+
+/**
+ * Oculta las secciones del CV en el DOM si no contienen elementos (colecciones vacías).
+ * @param {HTMLElement} container - El contenedor raíz del CV previsualizado.
+ * @description Compara los títulos del DOM con los del estado para identificar secciones vacías.
+ */
+function hideEmptySections(container) {
+  if (!state || !container) return;
+
+  const listKeys = ['experience', 'education', 'skills', 'languages', 'techSkills', 'interests', 'personality', 'contact', 'additional'];
+  const emptySectionTitles = [];
+
+  listKeys.forEach(key => {
+    // Caso 1: La sección tiene visibleSections en false (ocultada manualmente por el usuario en el formulario)
+    const isManuallyHidden = state.visibleSections && state.visibleSections[key] === false;
+    
+    // Caso 2: El array está vacío (eliminado por completo en la UI)
+    const array = state[key];
+    const isEmptyArray = Array.isArray(array) && array.length === 0;
+
+    if (isManuallyHidden || isEmptyArray) {
+      const title = getSectionTitle(key);
+      if (title) {
+        emptySectionTitles.push(title.trim().toLowerCase());
+      }
+    }
+  });
+
+  if (emptySectionTitles.length === 0) return;
+
+  // Buscar elementos de sección en el DOM del CV
+  const domSections = container.querySelectorAll('section, .section, .sidebar-section');
+  domSections.forEach(sec => {
+    const heading = sec.querySelector('h2, h3');
+    if (heading) {
+      const headingText = heading.textContent.trim().toLowerCase();
+      if (emptySectionTitles.includes(headingText)) {
+        sec.style.display = 'none';
+      }
+    }
+  });
+}
+
 export { templateCache };

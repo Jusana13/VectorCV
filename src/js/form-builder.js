@@ -11,10 +11,12 @@ import {
   templatesConfig,
   defaultData,
   SUPPORTED_FONTS,
+  VISUAL_PLACEHOLDERS,
   saveState,
   getDeepValue,
   getActiveTemplateSupportedShapes,
-  getActiveTemplateFeatures
+  getActiveTemplateFeatures,
+  resolveContactHref
 } from './state.js';
 import {
   getSectionTitle,
@@ -62,6 +64,16 @@ export function renderProfileForm() {
  * @description Crea campos de texto, inputs de fecha (con bloqueo dinámico si es puesto activo),
  *              área de viñetas de logros e inputs opcionales de botón/proyecto según la plantilla.
  */
+export let expandedExperienceIndex = 0;
+export function setExpandedExperienceIndex(idx) {
+  expandedExperienceIndex = idx;
+}
+
+export let expandedEducationIndex = 0;
+export function setExpandedEducationIndex(idx) {
+  expandedEducationIndex = idx;
+}
+
 export function renderExperienceForm() {
   const container = document.getElementById('experience-list-container');
   if (!container) return;
@@ -74,22 +86,95 @@ export function renderExperienceForm() {
     addBtnSpan.textContent = getButtonText(singular, 'experience');
   }
 
+  // Corregir índice expandido por si cambió la cantidad de elementos
+  if (expandedExperienceIndex >= state.experience.length) {
+    expandedExperienceIndex = state.experience.length - 1;
+  }
+
   state.experience.forEach((exp, index) => {
     const card = getClonedTemplate('template-experience-card', index, { singular });
     if (!card) return;
 
+    // Título dinámico
+    const headerTitle = card.querySelector('.repeater-title');
+    const updateHeaderTitle = () => {
+      if (headerTitle) {
+        const jobTitle = exp.title ? exp.title.trim() : '';
+        const company = exp.company ? exp.company.trim() : '';
+        if (jobTitle || company) {
+          headerTitle.textContent = `${jobTitle}${jobTitle && company ? ' en ' : ''}${company}`;
+        } else {
+          headerTitle.textContent = `${singular} #${index + 1}`;
+        }
+      }
+    };
+    updateHeaderTitle();
+
+    // Configurar estado colapsado inicial
+    const isExpanded = index === expandedExperienceIndex;
+    if (isExpanded) {
+      card.classList.remove('collapsed');
+      const arrow = card.querySelector('.collapse-arrow');
+      if (arrow) arrow.style.transform = 'rotate(90deg)';
+    } else {
+      card.classList.add('collapsed');
+      const arrow = card.querySelector('.collapse-arrow');
+      if (arrow) arrow.style.transform = 'rotate(0deg)';
+    }
+
+    // Event listener para el acordeón (cabecera cliqueable)
+    const header = card.querySelector('.repeater-header');
+    if (header) {
+      header.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-remove')) return;
+
+        const wasCollapsed = card.classList.contains('collapsed');
+
+        // Colapsar todas las demás
+        const allCards = container.querySelectorAll('.repeater-card');
+        allCards.forEach((c) => {
+          c.classList.add('collapsed');
+          const arrow = c.querySelector('.collapse-arrow');
+          if (arrow) arrow.style.transform = 'rotate(0deg)';
+        });
+
+        if (wasCollapsed) {
+          card.classList.remove('collapsed');
+          const arrow = card.querySelector('.collapse-arrow');
+          if (arrow) arrow.style.transform = 'rotate(90deg)';
+          expandedExperienceIndex = index;
+        } else {
+          expandedExperienceIndex = -1;
+        }
+      });
+    }
+
     const titleInput = card.querySelector('.exp-input[data-field="title"]');
-    if (titleInput) titleInput.value = exp.title || '';
+    if (titleInput) {
+      titleInput.value = exp.title || '';
+      // Actualizar título de cabecera dinámicamente al escribir
+      titleInput.addEventListener('input', (e) => {
+        exp.title = e.target.value;
+        updateHeaderTitle();
+      });
+    }
 
     const companyInput = card.querySelector('.exp-input[data-field="company"]');
-    if (companyInput) companyInput.value = exp.company || '';
+    if (companyInput) {
+      companyInput.value = exp.company || '';
+      // Actualizar título de cabecera dinámicamente al escribir
+      companyInput.addEventListener('input', (e) => {
+        exp.company = e.target.value;
+        updateHeaderTitle();
+      });
+    }
 
     const startInput = card.querySelector('.exp-date-start');
-    if (startInput) startInput.value = exp.startDate || '';
+    if (startInput) startInput.value = exp.startDate ? exp.startDate.substring(0, 7) : '';
 
     const endInput = card.querySelector('.exp-date-end');
     if (endInput) {
-      endInput.value = exp.endDate || '';
+      endInput.value = exp.endDate ? exp.endDate.substring(0, 7) : '';
       if (exp.current) {
         endInput.disabled = true;
       }
@@ -100,10 +185,36 @@ export function renderExperienceForm() {
       currentCheckbox.checked = !!exp.current;
     }
 
+    const descTypeSelect = card.querySelector('.exp-desc-type-select');
+    if (descTypeSelect) {
+      descTypeSelect.value = exp.descriptionType || 'bullets';
+    }
+
+    const bulletsGroup = card.querySelector('.exp-bullets-group');
+    const paragraphGroup = card.querySelector('.exp-paragraph-group');
+    const isBullets = (exp.descriptionType || 'bullets') === 'bullets';
+    if (bulletsGroup) bulletsGroup.style.display = isBullets ? 'flex' : 'none';
+    if (paragraphGroup) paragraphGroup.style.display = isBullets ? 'none' : 'flex';
 
     const bulletsTextarea = card.querySelector('.exp-bullets-input');
     if (bulletsTextarea) {
       bulletsTextarea.value = (exp.bullets || []).join('\n');
+    }
+
+    const paragraphTextarea = card.querySelector('.exp-paragraph-input');
+    if (paragraphTextarea) {
+      paragraphTextarea.value = exp.description || '';
+    }
+
+    // Configurar enlace opcional
+    const optionalLinkCheckbox = card.querySelector('.exp-optional-link-checkbox');
+    const linkFieldset = card.querySelector('.exp-link-fieldset');
+    const hasButton = exp.button && exp.button.enabled === true;
+    if (optionalLinkCheckbox) {
+      optionalLinkCheckbox.checked = hasButton;
+    }
+    if (linkFieldset) {
+      linkFieldset.style.display = hasButton ? 'block' : 'none';
     }
 
     const btnTextInput = card.querySelector('.exp-btn-input[data-field="text"]');
@@ -115,6 +226,7 @@ export function renderExperienceForm() {
     container.appendChild(card);
   });
 }
+
 
 /**
  * Renderiza las tarjetas repetidoras de la sección Formación Académica.
@@ -133,22 +245,93 @@ export function renderEducationForm() {
     addBtnSpan.textContent = getButtonText(singular, 'education');
   }
 
+  // Corregir índice expandido por si cambió la cantidad de elementos
+  if (expandedEducationIndex >= state.education.length) {
+    expandedEducationIndex = state.education.length - 1;
+  }
+
   state.education.forEach((edu, index) => {
     const card = getClonedTemplate('template-education-card', index, { singular });
     if (!card) return;
 
+    // Título dinámico
+    const headerTitle = card.querySelector('.repeater-title');
+    const updateHeaderTitle = () => {
+      if (headerTitle) {
+        const eduTitle = edu.title ? edu.title.trim() : '';
+        const inst = edu.institution ? edu.institution.trim() : '';
+        if (eduTitle || inst) {
+          headerTitle.textContent = `${eduTitle}${eduTitle && inst ? ' en ' : ''}${inst}`;
+        } else {
+          headerTitle.textContent = `${singular} #${index + 1}`;
+        }
+      }
+    };
+    updateHeaderTitle();
+
+    // Configurar estado colapsado inicial
+    const isExpanded = index === expandedEducationIndex;
+    if (isExpanded) {
+      card.classList.remove('collapsed');
+      const arrow = card.querySelector('.collapse-arrow');
+      if (arrow) arrow.style.transform = 'rotate(90deg)';
+    } else {
+      card.classList.add('collapsed');
+      const arrow = card.querySelector('.collapse-arrow');
+      if (arrow) arrow.style.transform = 'rotate(0deg)';
+    }
+
+    // Event listener para el acordeón (cabecera cliqueable)
+    const header = card.querySelector('.repeater-header');
+    if (header) {
+      header.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-remove')) return;
+
+        const wasCollapsed = card.classList.contains('collapsed');
+
+        // Colapsar todas las demás
+        const allCards = container.querySelectorAll('.repeater-card');
+        allCards.forEach((c) => {
+          c.classList.add('collapsed');
+          const arrow = c.querySelector('.collapse-arrow');
+          if (arrow) arrow.style.transform = 'rotate(0deg)';
+        });
+
+        if (wasCollapsed) {
+          card.classList.remove('collapsed');
+          const arrow = card.querySelector('.collapse-arrow');
+          if (arrow) arrow.style.transform = 'rotate(90deg)';
+          expandedEducationIndex = index;
+        } else {
+          expandedEducationIndex = -1;
+        }
+      });
+    }
+
     const titleInput = card.querySelector('.edu-input[data-field="title"]');
-    if (titleInput) titleInput.value = edu.title || '';
+    if (titleInput) {
+      titleInput.value = edu.title || '';
+      titleInput.addEventListener('input', (e) => {
+        edu.title = e.target.value;
+        updateHeaderTitle();
+      });
+    }
 
     const instInput = card.querySelector('.edu-input[data-field="institution"]');
-    if (instInput) instInput.value = edu.institution || '';
+    if (instInput) {
+      instInput.value = edu.institution || '';
+      instInput.addEventListener('input', (e) => {
+        edu.institution = e.target.value;
+        updateHeaderTitle();
+      });
+    }
 
     const startInput = card.querySelector('.edu-date-start');
-    if (startInput) startInput.value = edu.startDate || '';
+    if (startInput) startInput.value = edu.startDate ? edu.startDate.substring(0, 7) : '';
 
     const endInput = card.querySelector('.edu-date-end');
     if (endInput) {
-      endInput.value = edu.endDate || '';
+      endInput.value = edu.endDate ? edu.endDate.substring(0, 7) : '';
       if (edu.current) {
         endInput.disabled = true;
       }
@@ -161,6 +344,17 @@ export function renderEducationForm() {
 
     const descTextarea = card.querySelector('textarea[data-field="description"]');
     if (descTextarea) descTextarea.value = edu.description || '';
+
+    // Configurar enlace opcional
+    const optionalLinkCheckbox = card.querySelector('.edu-optional-link-checkbox');
+    const linkFieldset = card.querySelector('.edu-link-fieldset');
+    const hasButton = edu.button && edu.button.enabled === true;
+    if (optionalLinkCheckbox) {
+      optionalLinkCheckbox.checked = hasButton;
+    }
+    if (linkFieldset) {
+      linkFieldset.style.display = hasButton ? 'block' : 'none';
+    }
 
     const btnTextInput = card.querySelector('.edu-btn-input[data-field="text"]');
     if (btnTextInput) btnTextInput.value = edu.button?.text || 'Ver Certificado';
@@ -551,7 +745,7 @@ export function syncColorPickers() {
   if (!container) return;
 
   const activeTemplateConfig = templatesConfig ? templatesConfig.find(t => t.id === activeTmpl) : null;
-  const colorsDef = activeTemplateConfig?.colors || { primary: "Color Principal", accent: "Color de Acento" };
+  const colorsDef = activeTemplateConfig?.colors || { primary: "Color Principal", accent: "Color Secundario" };
   
   if (!state.colors[activeTmpl]) {
     const defaultColors = defaultData.colors[activeTmpl] || { primary: '#2C2D30', accent: '#C9A227' };
@@ -592,7 +786,7 @@ export function syncColorPickers() {
         const dotsContainer = document.createElement('div');
         dotsContainer.className = 'skin-preview-dots';
         
-        const previewKeys = ['primary', 'accent', 'cardLight'];
+        const previewKeys = ['primary', 'accent', 'bgLight', 'sidebarBg', 'cardLight'];
         previewKeys.forEach(k => {
           if (skin.colors[k]) {
             const dot = document.createElement('span');
@@ -959,13 +1153,107 @@ export function syncStaticInputs() {
   syncColorPickers();
   updateThumbnailColors();
   syncFontSelector();
+
+  // Sincronizar estado de los botones de alternancia de visibilidad de secciones
+  const visibilityButtons = document.querySelectorAll('.btn-toggle-visibility');
+  visibilityButtons.forEach(btn => {
+    const secKey = btn.getAttribute('data-section');
+    if (secKey && state.visibleSections) {
+      const isVisible = state.visibleSections[secKey] !== false;
+      btn.classList.toggle('is-hidden', !isVisible);
+    }
+  });
 }
 
 /**
  * Renderiza todo el panel lateral sincronizando inputs y regenerando repeaters.
  */
+const CONTACT_NAMES = {
+  web: "Página Web",
+  linkedin: "LinkedIn",
+  github: "GitHub",
+  facebook: "Facebook",
+  instagram: "Instagram",
+  x: "X (Twitter)",
+  behance: "Behance",
+  dribbble: "Dribbble",
+  portfolio: "Portafolio",
+  youtube: "YouTube",
+  whatsapp: "WhatsApp",
+  telegram: "Telegram",
+  skype: "Skype",
+  medium: "Medium",
+  stackoverflow: "Stack Overflow"
+};
+
+/**
+ * Renderiza los canales de contacto dinámicos/adicionales y rellena el selector para agregar nuevos.
+ */
+export function renderDynamicContacts() {
+  const container = document.getElementById('dynamic-contacts-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const select = document.getElementById('select-add-contact-type');
+  const activeContacts = state.contact.slice(3);
+
+  activeContacts.forEach((contact, idx) => {
+    const realIdx = idx + 3;
+    const name = CONTACT_NAMES[contact.type] || contact.type;
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'form-group dynamic-contact-item';
+    itemDiv.innerHTML = `
+      <div class="dynamic-contact-header">
+        <label>${name}</label>
+        <button type="button" class="btn-delete-contact" data-index="${realIdx}" title="Eliminar este canal de contacto">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+          </svg>
+        </button>
+      </div>
+      <input type="text" class="dynamic-contact-input" data-index="${realIdx}" placeholder="Ej. ${VISUAL_PLACEHOLDERS.contact[contact.type] || ''}" value="${contact.text || ''}">
+    `;
+    container.appendChild(itemDiv);
+
+    const input = itemDiv.querySelector('.dynamic-contact-input');
+    input.addEventListener('input', (e) => {
+      state.contact[realIdx].text = e.target.value;
+      
+      const val = e.target.value.trim();
+      const type = state.contact[realIdx].type;
+      state.contact[realIdx].href = resolveContactHref(type, val);
+
+      updatePreview();
+      saveState();
+    });
+
+    const deleteBtn = itemDiv.querySelector('.btn-delete-contact');
+    deleteBtn.addEventListener('click', () => {
+      state.contact.splice(realIdx, 1);
+      renderDynamicContacts();
+      updatePreview();
+      saveState();
+    });
+  });
+
+  if (select) {
+    select.innerHTML = '<option value="" disabled selected>Seleccionar canal...</option>';
+    const currentTypes = state.contact.map(c => c.type);
+    
+    Object.entries(CONTACT_NAMES).forEach(([type, name]) => {
+      if (!currentTypes.includes(type)) {
+        const opt = document.createElement('option');
+        opt.value = type;
+        opt.textContent = name;
+        select.appendChild(opt);
+      }
+    });
+  }
+}
+
 export function renderAllForms() {
   syncStaticInputs();
+  renderDynamicContacts();
   renderProfileForm();
   renderExperienceForm();
   renderEducationForm();

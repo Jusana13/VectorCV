@@ -257,11 +257,11 @@ export function parsePeriodToDates(periodText) {
     if (myMatch) {
       const month = myMatch[1].padStart(2, '0');
       const year = myMatch[2];
-      return `${year}-${month}-01`;
+      return `${year}-${month}`;
     }
     const yMatch = str.match(/^(\d{4})$/);
     if (yMatch) {
-      return `${yMatch[1]}-01-01`;
+      return `${yMatch[1]}-01`;
     }
     return '';
   };

@@ -14,9 +14,9 @@
     },
     "tabOrder": [
         "sec-personal",
+        "sec-contact",
         "sec-education",
         "sec-experience",
-        "sec-contact",
         "sec-skills",
         "sec-languages",
         "sec-interests",
@@ -24,9 +24,56 @@
     ],
     "colors": {
         "primary": "Color Principal",
-        "accent": "Color de Acento",
+        "accent": "Color Secundario",
         "sidebarBg": "Fondo de Barra Lateral"
     },
+    "skins": [
+        {
+            "id": "default",
+            "name": "Clásico Corporativo (Defecto)",
+            "colors": {
+                "primary": "#1b2a4a",
+                "accent": "#e8a838",
+                "sidebarBg": "#f4f6f8"
+            }
+        },
+        {
+            "id": "emerald-mint",
+            "name": "Verde Orgánico",
+            "colors": {
+                "primary": "#1b3a24",
+                "accent": "#83a281",
+                "sidebarBg": "#f1f6f1"
+            }
+        },
+        {
+            "id": "chocolate-gold",
+            "name": "Chocolate y Crema",
+            "colors": {
+                "primary": "#422b1b",
+                "accent": "#d2b48c",
+                "sidebarBg": "#faf6f0"
+            }
+        },
+        {
+            "id": "graphite-coral",
+            "name": "Noche Urbana",
+            "colors": {
+                "primary": "#2d3033",
+                "accent": "#d9745b",
+                "sidebarBg": "#f4f4f5"
+            }
+        },
+        {
+            "id": "wine-champagne",
+            "name": "Ciruela y Champagne",
+            "colors": {
+                "primary": "#4a1e35",
+                "accent": "#d5bca9",
+                "sidebarBg": "#faf7f5"
+            }
+        }
+    ],
     "resourceLayouts": {
         "skills": "rating-stars",
         "languages": "progress-circular-dash-br"

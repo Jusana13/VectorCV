@@ -19,11 +19,11 @@ export function render(data) {
   // Formato del nombre completo en mayúsculas
   const fullName = `${data.personal.name || ''} ${data.personal.lastName || ''}`.toUpperCase();
   
-  // Barra lateral: "Habilidades Técnicas" (desde data.techSkills)
-  const techSkillsHTML = renderResource(data.techSkills, 'techSkills', data.resourceLayouts?.techSkills, colors);
-
-  // Barra lateral: "Competencias" (desde data.skills)
+  // Barra lateral: "Habilidades Técnicas" (desde data.skills)
   const skillsHTML = renderResource(data.skills, 'skills', data.resourceLayouts?.skills, colors);
+
+  // Barra lateral: "Competencias" (desde data.techSkills)
+  const techSkillsHTML = renderResource(data.techSkills, 'techSkills', data.resourceLayouts?.techSkills, colors);
 
   // Barra lateral: "Idiomas"
   const languagesHTML = renderResource(data.languages, 'languages', data.resourceLayouts?.languages, colors);
@@ -149,9 +149,9 @@ export function render(data) {
         
         <!-- Habilidades técnicas (barra lateral) -->
         <div class="sidebar-section">
-          <h3>${escapeHTML(data.sectionTitles?.techSkills || 'Habilidades Técnicas')}</h3>
+          <h3>${escapeHTML(data.sectionTitles?.skills || 'Habilidades Técnicas')}</h3>
           <div class="bullet-list-container">
-            ${techSkillsHTML}
+            ${skillsHTML}
           </div>
         </div>
 
@@ -165,9 +165,9 @@ export function render(data) {
 
         <!-- Competencias (barra lateral) -->
         <div class="sidebar-section">
-          <h3>${escapeHTML(data.sectionTitles?.skills || 'Competencias')}</h3>
+          <h3>${escapeHTML(data.sectionTitles?.techSkills || 'Competencias')}</h3>
           <div class="bullet-list-container">
-            ${skillsHTML}
+            ${techSkillsHTML}
           </div>
         </div>
       </aside>

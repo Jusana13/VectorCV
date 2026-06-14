@@ -17,21 +17,83 @@
         "sec-contact",
         "sec-experience",
         "sec-education",
-        "sec-tech-skills",
-        "sec-languages",
         "sec-skills",
+        "sec-languages",
+        "sec-tech-skills",
         "sec-design"
     ],
     "colors": {
         "primary": "Color Principal",
-        "accent": "Color de Acento",
+        "accent": "Color Secundario",
         "bgLight": "Fondo Claro"
     },
+    "skins": [
+        {
+            "id": "default",
+            "name": "Miel Artesanal (Defecto)",
+            "description": "Dorado cálido y tipografía oscura. Diseño gráfico, fotografía y artes visuales.",
+            "colors": {
+                "primary": "#222222",
+                "accent": "#f4b844",
+                "bgLight": "#fdf8ec"
+            }
+        },
+        {
+            "id": "coral-sunset",
+            "name": "Atardecer Coral",
+            "description": "Coral vibrante y grafito. Marketing, publicidad y comunicación visual.",
+            "colors": {
+                "primary": "#2b2d33",
+                "accent": "#e8705a",
+                "bgLight": "#fef3f0"
+            }
+        },
+        {
+            "id": "ocean-breeze",
+            "name": "Brisa Marina",
+            "description": "Azul cerúleo y arena. UX/UI, tecnología y startups digitales.",
+            "colors": {
+                "primary": "#1e3044",
+                "accent": "#4a9ec5",
+                "bgLight": "#eef6fb"
+            }
+        },
+        {
+            "id": "forest-moss",
+            "name": "Musgo del Bosque",
+            "description": "Verde bosque y terracota. Sostenibilidad, ecología y ONGs.",
+            "colors": {
+                "primary": "#2a3a2e",
+                "accent": "#6b9e5e",
+                "bgLight": "#f1f7ef"
+            }
+        },
+        {
+            "id": "plum-velvet",
+            "name": "Terciopelo Ciruela",
+            "description": "Púrpura profundo y rosa empolvado. Moda, lujo y editorial.",
+            "colors": {
+                "primary": "#35233a",
+                "accent": "#a867a0",
+                "bgLight": "#f8f0f7"
+            }
+        },
+        {
+            "id": "terracotta-clay",
+            "name": "Arcilla y Lino",
+            "description": "Terracota orgánico y lino natural. Arquitectura, interiorismo y artesanía.",
+            "colors": {
+                "primary": "#3b2e28",
+                "accent": "#c07a50",
+                "bgLight": "#faf4ee"
+            }
+        }
+    ],
     "sectionAliases": {
-        "skills": "Competencias"
+        "techSkills": "Competencias"
     },
     "singularAliases": {
-        "skills": "Competencia"
+        "techSkills": "Competencia"
     },
     "resourceLayouts": {
         "skills": "bullets-list",
